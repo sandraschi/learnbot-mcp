@@ -1,7 +1,7 @@
 [project]
 name = "learnbot-mcp"
-version = "0.1.0"
-description = "AI chatbot orchestrator - persona management, safety, multi-platform output"
+version = "0.3.0"
+description = "Language learning chatbot - persona management, safety, multi-platform output, robot control"
 requires-python = ">=3.12"
 dependencies = [
     "fastmcp>=3.4.2,<4",

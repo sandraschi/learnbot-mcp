@@ -154,8 +154,6 @@ async def proactive_tick() -> dict[str, Any]:
                 await db_conv.commit()
 
             resolved_prompt = prompt
-            if "{overdue_count}" in prompt:
-                resolved_prompt = prompt.replace("{overdue_count}", "3")
             if "{time_of_day}" in prompt:
                 resolved_prompt = prompt.replace(
                     "{time_of_day}",

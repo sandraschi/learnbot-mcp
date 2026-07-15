@@ -16,6 +16,7 @@ from learnbot_mcp.config import get_settings
 
 _READ_ONLY = {"readonly": True}
 _MUTATING: dict = {}
+_disclosed_convos: set[str] = set()
 
 log = logging.getLogger(__name__)
 cfg = get_settings()
@@ -200,10 +201,10 @@ async def chat_send(
     if requires_real_name_auth() and not user_id:
         return {"success": False, "error": "Real-name authentication required for this deployment."}
 
-    if not hasattr(chat_send, "_disclosed"):
+    if conversation_id not in _disclosed_convos:
         disc = disclosure_message()
         if disc:
-            chat_send._disclosed = True
+            _disclosed_convos.add(conversation_id)
             return {"success": True, "response": disc, "safety_verdict": "system"}
 
     # Safety check
@@ -285,10 +286,10 @@ async def chat_send(
         await db.execute(_CONV_ACTIVE, (stamp, conversation_id))
         await db.commit()
 
+    import re as _re
+
     # Speak via speech-mcp (fire-and-forget), strip emotion tags for display
     if persona and persona.get("voice"):
-        import re as _re
-
         from learnbot_mcp.platforms import speech_say
 
         _tags = _re.findall(

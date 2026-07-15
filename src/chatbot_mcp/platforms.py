@@ -12,7 +12,7 @@ from chatbot_mcp.config import get_settings
 log = logging.getLogger(__name__)
 
 
-async def speech_say(text: str, voice: str = "", provider: str = "") -> dict:
+async def speech_say(text: str, voice: str = "Kore", provider: str = "gemini") -> dict:
     """Speak text aloud. Tries speech-mcp first, falls back to Windows SAPI5.
 
     Calls ``POST /api/v1/tts`` on speech-mcp (port 10909).

@@ -465,9 +465,55 @@ async def chatbot_help() -> dict:
             "safety_rule_create, safety_rule_list, safety_rule_delete",
             "audit_query, platform_send",
             "vocab_quiz, vocab_submit, grammar_check, reading_passage",
+            "lesson_create, lesson_generate, lesson_list, lesson_get, lesson_update, lesson_delete, lesson_run",
+            "chat_proactive_tick",
         ],
         "message": "See SPEC.md for full documentation.",
     }
+
+
+@mcp.tool(annotations=_MUTATING)
+async def lesson_update(
+    lesson_id: int,
+    title: str = "",
+    level: str = "",
+    language: str = "",
+) -> dict:
+    """Update a lesson plan's title, level, or language."""
+    from learnbot_mcp.lessons import lesson_update as _lu
+
+    kwargs = {}
+    if title:
+        kwargs["title"] = title
+    if level:
+        kwargs["level"] = level
+    if language:
+        kwargs["language"] = language
+    return await _lu(lesson_id=lesson_id, **kwargs)
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def lesson_get(lesson_id: int) -> dict:
+    """Get a lesson plan by ID with full content."""
+    from learnbot_mcp.lessons import lesson_get as _lg
+
+    return await _lg(lesson_id=lesson_id)
+
+
+@mcp.tool(annotations=_MUTATING)
+async def lesson_delete(lesson_id: int) -> dict:
+    """Delete a lesson plan."""
+    from learnbot_mcp.lessons import lesson_delete as _ld
+
+    return await _ld(lesson_id=lesson_id)
+
+
+@mcp.tool(annotations=_MUTATING)
+async def lesson_run(lesson_id: int, conversation_id: str) -> dict:
+    """Execute a lesson plan through an active conversation."""
+    from learnbot_mcp.lessons import lesson_run as _lr
+
+    return await _lr(lesson_id=lesson_id, conversation_id=conversation_id)
 
 
 @mcp.tool(annotations=_MUTATING)

@@ -64,7 +64,7 @@ async def vocab_quiz(
     quiz = []
     for item in due_items:
         word = item["word"]
-        reading = item.get("reading", "") or ""
+        reading = item["reading"] if item["reading"] else ""
         correct = item["definition"]
         # Generate distractors via LLM
         distractors = await _generate_distractors(word, correct, source_lang, target_lang, count=3)
@@ -193,7 +193,7 @@ async def _generate_distractors(
     """Generate plausible wrong answers for a vocabulary item."""
     prompt = (
         f"Generate {count} plausible but incorrect {tgt} translations for the {src} word '{word}'. "
-        "The correct answer is '{correct}'. Return only a JSON array of strings, nothing else."
+        f"The correct answer is '{correct}'. Return only a JSON array of strings, nothing else."
     )
     try:
         result = await chat_completion(

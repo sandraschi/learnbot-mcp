@@ -1,8 +1,32 @@
 # Changelog
 
-## [0.3.0] — 2026-07-15
+## [0.4.0] — 2026-07-15
 
 ### Added
+- Lesson depot — create, generate, list, update, delete, run lesson plans
+- AI lesson generator — full curriculum from a title (sections, vocab, quiz questions)
+- Lesson runner — injects lesson into conversation flow
+- Vocab quiz with spaced repetition (SM-2 algorithm)
+- Grammar check tool (LLM-based sentence correction)
+- Reading passage generator (JLPT-graded)
+- Lesson management page in webapp (generate, view, delete)
+- Demo runner page (5 clickable demos + Run All)
+- Soundscape module (emotion → SFX via yahboom-mcp audio + buzzer)
+- 23 smoke tests + 4 lesson CRUD tests
+- Centralized emotion tags (TAG_PATTERN constant, imported everywhere)
+
+### Fixed
+- `_re` NameError crash on voiceless personas (hoisted import)
+- Per-conversation disclosure tracking (global set → per-conversation set)
+- `item.get()` crash on `sqlite3.Row` in vocab_quiz
+- Missing `f` prefix on f-string in `_generate_distractors` (LLM received literal `{correct}`)
+- `lesson_update` MCP tool missing from server.py registration
+
+### Changed
+- Emotion tag regex consolidated into `robot_orchestrator.TAG_PATTERN` (single source of truth)
+- Version bumped to 0.4.0
+
+## [0.3.0] — 2026-07-15
 - Robot orchestrator — emotion tags mapped to Boomy (yahboom-mcp) motion, LED, camera sequences
 - 12 emotion→action mappings with fire-and-forget async execution
 - `robot_stop_all()` emergency stop function

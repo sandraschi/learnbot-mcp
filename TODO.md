@@ -13,12 +13,15 @@
 - [ ] **Conversation export** — full .txt/.json download with metadata
 - [ ] **Error audit logging** — all API error responses logged with traceback
 
-## P2 — Learnbot tools
+## P2 — Learnbot tools (in progress)
 
-- [ ] `vocab_quiz` — spaced-repetition vocab from conversation context
-- [ ] `grammar_check` — LLM corrects learner's sentence, explains grammar
-- [ ] `reading_passage` — generate JLPT-graded text + comprehension questions
+- [x] `vocab_quiz` — spaced-repetition vocab from conversation context
+- [x] `grammar_check` — LLM corrects learner's sentence, explains grammar
+- [x] `reading_passage` — generate JLPT-graded text + comprehension questions
+- [ ] `lesson_generate` — ✅ DONE (AI generates full lesson from title)
+- [ ] `lesson_runner` — ✅ DONE (injects lesson into conversation)
 - [ ] `speaking_drill` — speech-mcp prompts, listens (STT), rates pronunciation
+- [ ] `writing_practice` — gimp-mcp renders learner text as annotated image
 
 ## P3 — Avatar & presence
 

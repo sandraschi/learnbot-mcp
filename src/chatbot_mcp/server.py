@@ -239,6 +239,13 @@ async def chat_send(
     persona = await get_persona(conv["persona_name"])
     system_prompt = persona["backstory"] if persona else "You are a helpful assistant."
 
+    _emo_tag_instr = (
+        "\n\nIMPORTANT: Prefix your response with ONE bracketed emotion tag that best matches your feeling. "  # noqa: E501
+        "Examples: [cheerfully] [sympathetically] [excited] [softly] [thoughtful] [playful] [serious] [warmly] [sad] [laughs] "  # noqa: E501
+        "The tag tells the voice synthesis how to speak. Do NOT use tags in short answers."
+    )
+    system_prompt = (system_prompt or "") + _emo_tag_instr
+
     from chatbot_mcp.llm_client import build_history, chat_completion
 
     async with get_db() as db:
@@ -272,15 +279,29 @@ async def chat_send(
         await db.execute(_CONV_ACTIVE, (stamp, conversation_id))
         await db.commit()
 
-    # Speak via speech-mcp if configured (fire-and-forget)
+    # Speak via speech-mcp (fire-and-forget), strip emotion tags for display
     if persona and persona.get("voice"):
+        import re as _re
+
         from chatbot_mcp.platforms import speech_say
 
-        speech_text = (response_text or "")[:2000]
-        _speech_voice = persona["voice"]
+        _tags = _re.findall(
+            r"\[(laughs|whispers|sighs|excited|sad|happy|cheerfully|softly|sympathetically|warmly|gently|dramatically|nervously|sarcastically|angry|serious|thoughtful|playful|warm|cold|formal|casual)\]",
+            response_text,
+        )
+        _speech_text = (response_text or "")[:2000]
+        if _tags:
+            _speech_text = f"[{_tags[0]}] {_speech_text}"[:2000]
         import asyncio
 
-        asyncio.create_task(speech_say(text=speech_text, voice=_speech_voice))
+        asyncio.create_task(speech_say(text=_speech_text, voice=persona["voice"]))
+
+    # Strip emotion tags from displayed response
+    response_text = _re.sub(
+        r"\[(laughs|whispers|sighs|excited|sad|happy|cheerfully|softly|sympathetically|warmly|gently|dramatically|nervously|sarcastically|angry|serious|thoughtful|playful|warm|cold|formal|casual)\]",
+        "",
+        response_text,
+    ).strip()
 
     return {"success": True, "response": response_text, "safety_verdict": "passed"}
 

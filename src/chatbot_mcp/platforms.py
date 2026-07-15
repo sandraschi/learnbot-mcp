@@ -1,4 +1,4 @@
-"""Platform bridges - speech-mcp TTS, Windows SAPI5 fallback, avatar-mcp, etc."""
+"""Platform bridges - speech-mcp TTS (default Gemini, fallback Windows SAPI5)."""
 
 from __future__ import annotations
 
@@ -12,22 +12,10 @@ from chatbot_mcp.config import get_settings
 log = logging.getLogger(__name__)
 
 
-async def speech_say(text: str, voice: str = "Kore", provider: str = "gemini") -> dict:
-    """Speak text aloud. Tries speech-mcp first, falls back to Windows SAPI5.
-
-    Calls ``POST /api/v1/tts`` on speech-mcp (port 10909).
-    If speech-mcp is unreachable, uses ``winsound.SND_ASYNC`` as a basic
-    fallback (Windows beep — minimal but confirms the pipeline works).
-    """
+async def _call_speech_mcp(payload: dict) -> dict:
+    """Call speech-mcp's POST /api/v1/tts. Returns response dict or None on failure."""
     cfg = get_settings()
     url = f"{cfg.speech_mcp_url.rstrip('/')}/api/v1/tts"
-    payload: dict = {"text": text[:2000]}
-    if voice:
-        payload["voice_id"] = voice
-    if provider:
-        payload["provider"] = provider
-
-    # Try speech-mcp
     try:
         async with httpx.AsyncClient(timeout=8.0) as client:
             resp = await client.post(url, json=payload)
@@ -40,12 +28,17 @@ async def speech_say(text: str, voice: str = "Kore", provider: str = "gemini") -
                     "voice": data.get("voice"),
                 }
             log.warning("Speech-mcp HTTP %s", resp.status_code)
+            return None
     except httpx.ConnectError:
-        log.info("Speech-mcp unreachable, trying Windows SAPI5")
+        log.info("Speech-mcp unreachable")
+        return None
     except Exception as e:
         log.warning("Speech-mcp error: %s", e)
+        return None
 
-    # Fallback: Windows SAPI5 via PowerShell (non-blocking)
+
+async def _sapi5_fallback(text: str) -> dict:
+    """Windows SAPI5 via PowerShell — last resort when speech-mcp is down."""
     try:
         safe = text[:500].replace('"', '\\"').replace("`", "\\`")
         ps_cmd = f'Add-Type -AssemblyName System.Speech; $s=New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.Speak("{safe}")'  # noqa: E501
@@ -57,11 +50,35 @@ async def speech_say(text: str, voice: str = "Kore", provider: str = "gemini") -
             stdout=asyncio.DEVNULL,
             stderr=asyncio.DEVNULL,
         )
-        log.info("Windows SAPI5 speech dispatched")
+        log.info("Windows SAPI5 dispatched")
         return {"success": True, "provider": "windows-sapi5", "voice": "default"}
     except Exception as e:
-        log.warning("Windows SAPI5 fallback failed: %s", e)
+        log.warning("SAPI5 failed: %s", e)
         return {"success": False, "error": str(e)}
+
+
+async def speech_say(text: str, voice: str = "Leda", provider: str = "gemini") -> dict:
+    """Speak text aloud. Tries Gemini via speech-mcp, falls back to Windows SAPI5.
+
+    Speech-mcp provider chain: gemini → windows (if gemini key missing) → SAPI5 (if speech-mcp down).
+    """  # noqa: E501
+    payload: dict = {"text": text[:2000], "voice_id": voice, "provider": provider}
+
+    # Try 1: Gemini via speech-mcp
+    result = await _call_speech_mcp(payload)
+    if result:
+        return result
+
+    # Try 2: Windows via speech-mcp (Gemini key missing or provider errored)
+    if provider != "windows":
+        log.info("Falling back to speech-mcp with provider=windows")
+        payload["provider"] = "windows"
+        result = await _call_speech_mcp(payload)
+        if result:
+            return result
+
+    # Try 3: Windows SAPI5 (speech-mcp entirely unreachable)
+    return await _sapi5_fallback(text)
 
 
 async def platform_send(
@@ -70,10 +87,7 @@ async def platform_send(
     platform: str,
     voice: str = "",
 ) -> dict:
-    """Send content to a specific platform bridge.
-
-    Supported platforms: ``speech``, ``opencode``, ``discord`` (future).
-    """
+    """Send content to a specific platform bridge."""
     if platform == "speech":
         return await speech_say(text=content, voice=voice)
     if platform == "opencode":

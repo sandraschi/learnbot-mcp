@@ -18,7 +18,44 @@ from starlette.staticfiles import StaticFiles
 from chatbot_mcp._version import __version__
 from chatbot_mcp.compliance import disclosure_message, refusal_templates, requires_real_name_auth
 from chatbot_mcp.config import get_settings
+from chatbot_mcp.platforms import speech_say
 from chatbot_mcp.proactive import proactive_tick
+
+# Gemini TTS voices with character descriptions (from speech-mcp)
+GEMINI_VOICES = [
+    {
+        "id": "Leda",
+        "gender": "female",
+        "desc": "Warm, friendly, youthful — good for cheerful assistants",
+    },
+    {"id": "Aoede", "gender": "female", "desc": "Soft, melodic — good for storytelling"},
+    {
+        "id": "Callirrhoe",
+        "gender": "female",
+        "desc": "Bright, energetic — good for upbeat responses",
+    },
+    {"id": "Autonoe", "gender": "female", "desc": "Calm, measured — good for thoughtful answers"},
+    {"id": "Despina", "gender": "female", "desc": "Smooth, professional — good for business"},
+    {"id": "Erinome", "gender": "female", "desc": "Gentle, soothing — good for comfort"},
+    {"id": "Laomedeia", "gender": "female", "desc": "Rich, warm — good for narration"},
+    {"id": "Iocaste", "gender": "female", "desc": "Clear, authoritative — good for presenting"},
+    {
+        "id": "Umbriel",
+        "gender": "female",
+        "desc": "Soft-spoken, intimate — good for close conversation",
+    },
+    {"id": "Kore", "gender": "neutral", "desc": "Balanced, all-purpose — good for general use"},
+    {"id": "Puck", "gender": "neutral", "desc": "Playful, mischievous — good for casual chat"},
+    {"id": "Algieba", "gender": "neutral", "desc": "Steady, reliable — safe default"},
+    {"id": "Algenib", "gender": "neutral", "desc": "Earnest, honest — good for serious topics"},
+    {"id": "Charon", "gender": "male", "desc": "Deep, resonant — good for authority figures"},
+    {"id": "Fenrir", "gender": "male", "desc": "Gruff, rough — good for pirates and warriors"},
+    {"id": "Orion", "gender": "male", "desc": "Bold, confident — good for heroes"},
+    {"id": "Orus", "gender": "male", "desc": "Warm baritone — good for mentors"},
+    {"id": "Zephyr", "gender": "male", "desc": "Light, airy — good for friendly banter"},
+    {"id": "Enceladus", "gender": "male", "desc": "Deep, booming — good for villains"},
+    {"id": "Rasalgethi", "gender": "male", "desc": "Grand, theatrical — good for dramatic effect"},
+]
 
 log = logging.getLogger(__name__)
 cfg = get_settings()
@@ -196,7 +233,10 @@ async def api_conversations_send(request: Request) -> JSONResponse:
             )  # noqa: E501
             history = build_history(await cur_hist.fetchall())
         history.append({"role": "user", "content": (redacted or content)[:4000]})
-        system = persona["backstory"] if persona else ""
+        system = (persona["backstory"] if persona else "") + (
+            "\n\nPrefix your response with ONE bracketed emotion tag matching your feeling. "
+            "Examples: [cheerfully] [sympathetically] [excited] [softly] [thoughtful] [playful] [serious] [warmly] [sad] [laughs]"  # noqa: E501
+        )
         response_text = ""
         try:
             result = await chat_completion(messages=history, system_prompt=system)
@@ -216,14 +256,24 @@ async def api_conversations_send(request: Request) -> JSONResponse:
             )  # noqa: E501
             await db.commit()
 
+        # Strip emotion tags from display, use them in TTS
+        import re as _re
+
+        _tag_pattern = r"\[(laughs|whispers|sighs|excited|sad|happy|cheerfully|softly|sympathetically|warmly|gently|dramatically|nervously|sarcastically|angry|serious|thoughtful|playful|warm|cold|formal|casual)\]"  # noqa: E501
+        _tags = _re.findall(_tag_pattern, response_text)
+        _display_text = _re.sub(_tag_pattern, "", response_text).strip()
+
         if persona and persona.get("voice"):
             import asyncio
 
             from chatbot_mcp.platforms import speech_say
 
-            asyncio.create_task(speech_say(text=response_text[:2000], voice=persona["voice"]))
+            _speech = _display_text[:1900]
+            if _tags:
+                _speech = f"[{_tags[0]}] {_speech}"
+            asyncio.create_task(speech_say(text=_speech[:2000], voice=persona["voice"]))
 
-        return JSONResponse({"response": response_text, "safety_verdict": "passed"})
+        return JSONResponse({"response": _display_text, "safety_verdict": "passed"})
     except Exception as e:
         _tb.print_exc()
         log.error("chat_send failed: %s", e, exc_info=True)
@@ -313,6 +363,20 @@ async def api_compliance(request: Request) -> JSONResponse:
     )
 
 
+async def api_voices(request: Request) -> JSONResponse:
+    """List available Gemini TTS voices with test-playback endpoint hint."""
+    return JSONResponse({"voices": GEMINI_VOICES, "count": len(GEMINI_VOICES)})
+
+
+async def api_voice_test(request: Request) -> JSONResponse:
+    """Test a voice by saying a sample phrase."""
+    body = await request.json()
+    voice_id = body.get("voice_id", "Leda")
+    text = body.get("text", "Hello! This is a voice test. How do I sound?")
+    result = await speech_say(text=text, voice=voice_id)
+    return JSONResponse(result)
+
+
 async def api_proactive_tick(request: Request) -> JSONResponse:
     result = await proactive_tick()
     return JSONResponse(result)
@@ -385,6 +449,8 @@ def build_app() -> Starlette:
         Route("/api/safety/rules", api_safety_rules_create, methods=["POST"]),
         Route("/api/safety/rules/{id}", api_safety_rule_delete, methods=["DELETE"]),
         Route("/api/compliance", api_compliance),
+        Route("/api/voices", api_voices),
+        Route("/api/voice/test", api_voice_test, methods=["POST"]),
         Route("/api/chat/proactive-tick", api_proactive_tick, methods=["POST"]),
         Route("/api/audit", api_audit_query),
     ]

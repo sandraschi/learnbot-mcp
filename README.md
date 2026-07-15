@@ -1,4 +1,4 @@
-# chatbot-mcp
+# learnbot-mcp
 
 AI chatbot orchestrator — define personas, run conversations with safety guardrails, speak via TTS, log everything.
 
@@ -6,9 +6,9 @@ AI chatbot orchestrator — define personas, run conversations with safety guard
 // opencode.json
 {
   "mcpServers": {
-    "chatbot-mcp": {
+    "learnbot-mcp": {
       "command": "uv",
-      "args": ["run", "--directory", "D:/Dev/repos/chatbot-mcp", "python", "-m", "chatbot_mcp"]
+      "args": ["run", "--directory", "D:/Dev/repos/learnbot-mcp", "python", "-m", "learnbot_mcp"]
     }
   }
 }
@@ -18,7 +18,7 @@ AI chatbot orchestrator — define personas, run conversations with safety guard
 
 ```bash
 uv sync              # install deps
-uv run python -m chatbot_mcp.api   # REST API on :11101
+uv run python -m learnbot_mcp.api   # REST API on :11101
 cd web_sota && bun run dev          # webapp on :11102
 ```
 
@@ -38,7 +38,7 @@ Or double-click `start.bat`.
 ## Architecture
 
 ```
-chatbot-mcp → local-llm-mcp / Ollama (LLM)
+learnbot-mcp → local-llm-mcp / Ollama (LLM)
             → speech-mcp / Windows SAPI5 (TTS)
             → SQLite (conversations, personas, audit)
             → React webapp (6 pages)

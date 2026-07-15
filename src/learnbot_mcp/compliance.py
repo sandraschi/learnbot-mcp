@@ -6,7 +6,7 @@ import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from chatbot_mcp.config import get_settings
+from learnbot_mcp.config import get_settings
 
 log = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ async def check_conversation_retention() -> dict[str, Any]:
     if cfg.regulatory_regime.lower() == "none":
         return {"success": True, "deleted": 0, "note": "No retention policy active"}
 
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     cutoff = (datetime.now(UTC) - retention_limit()).isoformat()
     async with get_db() as db:

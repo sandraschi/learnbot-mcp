@@ -1,4 +1,4 @@
-# chatbot-mcp - PRD
+# learnbot-mcp - PRD
 
 **Status**: Draft  
 **Date**: 2026-07-15  
@@ -14,7 +14,7 @@ One MCP server that lets you define a chatbot persona once, then spawn it across
 
 ## Scope
 
-### In scope (chatbot-mcp owns)
+### In scope (learnbot-mcp owns)
 
 - **Persona definition**: YAML/JSON schema - name, backstory, voice, avatar, behavioral constraints, knowledge base
 - **Conversation lifecycle**: spawn, run, hibernate, destroy - state persisted to SQLite
@@ -38,7 +38,7 @@ One MCP server that lets you define a chatbot persona once, then spawn it across
 3. As Sandra, all conversations are logged with timestamps and can be audited.
 4. As Sandra, the bot refuses topics I configure (gore, politics, etc.) with configurable refusal messages.
 5. As Sandra, the bot can proactively start a conversation ("Good morning, your TBR pile has 3 items due").
-6. As a fleet user, I deploy chatbot-mcp in China-compliant mode - real-name auth, 30-day retention, topic blocklist.
+6. As a fleet user, I deploy learnbot-mcp in China-compliant mode - real-name auth, 30-day retention, topic blocklist.
 
 ## Success Metrics
 

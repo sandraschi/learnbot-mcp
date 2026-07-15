@@ -15,7 +15,7 @@ Get-NetTCPConnection -LocalPort $FrontendPort -ErrorAction SilentlyContinue |
 $BackendJob = Start-Job -Name "chatbot-backend" -ScriptBlock {
     param($Root)
     Set-Location $Root
-    uv run python -m chatbot_mcp.api
+    uv run python -m learnbot_mcp.api
 } -ArgumentList $Root
 
 # Readiness poll
@@ -36,7 +36,7 @@ if (-not $NoFrontend) {
     if (-not $Headless) { Start-Process "http://127.0.0.1:$FrontendPort" }
 }
 
-Write-Host "chatbot-mcp running:"
+Write-Host "learnbot-mcp running:"
 Write-Host "  Backend API: http://127.0.0.1:$BackendPort"
 Write-Host "  Frontend:    http://127.0.0.1:$FrontendPort"
 

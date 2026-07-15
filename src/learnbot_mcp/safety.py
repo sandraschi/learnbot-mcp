@@ -8,7 +8,7 @@ import time
 from collections import defaultdict
 from typing import Any
 
-from chatbot_mcp.config import get_settings
+from learnbot_mcp.config import get_settings
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ async def check_safety(content: str, user_id: str) -> dict[str, Any]:
             "user_id": user_id,
         }
 
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     async with get_db() as db:
         cur = await db.execute("SELECT topic, action, message FROM safety_rules WHERE enabled=1")

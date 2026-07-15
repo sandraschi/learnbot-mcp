@@ -1,4 +1,4 @@
-# chatbot-mcp - Full Reference
+# learnbot-mcp - Full Reference
 
 AI chatbot orchestrator - persona management, conversation lifecycle, safety guardrails, multi-platform output (speech, opencode, future: discord, resonite, avatar).
 
@@ -45,7 +45,7 @@ AI chatbot orchestrator - persona management, conversation lifecycle, safety gua
 ## Architecture
 
 ```
-chatbot-mcp (orchestrator)
+learnbot-mcp (orchestrator)
   ├── Persona CRUD → SQLite
   ├── Conversation lifecycle → SQLite
   ├── Safety rules (topic blocking, rate limiting, PII redaction)
@@ -66,10 +66,10 @@ Every incoming message flows through rate limiter → topic rules → PII redact
 ## Config (.env)
 
 ```
-CHATBOT_REGULATORY_REGIME=none|china|eu
-CHATBOT_LLM_BASE_URL=http://127.0.0.1:10832
-CHATBOT_SPEECH_MCP_URL=http://127.0.0.1:10908
-CHATBOT_RATE_LIMIT=30
+LEARNBOT_REGULATORY_REGIME=none|china|eu
+LEARNBOT_LLM_BASE_URL=http://127.0.0.1:10832
+LEARNBOT_SPEECH_MCP_URL=http://127.0.0.1:10908
+LEARNBOT_RATE_LIMIT=30
 BACKEND_PORT=11101
 FRONTEND_PORT=11102
 ```

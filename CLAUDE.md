@@ -1,4 +1,4 @@
-## Session Context (ChatBot MCP)
+## Session Context (LearnBot MCP)
 
 You have access to a chatbot orchestrator with persona management, conversation lifecycle, safety guardrails, and multi-platform output (speech, opencode).
 

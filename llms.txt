@@ -1,4 +1,4 @@
-# chatbot-mcp
+# learnbot-mcp
 
 AI chatbot orchestrator - persona management, conversation lifecycle, safety guardrails, multi-platform output (speech, opencode).
 

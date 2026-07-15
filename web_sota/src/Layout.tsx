@@ -30,7 +30,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       >
         <div className="flex items-center gap-2 p-3 border-b border-zinc-800">
           <Bot className="w-6 h-6 text-amber-500 shrink-0" />
-          {!collapsed && <span className="font-semibold text-sm">ChatBot MCP</span>}
+          {!collapsed && <span className="font-semibold text-sm">LearnBot MCP</span>}
         </div>
         <nav className="flex-1 p-2 space-y-1">
           {nav.map(({ to, icon: Icon, label }) => (

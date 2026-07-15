@@ -7,7 +7,7 @@ import pytest
 
 @pytest.fixture(autouse=True)
 async def auto_db():
-    from chatbot_mcp.database import clear_db_init_guard, close_db_pool, init_db
+    from learnbot_mcp.database import clear_db_init_guard, close_db_pool, init_db
 
     await init_db()
     yield
@@ -17,7 +17,7 @@ async def auto_db():
 
 @pytest.mark.asyncio
 async def test_create_and_get_persona():
-    from chatbot_mcp.database import get_persona, list_personas, upsert_persona
+    from learnbot_mcp.database import get_persona, list_personas, upsert_persona
 
     result = await upsert_persona(
         {
@@ -39,7 +39,7 @@ async def test_create_and_get_persona():
 
 @pytest.mark.asyncio
 async def test_delete_persona():
-    from chatbot_mcp.database import delete_persona, get_persona, upsert_persona
+    from learnbot_mcp.database import delete_persona, get_persona, upsert_persona
 
     await upsert_persona({"name": "delete-me", "display_name": "Delete Me", "backstory": ""})
     assert await get_persona("delete-me") is not None

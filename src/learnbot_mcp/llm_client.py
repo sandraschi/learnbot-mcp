@@ -7,7 +7,7 @@ from typing import Any
 
 import httpx
 
-from chatbot_mcp.config import get_settings
+from learnbot_mcp.config import get_settings
 
 log = logging.getLogger(__name__)
 

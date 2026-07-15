@@ -8,8 +8,8 @@ interface Msg {
   ts: string;
 }
 
-const STORAGE_KEY = "chatbot-mcp-chat-history";
-const PERSONALITY_KEY = "chatbot-mcp-chat-personality";
+const STORAGE_KEY = "learnbot-mcp-chat-history";
+const PERSONALITY_KEY = "learnbot-mcp-chat-personality";
 
 export function Chat() {
   const [msgs, setMsgs] = useState<Msg[]>(() => {
@@ -78,7 +78,7 @@ export function Chat() {
     const blob = new Blob([txt], { type: "text/plain" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `chatbot-mcp-chat-${Date.now()}.txt`;
+    a.download = `learnbot-mcp-chat-${Date.now()}.txt`;
     a.click();
   };
 

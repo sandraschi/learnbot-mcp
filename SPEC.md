@@ -1,4 +1,4 @@
-# chatbot-mcp - Architecture Specification
+# learnbot-mcp - Architecture Specification
 
 **Version**: 0.1.0-draft  
 **Status**: draft  
@@ -7,7 +7,7 @@
 ## Architecture Overview
 
 ```
-chatbot-mcp (orchestrator)
+learnbot-mcp (orchestrator)
     │
     ├── MCP tools: persona CRUD, chat lifecycle, safety config, audit
     ├── Starlette REST: /api/health, /api/chat, /api/personas
@@ -143,7 +143,7 @@ user message
 - Opt-out: user can delete all conversation data
 - Provider attribution: which LLM model was used per turn
 
-Config via `.env`: `CHATBOT_REGULATORY_REGIME=china|eu|none`
+Config via `.env`: `LEARNBOT_REGULATORY_REGIME=china|eu|none`
 
 ## Deployment
 
@@ -151,9 +151,9 @@ Config via `.env`: `CHATBOT_REGULATORY_REGIME=china|eu|none`
 # opencode.json
 {
   "mcpServers": {
-    "chatbot-mcp": {
+    "learnbot-mcp": {
       "command": "uv",
-      "args": ["run", "--directory", "D:/Dev/repos/chatbot-mcp", "python", "-m", "chatbot_mcp"]
+      "args": ["run", "--directory", "D:/Dev/repos/learnbot-mcp", "python", "-m", "learnbot_mcp"]
     }
   }
 }

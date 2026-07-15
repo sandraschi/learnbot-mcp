@@ -11,8 +11,8 @@ from typing import Any
 from fastmcp.server.lifespan import lifespan
 from fastmcp.server.server import FastMCP
 
-from chatbot_mcp._version import __version__
-from chatbot_mcp.config import get_settings
+from learnbot_mcp._version import __version__
+from learnbot_mcp.config import get_settings
 
 _READ_ONLY = {"readonly": True}
 _MUTATING: dict = {}
@@ -26,12 +26,12 @@ _CONV_ACTIVE = "UPDATE conversations SET turn_count=turn_count+1, updated_at=? W
 
 @lifespan
 async def _lifespan(_server):
-    from chatbot_mcp.database import close_db_pool, init_db
+    from learnbot_mcp.database import close_db_pool, init_db
 
     await init_db()
-    log.info("chatbot-mcp startup: DB ready")
+    log.info("learnbot-mcp startup: DB ready")
 
-    from chatbot_mcp.compliance import check_conversation_retention
+    from learnbot_mcp.compliance import check_conversation_retention
 
     retention = await check_conversation_retention()
     if retention.get("deleted", 0) > 0:
@@ -41,7 +41,7 @@ async def _lifespan(_server):
         yield {}
     finally:
         await close_db_pool()
-        log.info("chatbot-mcp shutdown: DB closed")
+        log.info("learnbot-mcp shutdown: DB closed")
 
 
 mcp = FastMCP(
@@ -75,7 +75,7 @@ async def persona_create(
     ## Examples
     persona_create(name="miko", display_name="Miko-chan", backstory="A friendly assistant...")
     """
-    from chatbot_mcp.database import upsert_persona
+    from learnbot_mcp.database import upsert_persona
 
     persona = {
         "name": name,
@@ -105,7 +105,7 @@ async def persona_get(name: str) -> dict:
     ## Return Format
     {"success": bool, "persona": {...} or None}
     """
-    from chatbot_mcp.database import get_persona
+    from learnbot_mcp.database import get_persona
 
     p = await get_persona(name)
     return {"success": p is not None, "persona": p}
@@ -118,7 +118,7 @@ async def persona_list() -> dict:
     ## Return Format
     {"success": bool, "personas": [...], "count": int}
     """
-    from chatbot_mcp.database import list_personas
+    from learnbot_mcp.database import list_personas
 
     personas = await list_personas()
     return {"success": True, "personas": personas, "count": len(personas)}
@@ -131,7 +131,7 @@ async def persona_delete(name: str) -> dict:
     ## Return Format
     {"success": bool, "deleted": bool}
     """
-    from chatbot_mcp.database import delete_persona
+    from learnbot_mcp.database import delete_persona
 
     deleted = await delete_persona(name)
     return {"success": deleted, "deleted": deleted}
@@ -151,7 +151,7 @@ async def chat_start(
     ## Examples
     chat_start(persona="miko", platform="resonite", user_id="sandra")
     """
-    from chatbot_mcp.database import get_db, get_persona
+    from learnbot_mcp.database import get_db, get_persona
 
     existing = await get_persona(persona)
     if not existing:
@@ -182,8 +182,8 @@ async def chat_send(
     ## Examples
     chat_send(conversation_id="abc123", content="Hello!")
     """
-    from chatbot_mcp.database import get_db, get_persona
-    from chatbot_mcp.safety import check_safety
+    from learnbot_mcp.database import get_db, get_persona
+    from learnbot_mcp.safety import check_safety
 
     async with get_db() as db:
         cur = await db.execute("SELECT * FROM conversations WHERE id=?", (conversation_id,))
@@ -195,7 +195,7 @@ async def chat_send(
         return {"success": False, "error": f"Conversation is {conv['state']}"}
 
     # Compliance check (regulatory regime)
-    from chatbot_mcp.compliance import disclosure_message, requires_real_name_auth
+    from learnbot_mcp.compliance import disclosure_message, requires_real_name_auth
 
     if requires_real_name_auth() and not user_id:
         return {"success": False, "error": "Real-name authentication required for this deployment."}
@@ -252,7 +252,7 @@ async def chat_send(
     )
     system_prompt = (system_prompt or "") + _emo_tag_instr
 
-    from chatbot_mcp.llm_client import build_history, chat_completion
+    from learnbot_mcp.llm_client import build_history, chat_completion
 
     async with get_db() as db:
         cur = await db.execute(
@@ -289,7 +289,7 @@ async def chat_send(
     if persona and persona.get("voice"):
         import re as _re
 
-        from chatbot_mcp.platforms import speech_say
+        from learnbot_mcp.platforms import speech_say
 
         _tags = _re.findall(
             r"\[(laughs|whispers|sighs|excited|sad|happy|cheerfully|softly|sympathetically|warmly|gently|dramatically|nervously|sarcastically|angry|serious|thoughtful|playful|warm|cold|formal|casual)\]",
@@ -315,7 +315,7 @@ async def chat_send(
 @mcp.tool(annotations=_MUTATING)
 async def chat_hibernate(conversation_id: str) -> dict:
     """Pause a conversation. State is preserved for later resume."""
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     stamp = datetime.now(UTC).isoformat()
     async with get_db() as db:
@@ -330,7 +330,7 @@ async def chat_hibernate(conversation_id: str) -> dict:
 @mcp.tool(annotations=_MUTATING)
 async def chat_resume(conversation_id: str) -> dict:
     """Resume a hibernated conversation."""
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     stamp = datetime.now(UTC).isoformat()
     async with get_db() as db:
@@ -345,7 +345,7 @@ async def chat_resume(conversation_id: str) -> dict:
 @mcp.tool(annotations=_MUTATING)
 async def chat_destroy(conversation_id: str) -> dict:
     """Permanently delete a conversation and all its turns."""
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     async with get_db() as db:
         await db.execute("DELETE FROM turns WHERE conversation_id=?", (conversation_id,))
@@ -361,7 +361,7 @@ async def chat_list(state_filter: str = "") -> dict:
     ## Return Format
     {"success": bool, "conversations": [...], "count": int}
     """
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     async with get_db() as db_cl:
         if state_filter:
@@ -382,7 +382,7 @@ async def safety_rule_create(topic: str, action: str = "refuse", message: str = 
     ## Return Format
     {"success": bool, "id": int}
     """
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     async with get_db() as db:
         cur = await db.execute(
@@ -396,7 +396,7 @@ async def safety_rule_create(topic: str, action: str = "refuse", message: str = 
 @mcp.tool(annotations=_READ_ONLY)
 async def safety_rule_list() -> dict:
     """List all safety rules."""
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     async with get_db() as db_sr:
         cur = await db_sr.execute("SELECT * FROM safety_rules ORDER BY topic")
@@ -407,7 +407,7 @@ async def safety_rule_list() -> dict:
 @mcp.tool(annotations=_MUTATING)
 async def safety_rule_delete(rule_id: int) -> dict:
     """Delete a safety rule by ID."""
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     async with get_db() as db:
         cur = await db.execute("DELETE FROM safety_rules WHERE id=?", (rule_id,))
@@ -424,7 +424,7 @@ async def audit_query(
     ## Return Format
     {"success": bool, "turns": [...], "count": int}
     """
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     conditions: list[str] = []
     params: list[Any] = []
@@ -452,7 +452,7 @@ async def audit_query(
 
 @mcp.tool(annotations=_READ_ONLY)
 async def chatbot_help() -> dict:
-    """Show all available chatbot-mcp tools and usage."""
+    """Show all available learnbot-mcp tools and usage."""
     return {
         "success": True,
         "tools": [
@@ -480,7 +480,7 @@ async def platform_send(
     ## Examples
     platform_send(conversation_id="abc123", content="Hello!", platform="speech", voice="heart")
     """
-    from chatbot_mcp.platforms import platform_send as _send
+    from learnbot_mcp.platforms import platform_send as _send
 
     return await _send(
         conversation_id=conversation_id, content=content, platform=platform, voice=voice
@@ -497,12 +497,12 @@ async def chat_proactive_tick() -> dict:
     ## Return Format
     {"success": bool, "triggered": [...], "count": int}
     """
-    from chatbot_mcp.proactive import proactive_tick
+    from learnbot_mcp.proactive import proactive_tick
 
     return await proactive_tick()
 
 
 def main():
-    from chatbot_mcp.server import mcp
+    from learnbot_mcp.server import mcp
 
     mcp.run(transport="stdio")

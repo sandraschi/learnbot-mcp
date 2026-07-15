@@ -1,8 +1,8 @@
-# AGENTS.md - chatbot-mcp
+# AGENTS.md - learnbot-mcp
 
 ## Identity
 
-- **Name**: chatbot-mcp
+- **Name**: learnbot-mcp
 - **Purpose**: AI chatbot orchestrator - persona management, conversation lifecycle, safety guardrails, multi-platform output (Resonite, Discord, web, TTS)
 - **Owner**: Sandra Schipal, Vienna
 - **Ports**: Backend 11101, Frontend 11102
@@ -10,7 +10,7 @@
 ## Architecture
 
 ```
-chatbot-mcp (orchestrator)
+learnbot-mcp (orchestrator)
   ├── Persona CRUD (create, read, list, delete)
   ├── Conversation lifecycle (start, send, hibernate, resume, destroy)
   ├── Safety rules (topic-based blocking, rate limiting, PII redaction)
@@ -28,10 +28,10 @@ chatbot-mcp (orchestrator)
 
 | File | Purpose |
 |------|---------|
-| `src/chatbot_mcp/server.py` | MCP tool registrations |
-| `src/chatbot_mcp/database.py` | Schema + CRUD (aiosqlite) |
-| `src/chatbot_mcp/safety.py` | Safety guardrails |
-| `src/chatbot_mcp/config.py` | Settings (pydantic-settings) |
+| `src/learnbot_mcp/server.py` | MCP tool registrations |
+| `src/learnbot_mcp/database.py` | Schema + CRUD (aiosqlite) |
+| `src/learnbot_mcp/safety.py` | Safety guardrails |
+| `src/learnbot_mcp/config.py` | Settings (pydantic-settings) |
 | `SPEC.md` | Architecture specification |
 | `PRD.md` | Product requirements |
 

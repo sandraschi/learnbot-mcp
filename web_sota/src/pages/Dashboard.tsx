@@ -66,7 +66,7 @@ export function Dashboard() {
         <KpiCard icon={Activity} label="Uptime" value={`${Math.floor((health.uptime_seconds ?? 0) / 3600)}h`} testid="kpi-uptime" />
       </div>
       <div className="mt-4 text-sm text-zinc-600">
-        chatbot-mcp v{health.version} &middot; {err && <span className="text-red-400">{err}</span>}
+        learnbot-mcp v{health.version} &middot; {err && <span className="text-red-400">{err}</span>}
       </div>
       <div className="mt-8" data-testid="dashboard" />
     </div>

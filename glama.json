@@ -1,7 +1,7 @@
 {
-  "name": "chatbot-mcp",
+  "name": "learnbot-mcp",
   "description": "AI chatbot orchestrator - persona management, conversation lifecycle, safety guardrails, multi-platform output",
-  "repository": "https://github.com/sandraschi/chatbot-mcp",
+  "repository": "https://github.com/sandraschi/learnbot-mcp",
   "server_type": "python",
   "framework": "FastMCP 3.4+",
   "tools": {

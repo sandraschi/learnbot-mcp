@@ -99,7 +99,7 @@ async def proactive_tick() -> dict[str, Any]:
 
     Returns summary of triggered conversations.
     """
-    from chatbot_mcp.database import get_db, get_persona
+    from learnbot_mcp.database import get_db, get_persona
 
     triggered: list[dict[str, Any]] = []
 
@@ -162,7 +162,7 @@ async def proactive_tick() -> dict[str, Any]:
                     "morning" if datetime.now(UTC).hour < 12 else "afternoon",
                 )
 
-            from chatbot_mcp.server import chat_send
+            from learnbot_mcp.server import chat_send
 
             try:
                 result = await chat_send.__wrapped__(

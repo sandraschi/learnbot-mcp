@@ -5,7 +5,7 @@ const ZOOM_LEVELS = [0.8, 1.0, 1.25, 1.5, 2.0, 3.0];
 export function useZoom() {
   const [zoomIndex, setZoomIndex] = useState(() => {
     try {
-      const saved = localStorage.getItem("chatbot-mcp-zoom");
+      const saved = localStorage.getItem("learnbot-mcp-zoom");
       return saved ? ZOOM_LEVELS.indexOf(parseFloat(saved)) : 0;
     } catch {
       return 0;
@@ -13,7 +13,7 @@ export function useZoom() {
   });
 
   const applyZoom = useCallback((level: number) => {
-    localStorage.setItem("chatbot-mcp-zoom", String(level));
+    localStorage.setItem("learnbot-mcp-zoom", String(level));
     document.documentElement.style.zoom = String(level);
   }, []);
 
@@ -32,7 +32,7 @@ export function useZoom() {
     };
     window.addEventListener("wheel", handler, { passive: false });
 
-    const saved = localStorage.getItem("chatbot-mcp-zoom");
+    const saved = localStorage.getItem("learnbot-mcp-zoom");
     if (saved) applyZoom(parseFloat(saved));
 
     return () => window.removeEventListener("wheel", handler);

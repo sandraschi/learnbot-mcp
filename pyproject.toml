@@ -1,5 +1,5 @@
 [project]
-name = "chatbot-mcp"
+name = "learnbot-mcp"
 version = "0.1.0"
 description = "AI chatbot orchestrator - persona management, safety, multi-platform output"
 requires-python = ">=3.12"

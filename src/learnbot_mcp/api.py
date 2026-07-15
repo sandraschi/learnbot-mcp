@@ -15,11 +15,11 @@ from starlette.responses import HTMLResponse, JSONResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
-from chatbot_mcp._version import __version__
-from chatbot_mcp.compliance import disclosure_message, refusal_templates, requires_real_name_auth
-from chatbot_mcp.config import get_settings
-from chatbot_mcp.platforms import speech_say
-from chatbot_mcp.proactive import proactive_tick
+from learnbot_mcp._version import __version__
+from learnbot_mcp.compliance import disclosure_message, refusal_templates, requires_real_name_auth
+from learnbot_mcp.config import get_settings
+from learnbot_mcp.platforms import speech_say
+from learnbot_mcp.proactive import proactive_tick
 
 # Gemini TTS voices with character descriptions (from speech-mcp)
 GEMINI_VOICES = [
@@ -64,7 +64,7 @@ _START_TIME = datetime.now(UTC)
 
 
 async def api_health(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     uptime = (datetime.now(UTC) - _START_TIME).total_seconds()
     try:
@@ -104,14 +104,14 @@ async def api_diagnostics(request: Request) -> JSONResponse:
 
 
 async def api_personas_list(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import list_personas
+    from learnbot_mcp.database import list_personas
 
     personas = await list_personas()
     return JSONResponse({"personas": personas, "count": len(personas)})
 
 
 async def api_personas_create(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import upsert_persona
+    from learnbot_mcp.database import upsert_persona
 
     body = await request.json()
     created = await upsert_persona(
@@ -132,7 +132,7 @@ async def api_personas_create(request: Request) -> JSONResponse:
 
 
 async def api_persona_get(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import get_persona
+    from learnbot_mcp.database import get_persona
 
     p = await get_persona(request.path_params["name"])
     if not p:
@@ -141,14 +141,14 @@ async def api_persona_get(request: Request) -> JSONResponse:
 
 
 async def api_persona_delete(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import delete_persona
+    from learnbot_mcp.database import delete_persona
 
     deleted = await delete_persona(request.path_params["name"])
     return JSONResponse({"success": deleted})
 
 
 async def api_conversations_list(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     state = request.query_params.get("state", "")
     async with get_db() as db_conv:
@@ -163,7 +163,7 @@ async def api_conversations_list(request: Request) -> JSONResponse:
 
 
 async def api_conversations_create(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     body = await request.json()
     persona = body.get("persona", "")
@@ -183,7 +183,7 @@ async def api_conversations_create(request: Request) -> JSONResponse:
 async def api_conversations_send(request: Request) -> JSONResponse:
     import traceback as _tb
 
-    from chatbot_mcp.database import get_db, get_persona
+    from learnbot_mcp.database import get_db, get_persona
 
     try:
         body = await request.json()
@@ -198,7 +198,7 @@ async def api_conversations_send(request: Request) -> JSONResponse:
         if conv["state"] != "active":
             return JSONResponse({"error": f"Conversation is {conv['state']}"}, status_code=400)
 
-        from chatbot_mcp.safety import check_safety
+        from learnbot_mcp.safety import check_safety
 
         safety = await check_safety(content, user_id)
         turn_id = str(uuid.uuid4())[:12]
@@ -224,7 +224,7 @@ async def api_conversations_send(request: Request) -> JSONResponse:
             await db.commit()
 
         persona = await get_persona(conv["persona_name"])
-        from chatbot_mcp.llm_client import build_history, chat_completion
+        from learnbot_mcp.llm_client import build_history, chat_completion
 
         async with get_db() as db_hist:
             cur_hist = await db_hist.execute(
@@ -266,7 +266,7 @@ async def api_conversations_send(request: Request) -> JSONResponse:
         if persona and persona.get("voice"):
             import asyncio
 
-            from chatbot_mcp.platforms import speech_say
+            from learnbot_mcp.platforms import speech_say
 
             _speech = _display_text[:1900]
             if _tags:
@@ -281,7 +281,7 @@ async def api_conversations_send(request: Request) -> JSONResponse:
 
 
 async def api_conversation_hibernate(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     stamp = datetime.now(UTC).isoformat()
     async with get_db() as db:
@@ -294,7 +294,7 @@ async def api_conversation_hibernate(request: Request) -> JSONResponse:
 
 
 async def api_conversation_resume(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     stamp = datetime.now(UTC).isoformat()
     async with get_db() as db:
@@ -307,7 +307,7 @@ async def api_conversation_resume(request: Request) -> JSONResponse:
 
 
 async def api_conversation_delete(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     cid = request.path_params["id"]
     async with get_db() as db:
@@ -318,7 +318,7 @@ async def api_conversation_delete(request: Request) -> JSONResponse:
 
 
 async def api_safety_rules_list(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     async with get_db() as db_sr:
         cur = await db_sr.execute("SELECT * FROM safety_rules ORDER BY topic")
@@ -327,7 +327,7 @@ async def api_safety_rules_list(request: Request) -> JSONResponse:
 
 
 async def api_safety_rules_create(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     body = await request.json()
     async with get_db() as db:
@@ -340,7 +340,7 @@ async def api_safety_rules_create(request: Request) -> JSONResponse:
 
 
 async def api_safety_rule_delete(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     async with get_db() as db:
         cur = await db.execute(
@@ -383,7 +383,7 @@ async def api_proactive_tick(request: Request) -> JSONResponse:
 
 
 async def api_audit_query(request: Request) -> JSONResponse:
-    from chatbot_mcp.database import get_db
+    from learnbot_mcp.database import get_db
 
     try:
         user_id = request.query_params.get("user_id", "")
@@ -473,7 +473,7 @@ def run_rest() -> None:
     import uvicorn
 
     app = build_app()
-    log.info("chatbot-mcp REST API on port %s", cfg.backend_port)
+    log.info("learnbot-mcp REST API on port %s", cfg.backend_port)
     uvicorn.run(app, host="0.0.0.0", port=cfg.backend_port, log_level="info")
 
 

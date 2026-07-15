@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from chatbot_mcp.llm_client import build_history
+from learnbot_mcp.llm_client import build_history
 
 
 def test_build_history_empty():

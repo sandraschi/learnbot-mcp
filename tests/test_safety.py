@@ -7,7 +7,7 @@ import pytest
 
 @pytest.mark.asyncio
 async def test_rate_limit():
-    from chatbot_mcp.safety import _rate_limit
+    from learnbot_mcp.safety import _rate_limit
 
     # Should pass for a new user
     assert _rate_limit("test-user") is True
@@ -15,7 +15,7 @@ async def test_rate_limit():
 
 @pytest.mark.asyncio
 async def test_check_topics():
-    from chatbot_mcp.safety import _check_topics
+    from learnbot_mcp.safety import _check_topics
 
     rules = [
         {"topic": "politics", "action": "refuse", "message": "I avoid politics."},
@@ -31,7 +31,7 @@ async def test_check_topics():
 
 @pytest.mark.asyncio
 async def test_pii_redaction():
-    from chatbot_mcp.safety import _check_pii_redaction
+    from learnbot_mcp.safety import _check_pii_redaction
 
     result = _check_pii_redaction("My email is sandra@example.com")
     assert result["redacted"] is True

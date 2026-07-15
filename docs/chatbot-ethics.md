@@ -87,9 +87,9 @@ Most of the world has no chatbot-specific regulation. The companion bot industry
 
 ## What This Server Does About It
 
-This server (`chatbot-mcp`) implements:
+This server (`learnbot-mcp`) implements:
 
-1. **Configurable regulatory regime** — `CHATBOT_REGULATORY_REGIME=none|china|eu`
+1. **Configurable regulatory regime** — `LEARNBOT_REGULATORY_REGIME=none|china|eu`
 2. **Real-name auth** — gate conversations on verified identity
 3. **Safety rules** — topic blocking, rate limiting, PII redaction
 4. **Full audit logging** — every turn with user_id, verdict, platform

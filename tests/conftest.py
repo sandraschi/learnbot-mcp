@@ -11,11 +11,11 @@ async def auto_db(monkeypatch, tmp_path):
     db_file = str(tmp_path / "test.db")
     monkeypatch.setenv("DB_PATH", db_file)
     # Force settings re-read
-    import chatbot_mcp.config as cfg
+    import learnbot_mcp.config as cfg
 
     cfg._settings = None
 
-    from chatbot_mcp.database import clear_db_init_guard, close_db_pool, init_db
+    from learnbot_mcp.database import clear_db_init_guard, close_db_pool, init_db
 
     await init_db()
     yield

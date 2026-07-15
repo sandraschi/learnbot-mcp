@@ -6,14 +6,14 @@ const tabs = [
     id: "about",
     label: "About",
     icon: Info,
-    content: `## chatbot-mcp
+    content: `## learnbot-mcp
 
 An AI chatbot orchestrator — define personas, run conversations with safety guardrails, speak via TTS, and audit every turn.
 
 ### Architecture
 
 \`\`\`
-chatbot-mcp → Ollama (LLM)
+learnbot-mcp → Ollama (LLM)
             → speech-mcp / Windows SAPI5 (TTS)
             → SQLite (conversations, audit)
             → React webapp
@@ -60,7 +60,7 @@ Every message passes through safety checks before reaching the LLM.
 - **Regulatory compliance**: China real-name auth, EU transparency
 
 ### Compliance regimes
-Set \`CHATBOT_REGULATORY_REGIME\` in .env:
+Set \`LEARNBOT_REGULATORY_REGIME\` in .env:
 - \`none\`: no extra restrictions
 - \`china\`: real-name auth, topic blocklists, retention
 - \`eu\`: AI disclosure, opt-out, full logging`,

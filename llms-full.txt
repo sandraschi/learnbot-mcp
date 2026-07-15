@@ -1,0 +1,87 @@
+# chatbot-mcp - Full Reference
+
+AI chatbot orchestrator - persona management, conversation lifecycle, safety guardrails, multi-platform output (speech, opencode, future: discord, resonite, avatar).
+
+## Quick Facts
+
+| Attribute | Value |
+|-----------|-------|
+| Version | 0.1.0 |
+| Python | >= 3.12 |
+| Framework | FastMCP 3.4+ |
+| Backend port | 11101 |
+| Frontend port | 11102 |
+| Transport | stdio + REST API |
+| DB | SQLite (aiosqlite, WAL mode) |
+| LLM | Delegates to local-llm-mcp (:10832) |
+| TTS | Delegates to speech-mcp (:10908) |
+| License | MIT |
+
+## Tools (14)
+
+### Persona Management
+- `persona_create(name, display_name, backstory, voice, ...)` - create or update persona
+- `persona_get(name)` - get persona by name
+- `persona_list()` - list all personas
+- `persona_delete(name)` - delete persona
+
+### Conversation Lifecycle
+- `chat_start(persona, platform, user_id)` - start new conversation
+- `chat_send(conversation_id, content, user_id)` - send message, runs safety checks, calls LLM
+- `chat_hibernate(conversation_id)` - pause conversation (preserve state)
+- `chat_resume(conversation_id)` - resume hibernated conversation
+- `chat_destroy(conversation_id)` - permanently delete conversation + turns
+- `chat_list(state_filter?)` - list conversations
+
+### Safety & Compliance
+- `safety_rule_create(topic, action, message)` - add content filtering rule
+- `safety_rule_list()` - list all rules
+- `safety_rule_delete(rule_id)` - remove rule
+
+### Audit & Platform
+- `audit_query(user_id?, persona?, after?, limit?)` - query conversation audit log
+- `platform_send(conversation_id, content, platform, voice)` - send to platform bridge
+
+## Architecture
+
+```
+chatbot-mcp (orchestrator)
+  ├── Persona CRUD → SQLite
+  ├── Conversation lifecycle → SQLite
+  ├── Safety rules (topic blocking, rate limiting, PII redaction)
+  ├── Audit log (all turns with user_id, verdict, platform)
+  │
+  └── Delegates to fleet MCP servers:
+      ├── local-llm-mcp (:10832) - LLM inference
+      ├── speech-mcp (:10908) - TTS synthesis
+      ├── avatar-mcp (:10792) - avatar lifecycle (future)
+      ├── resonite-mcp (:10978) - Resonite bridge (future)
+      └── memops (:10732) - memory / RAG (future)
+```
+
+## Safety Flow
+
+Every incoming message flows through rate limiter → topic rules → PII redaction → LLM → output (text + optional TTS).
+
+## Config (.env)
+
+```
+CHATBOT_REGULATORY_REGIME=none|china|eu
+CHATBOT_LLM_BASE_URL=http://127.0.0.1:10832
+CHATBOT_SPEECH_MCP_URL=http://127.0.0.1:10908
+CHATBOT_RATE_LIMIT=30
+BACKEND_PORT=11101
+FRONTEND_PORT=11102
+```
+
+See `.env.example` for full list.
+
+## Development
+
+```bash
+uv sync                    # install deps
+just serve                 # start MCP server (stdio)
+just serve-rest            # start REST API (:11101)
+cd web_sota && bun run dev # start frontend (:11102)
+just test                  # run 8 tests
+```

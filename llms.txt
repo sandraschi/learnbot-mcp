@@ -1,0 +1,18 @@
+# chatbot-mcp
+
+AI chatbot orchestrator - persona management, conversation lifecycle, safety guardrails, multi-platform output (speech, opencode).
+
+## Tools
+
+- `persona_create`, `persona_get`, `persona_list`, `persona_delete` - persona CRUD
+- `chat_start`, `chat_send`, `chat_hibernate`, `chat_resume`, `chat_destroy`, `chat_list` - conversation lifecycle
+- `safety_rule_create`, `safety_rule_list`, `safety_rule_delete` - safety guardrails
+- `audit_query` - conversation audit log
+- `platform_send` - platform bridge (speech, etc.)
+
+## Ports
+
+- Backend: 11101 (REST API) + stdio (MCP)
+- Frontend: 11102 (Vite dev)
+
+See `llms-full.txt` for full reference.

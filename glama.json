@@ -1,0 +1,26 @@
+{
+  "name": "chatbot-mcp",
+  "description": "AI chatbot orchestrator - persona management, conversation lifecycle, safety guardrails, multi-platform output",
+  "repository": "https://github.com/sandraschi/chatbot-mcp",
+  "server_type": "python",
+  "framework": "FastMCP 3.4+",
+  "tools": {
+    "persona_create": "Create or update a chatbot persona",
+    "persona_get": "Get a persona by name",
+    "persona_list": "List all registered personas",
+    "persona_delete": "Delete a persona",
+    "chat_start": "Start a new conversation with a persona",
+    "chat_send": "Send a message in an active conversation",
+    "chat_hibernate": "Pause a conversation",
+    "chat_resume": "Resume a hibernated conversation",
+    "chat_destroy": "Delete a conversation and all turns",
+    "chat_list": "List conversations",
+    "safety_rule_create": "Create a safety rule",
+    "safety_rule_list": "List all safety rules",
+    "safety_rule_delete": "Delete a safety rule",
+    "audit_query": "Query the audit log",
+    "platform_send": "Send content to a platform bridge"
+  },
+  "prompts": [],
+  "resources": []
+}

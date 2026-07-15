@@ -1,0 +1,39 @@
+[project]
+name = "chatbot-mcp"
+version = "0.1.0"
+description = "AI chatbot orchestrator - persona management, safety, multi-platform output"
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp>=3.4.2,<4",
+    "aiosqlite",
+    "httpx",
+    "pydantic>=2.0.0",
+    "pydantic-settings",
+    "python-dotenv",
+    "starlette",
+    "uvicorn",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "SIM", "UP"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+]

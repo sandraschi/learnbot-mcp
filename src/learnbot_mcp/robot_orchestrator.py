@@ -172,5 +172,22 @@ async def robot_stop_all(yahboom_url: str = "http://127.0.0.1:10892") -> dict:
         return {"success": False, "error": str(e)}
 
 
-# Emotion tags the LLM can use in its responses (for system prompt injection)
-EMOTION_TAGS = list(_EMOTION_MOTIONS.keys())
+# Canonical tag list — all tags the LLM may emit (TTS-only tags have no robot mapping)
+_EXTRA_TTS_TAGS = [
+    "whispers",
+    "sighs",
+    "happy",
+    "warmly",
+    "gently",
+    "dramatically",
+    "nervously",
+    "sarcastically",
+    "warm",
+    "cold",
+    "formal",
+    "casual",
+]
+EMOTION_TAGS = list(_EMOTION_MOTIONS.keys()) + _EXTRA_TTS_TAGS
+
+# Single regex for all tag extraction — import and reuse, don't duplicate
+TAG_PATTERN = r"\[(" + "|".join(EMOTION_TAGS) + r")\]"

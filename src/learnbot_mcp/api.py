@@ -260,9 +260,10 @@ async def api_conversations_send(request: Request) -> JSONResponse:
         # Strip emotion tags from display, use them in TTS
         import re as _re
 
-        _tag_pattern = r"\[(laughs|whispers|sighs|excited|sad|happy|cheerfully|softly|sympathetically|warmly|gently|dramatically|nervously|sarcastically|angry|serious|thoughtful|playful|warm|cold|formal|casual)\]"  # noqa: E501
-        _tags = _re.findall(_tag_pattern, response_text)
-        _display_text = _re.sub(_tag_pattern, "", response_text).strip()
+        from learnbot_mcp.robot_orchestrator import TAG_PATTERN
+
+        _tags = _re.findall(TAG_PATTERN, response_text)
+        _display_text = _re.sub(TAG_PATTERN, "", response_text).strip()
 
         if persona and persona.get("voice"):
             import asyncio

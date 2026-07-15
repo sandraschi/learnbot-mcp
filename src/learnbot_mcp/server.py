@@ -288,14 +288,13 @@ async def chat_send(
 
     import re as _re
 
+    from learnbot_mcp.robot_orchestrator import TAG_PATTERN
+
     # Speak via speech-mcp (fire-and-forget), strip emotion tags for display
     if persona and persona.get("voice"):
         from learnbot_mcp.platforms import speech_say
 
-        _tags = _re.findall(
-            r"\[(laughs|whispers|sighs|excited|sad|happy|cheerfully|softly|sympathetically|warmly|gently|dramatically|nervously|sarcastically|angry|serious|thoughtful|playful|warm|cold|formal|casual)\]",
-            response_text,
-        )
+        _tags = _re.findall(TAG_PATTERN, response_text)
         _speech_text = (response_text or "")[:2000]
         if _tags:
             _speech_text = f"[{_tags[0]}] {_speech_text}"[:2000]
@@ -312,11 +311,7 @@ async def chat_send(
             asyncio.create_task(play_emotion_sfx(emotion_tag=_tags[0]))
 
     # Strip emotion tags from displayed response
-    response_text = _re.sub(
-        r"\[(laughs|whispers|sighs|excited|sad|happy|cheerfully|softly|sympathetically|warmly|gently|dramatically|nervously|sarcastically|angry|serious|thoughtful|playful|warm|cold|formal|casual)\]",
-        "",
-        response_text,
-    ).strip()
+    response_text = _re.sub(TAG_PATTERN, "", response_text).strip()
 
     return {"success": True, "response": response_text, "safety_verdict": "passed"}
 
@@ -469,6 +464,7 @@ async def chatbot_help() -> dict:
             "chat_start, chat_send, chat_hibernate, chat_resume, chat_destroy, chat_list",
             "safety_rule_create, safety_rule_list, safety_rule_delete",
             "audit_query, platform_send",
+            "vocab_quiz, vocab_submit, grammar_check, reading_passage",
         ],
         "message": "See SPEC.md for full documentation.",
     }
@@ -509,6 +505,66 @@ async def chat_proactive_tick() -> dict:
     from learnbot_mcp.proactive import proactive_tick
 
     return await proactive_tick()
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def vocab_quiz(
+    user_id: str,
+    source_lang: str = "ja",
+    target_lang: str = "en",
+    count: int = 5,
+) -> dict:
+    """Generate a vocabulary quiz from items due for review.
+
+    Pulls from spaced-repetition table, fills gaps with LLM-generated items.
+    Submit results via ``vocab_submit`` to schedule next review.
+
+    ## Return Format
+    {"success": bool, "quiz": [...], "count": int, "due": int}
+    """
+    from learnbot_mcp.learn_tools import vocab_quiz as _vq
+
+    return await _vq(user_id=user_id, source_lang=source_lang, target_lang=target_lang, count=count)
+
+
+@mcp.tool(annotations=_MUTATING)
+async def vocab_submit(user_id: str, word: str, correct: bool) -> dict:
+    """Submit a quiz result and update spaced-repetition schedule.
+
+    ## Return Format
+    {"success": bool, "word": str, "next_review_days": int, "ease": float}
+    """
+    from learnbot_mcp.learn_tools import vocab_submit as _vs
+
+    return await _vs(user_id=user_id, word=word, correct=correct)
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def grammar_check(text: str, source_lang: str = "ja", target_lang: str = "en") -> dict:
+    """Check a learner's sentence for grammar errors and return corrections.
+
+    Uses the LLM to analyze structure, particles, verb conjugation, etc.
+
+    ## Return Format
+    {"success": bool, "original": str, "corrected": str, "errors": list, "explanation": str}
+    """
+    from learnbot_mcp.learn_tools import grammar_check as _gc
+
+    return await _gc(text=text, source_lang=source_lang, target_lang=target_lang)
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def reading_passage(
+    level: str = "N4", source_lang: str = "ja", target_lang: str = "en"
+) -> dict:
+    """Generate a JLPT-graded reading passage with comprehension questions.
+
+    ## Return Format
+    {"success": bool, "passage": str, "vocabulary": list, "questions": list}
+    """
+    from learnbot_mcp.learn_tools import reading_passage as _rp
+
+    return await _rp(level=level, source_lang=source_lang, target_lang=target_lang)
 
 
 def main():

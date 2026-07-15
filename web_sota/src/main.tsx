@@ -10,6 +10,7 @@ import { Audit } from "./pages/Audit";
 import { Compliance } from "./pages/Compliance";
 import { Help } from "./pages/Help";
 import { Voices } from "./pages/Voices";
+import { Avatar } from "./pages/Avatar";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -25,6 +26,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/compliance" element={<Compliance />} />
           <Route path="/help" element={<Help />} />
           <Route path="/voices" element={<Voices />} />
+          <Route path="/avatar" element={<Avatar />} />
         </Routes>
       </Layout>
     </BrowserRouter>

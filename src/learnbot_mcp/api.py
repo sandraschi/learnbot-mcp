@@ -6,6 +6,7 @@ import logging
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
+from starlette.responses import FileResponse
 from typing import Any
 
 from starlette.applications import Starlette
@@ -368,6 +369,22 @@ async def api_voices(request: Request) -> JSONResponse:
     return JSONResponse({"voices": GEMINI_VOICES, "count": len(GEMINI_VOICES)})
 
 
+async def api_avatar_vrm(request: Request) -> FileResponse:
+    """Serve the VRM avatar file for three.js viewer."""
+    from learnbot_mcp.database import get_persona
+
+    persona_name = request.query_params.get("persona", "miko")
+    p = await get_persona(persona_name)
+    vrm_path = (p or {}).get("avatar_vrm", "")
+    if vrm_path and Path(vrm_path).is_file():
+        return FileResponse(vrm_path, media_type="application/octet-stream")
+    # Fallback: try default VRM
+    default = Path("D:/Dev/repos/avatar-mcp/models/Nekomimi-chan.vrm")
+    if default.is_file():
+        return FileResponse(str(default), media_type="application/octet-stream")
+    return JSONResponse({"error": "No VRM found"}, status_code=404)
+
+
 async def api_voice_test(request: Request) -> JSONResponse:
     """Test a voice by saying a sample phrase."""
     body = await request.json()
@@ -450,7 +467,9 @@ def build_app() -> Starlette:
         Route("/api/safety/rules/{id}", api_safety_rule_delete, methods=["DELETE"]),
         Route("/api/compliance", api_compliance),
         Route("/api/voices", api_voices),
-        Route("/api/voice/test", api_voice_test, methods=["POST"]),
+            Route("/api/avatar.vrm", api_avatar_vrm),
+            Route("/api/avatar/vrm", api_avatar_vrm),
+            Route("/api/voice/test", api_voice_test, methods=["POST"]),
         Route("/api/chat/proactive-tick", api_proactive_tick, methods=["POST"]),
         Route("/api/audit", api_audit_query),
     ]

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Miko-chan Mascot</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:transparent;overflow:hidden;width:320px;height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:system-ui,sans-serif}
+#info{position:absolute;bottom:8px;font-size:11px;color:#8b9cb3;opacity:0.6;text-align:center;pointer-events:none;width:100%}
+canvas{display:block;border-radius:16px}
+.drag-handle{position:absolute;top:0;left:0;right:0;height:32px;-webkit-app-region:drag;cursor:grab}
+</style>
+</head>
+<body>
+<div class="drag-handle"></div>
+<canvas id="vrm-canvas"></canvas>
+<div id="info">Miko-chan</div>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.185.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.185.1/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { VRMLoaderPlugin, VRMUtils } from 'https://unpkg.com/@pixiv/three-vrm@3.5.5/lib/three-vrm.module.js';
+
+const canvas = document.getElementById('vrm-canvas');
+const size = 280;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 20);
+camera.position.set(0, 1.1, 2.5);
+
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+renderer.setSize(size, size);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x000000, 0);
+
+const light = new THREE.DirectionalLight(0xffffff, 1.4);
+light.position.set(1, 2, 3);
+scene.add(light);
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+const loader = new GLTFLoader();
+loader.register((parser) => new VRMLoaderPlugin(parser));
+loader.load('/api/avatar.vrm?persona=miko', (gltf) => {
+  const vrm = gltf.userData.vrm;
+  if (!vrm) return;
+  VRMUtils.rotateVRM0(vrm);
+  scene.add(vrm.scene);
+  vrm.scene.position.y = -0.2;
+  const clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    const d = clock.getDelta();
+    vrm.scene.rotation.y += d * 0.3;
+    if (vrm.humanoid) vrm.update(d);
+    renderer.render(scene, camera);
+  }
+  animate();
+}, undefined, (e) => { document.getElementById('info').textContent = 'VRM load error'; });
+</script>
+</body>
+</html>

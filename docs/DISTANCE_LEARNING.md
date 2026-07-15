@@ -165,6 +165,81 @@ Optional: €10 flat per course for AI-generated courseware packs (microeconomic
 - Courseware marketplace — share AI-generated courses between classroom-mcp instances?
 - Student-facing mobile app for offline courseware access?
 
+## Competition: Claude for Teachers (Anthropic, July 2026)
+
+Anthropic launched Claude for Teachers on the same day this architecture was drafted. Key comparison:
+
+| Feature | Claude for Teachers | Our stack |
+|---------|-------------------|-----------|
+| **LLM** | Claude (cloud, pay-per-use) | Ollama (local, free) |
+| **Hosting** | Anthropic's servers | Self-hosted (Goliath or $5 VPS) |
+| **Privacy** | "Won't train on your data" (promise) | Can't train on your data (impossible — self-hosted) |
+| **Skills** | k12-lesson-planning, differentiation | Teaching agents (lecturer, tutor, grader, designer) |
+| **Standards** | Learning Commons Knowledge Graph (US 50 states) | JLPT/CEFR — not yet built |
+| **Automation** | Cowork agent with recurring tasks | chat_proactive_tick + lesson_runner |
+| **Integration** | Canva, MagicSchool, ASSISTments | speech-mcp, yahboom-mcp, godot-mcp (robots!) |
+| **Cost** | Free for verified K-12 US teachers | €3/student/month, no verification needed |
+| **Moat** | Standards data, Claude model, existing userbase | Self-hosting, robots, privacy, price, no lock-in |
+
+### What to filch (planned)
+
+1. **Lesson differentiation** — `lesson_differentiate(lesson_id, level)` that takes an existing lesson and generates versions for below/at/above proficiency. Pure LLM call, cheap to build.
+2. **Standards alignment** — JLPT N5-N1 is the obvious first standard. Add CEFR A1-C2 mapping for European languages. Store as a table in classroom-mcp so courseware can declare which standards it covers.
+3. **Eval framework** — their `evals/` directory has structured rubrics for skill quality. We should add the same for our teaching agents: a scoring tool that grades agent responses against pedagogical criteria.
+
+### What they can't copy
+
+- A robot that wiggles when the chatbot is happy
+- Offline operation on a train
+- No data leaving your machine — this is a technical guarantee, not a policy promise
+- €3/student/month (they can't run on Ollama)
+
+## Human Teachers in the Loop
+
+The platform is AI-first but need not be AI-only. A hybrid model where AI handles fundamentals and human teachers handle advanced or nuanced work is both more effective and more realistic for real language schools.
+
+### Teacher marketplace (future)
+
+A freelance English teacher in Tokyo, or anywhere, could register on a classroom-mcp instance:
+
+- **Profile**: qualifications, rates, availability, languages, specialization
+- **Referral**: when the AI tutor detects a student has plateaued or needs human nuance (essay feedback, pronunciation correction, cultural context), it recommends booking a session with a human teacher
+- **Mixed classes**: AI handles drills and vocab, human handles conversation practice and cultural discussion
+- **Booking**: calendly-style scheduling, Stripe payment, Zoom/Google Meet link
+
+### Why a human teacher would use it
+
+- **Passive income**: AI does the groundwork, human does the high-value interaction
+- **Student pipeline**: the AI identifies students who need human help and refers them
+- **Teaching materials**: AI generates lesson plans, human reviews and customizes
+- **No admin**: roster, timetable, assignments, progress tracking — all handled by classroom-mcp
+
+### Data model (future)
+
+```sql
+CREATE TABLE human_teachers (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    name        TEXT NOT NULL,
+    email       TEXT UNIQUE,
+    bio         TEXT,
+    languages   TEXT DEFAULT '[]',   -- JSON array
+    specializations TEXT DEFAULT '[]',
+    rate_per_hour DECIMAL DEFAULT 30,
+    currency    TEXT DEFAULT 'EUR',
+    available   INTEGER DEFAULT 1,
+    created_at  TEXT NOT NULL
+);
+
+CREATE TABLE referrals (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id  INTEGER REFERENCES students(id),
+    teacher_id  INTEGER REFERENCES human_teachers(id),
+    reason      TEXT,               -- "plateau detected", "essay review needed", "pronunciation"
+    status      TEXT DEFAULT 'pending',  -- pending, booked, completed, cancelled
+    created_at  TEXT NOT NULL
+);
+```
+
 ## Related
 
 - [PRD.md](PRD.md)

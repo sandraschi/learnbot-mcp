@@ -274,11 +274,13 @@ async def api_conversations_send(request: Request) -> JSONResponse:
                 _speech = f"[{_tags[0]}] {_speech}"
             asyncio.create_task(speech_say(text=_speech[:2000], voice=persona["voice"]))
 
-        # Robot emotion expression (fire-and-forget)
+        # Robot emotion expression + sound effect (fire-and-forget)
         if _tags:
             from learnbot_mcp.robot_orchestrator import execute_emotion
+            from learnbot_mcp.soundscape import play_emotion_sfx
 
             asyncio.create_task(execute_emotion(emotion_tag=_tags[0]))
+            asyncio.create_task(play_emotion_sfx(emotion_tag=_tags[0]))
 
         return JSONResponse({"response": _display_text, "safety_verdict": "passed"})
     except Exception as e:

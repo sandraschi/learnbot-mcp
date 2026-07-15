@@ -1,16 +1,15 @@
-"""Test configuration - temp DB for isolation."""
+"""Test configuration - temp DB for isolation. Not autouse — add ``db`` param to tests that need it."""
 
 from __future__ import annotations
 
 import pytest
 
 
-@pytest.fixture(autouse=True)
-async def auto_db(monkeypatch, tmp_path):
-    """Use a temp DB to avoid cross-contamination between tests."""
+@pytest.fixture
+async def db(monkeypatch, tmp_path):
+    """Use a temp DB. Add ``db`` parameter to test functions that need database access."""
     db_file = str(tmp_path / "test.db")
     monkeypatch.setenv("DB_PATH", db_file)
-    # Force settings re-read
     import learnbot_mcp.config as cfg
 
     cfg._settings = None

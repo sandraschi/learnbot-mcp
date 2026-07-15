@@ -11,6 +11,7 @@ import { Compliance } from "./pages/Compliance";
 import { Help } from "./pages/Help";
 import { Voices } from "./pages/Voices";
 import { Avatar } from "./pages/Avatar";
+import { Demos } from "./pages/Demos";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -27,6 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/help" element={<Help />} />
           <Route path="/voices" element={<Voices />} />
           <Route path="/avatar" element={<Avatar />} />
+          <Route path="/demos" element={<Demos />} />
         </Routes>
       </Layout>
     </BrowserRouter>

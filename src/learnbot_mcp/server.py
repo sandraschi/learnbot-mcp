@@ -303,11 +303,13 @@ async def chat_send(
 
         asyncio.create_task(speech_say(text=_speech_text, voice=persona["voice"]))
 
-        # Robot emotion expression (fire-and-forget)
+        # Robot emotion expression + sound effect (fire-and-forget)
         if _tags:
             from learnbot_mcp.robot_orchestrator import execute_emotion
+            from learnbot_mcp.soundscape import play_emotion_sfx
 
             asyncio.create_task(execute_emotion(emotion_tag=_tags[0]))
+            asyncio.create_task(play_emotion_sfx(emotion_tag=_tags[0]))
 
     # Strip emotion tags from displayed response
     response_text = _re.sub(

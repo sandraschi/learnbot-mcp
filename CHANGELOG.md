@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.3.0] — 2026-07-15
+
+### Added
+- Robot orchestrator — emotion tags mapped to Boomy (yahboom-mcp) motion, LED, camera sequences
+- 12 emotion→action mappings with fire-and-forget async execution
+- `robot_stop_all()` emergency stop function
+- godot-mcp integration: `godot_import_vrm` tool + V-Sekai addon registry entry
+- GDScript bridge `_cmd_import_vrm` command for VRM loading in Godot 4
+- `godot_list_vrm` tool to browse the shared avatar depot
+- VRM depot at `~/.avatarmcp/models/` (shared across avatar-mcp, resonite-mcp, vrchat-mcp)
+- STATUS.md and TODO.md documentation
+
+### Changed
+- Emotion tag system prompt expanded: tags now drive both voice + robot motion
+- Emotion tag regex pattern covers all 12 robot-mapped emotions
+
 ## [0.2.0] — 2026-07-15
 
 ### Added

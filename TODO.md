@@ -4,7 +4,10 @@
 
 ## P1 — Core experience
 
-- [ ] **Streaming responses** — SSE from Ollama → live text in chat UI
+- [ ] **Streaming responses (deferred)** — SSE from Ollama → live text
+  ~2 days for marginal UX gain. Revisit if chat latency becomes a top complaint.
+  Fire-and-forget TTS + robot motion already mask response time:
+  user hears/speaks/feels output while the LLM finishes generating.
 - [ ] **Server auto-start** — NSSM for learnbot-api, speech-mcp, Ollama
 - [ ] **LLM model config in webapp** — switch models via UI
 - [ ] **Conversation export** — full .txt/.json download with metadata

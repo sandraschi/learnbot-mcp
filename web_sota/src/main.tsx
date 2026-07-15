@@ -8,6 +8,7 @@ import { Chat } from "./pages/Chat";
 import { Safety } from "./pages/Safety";
 import { Audit } from "./pages/Audit";
 import { Compliance } from "./pages/Compliance";
+import { Help } from "./pages/Help";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -21,6 +22,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/safety" element={<Safety />} />
           <Route path="/audit" element={<Audit />} />
           <Route path="/compliance" element={<Compliance />} />
+          <Route path="/help" element={<Help />} />
         </Routes>
       </Layout>
     </BrowserRouter>

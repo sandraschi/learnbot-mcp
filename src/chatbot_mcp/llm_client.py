@@ -12,7 +12,7 @@ from chatbot_mcp.config import get_settings
 log = logging.getLogger(__name__)
 
 _DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
-_DEFAULT_MODEL = "qwen3.5-9b-deepseek-v4-flash"
+_DEFAULT_MODEL = "llama3.2:3b"
 
 
 async def chat_completion(
@@ -99,13 +99,17 @@ def _extract_response(data: dict) -> str:
     )
 
 
-def build_history(turns: list[dict[str, Any]], max_turns: int = 20) -> list[dict[str, str]]:
-    """Convert DB turns to message history for the LLM call."""
+def build_history(turns: list, max_turns: int = 20) -> list[dict[str, str]]:
+    """Convert DB turns (dicts or Row objects) to message history for the LLM call."""
     messages = []
     for t in turns[-max_turns:]:
-        role = t.get("role", "")
+        try:
+            role = t["role"] if isinstance(t, dict) else t["role"]
+        except (KeyError, TypeError):
+            continue
         if role not in ("user", "assistant"):
             continue
-        content = (t.get("content") or "")[:2000]
+        content_raw = t.get("content", "") if isinstance(t, dict) else (t["content"] or "")
+        content = str(content_raw)[:2000]
         messages.append({"role": role, "content": content})
     return messages

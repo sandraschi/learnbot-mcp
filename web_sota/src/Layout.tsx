@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard, MessageCircle, Users2, ShieldAlert, ShieldCheck, ScrollText,
-  ChevronLeft, ChevronRight, Bot,
+  HelpCircle, ChevronLeft, ChevronRight, Bot,
 } from "lucide-react";
 import { useZoom } from "./useZoom";
 
@@ -13,6 +13,7 @@ const nav = [
   { to: "/safety", icon: ShieldAlert, label: "Safety" },
   { to: "/compliance", icon: ShieldCheck, label: "Compliance" },
   { to: "/audit", icon: ScrollText, label: "Audit" },
+  { to: "/help", icon: HelpCircle, label: "Help" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

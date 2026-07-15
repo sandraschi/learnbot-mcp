@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     llm_base_url: str = Field(default="http://127.0.0.1:10832", alias="CHATBOT_LLM_BASE_URL")
     llm_model: str = Field(default="", alias="CHATBOT_LLM_MODEL")
 
-    speech_mcp_url: str = Field(default="http://127.0.0.1:10908", alias="CHATBOT_SPEECH_MCP_URL")
+    speech_mcp_url: str = Field(default="http://127.0.0.1:10909", alias="CHATBOT_SPEECH_MCP_URL")
     avatar_mcp_url: str = Field(default="http://127.0.0.1:10792", alias="CHATBOT_AVATAR_MCP_URL")
     resonite_mcp_url: str = Field(
         default="http://127.0.0.1:10978", alias="CHATBOT_RESONITE_MCP_URL"

@@ -70,6 +70,8 @@ CREATE TABLE IF NOT EXISTS personas (
     constraints TEXT DEFAULT '[]',
     proactive_triggers TEXT DEFAULT '[]',
     knowledge_base TEXT DEFAULT '',
+    languages   TEXT DEFAULT '[]',
+    skills      TEXT DEFAULT '[]',
     created_at  TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -124,6 +126,14 @@ async def init_db() -> None:
             await db.executescript(SCHEMA)
             await db.commit()
             log.info("Database initialized")
+        # Schema migrations
+        for col in ("languages", "skills"):
+            try:
+                await db.execute(f"ALTER TABLE personas ADD COLUMN {col} TEXT DEFAULT '[]'")
+                await db.commit()
+                log.info("Migrated personas: added %s", col)
+            except aiosqlite.OperationalError:
+                pass
         _db_initialized = True
 
 
@@ -132,8 +142,9 @@ async def upsert_persona(persona: dict[str, Any]) -> bool:
         try:
             await db.execute(
                 """INSERT INTO personas (name, display_name, backstory, voice, avatar_vrm,
-                   avatar_scale, platforms, constraints, proactive_triggers, knowledge_base)
-                   VALUES (?,?,?,?,?,?,?,?,?,?)""",
+                   avatar_scale, platforms, constraints, proactive_triggers, knowledge_base,
+                   languages, skills)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (
                     persona["name"],
                     persona.get("display_name", persona["name"]),
@@ -145,6 +156,8 @@ async def upsert_persona(persona: dict[str, Any]) -> bool:
                     json.dumps(persona.get("constraints", [])),
                     json.dumps(persona.get("proactive_triggers", [])),
                     persona.get("knowledge_base", ""),
+                    json.dumps(persona.get("languages", [])),
+                    json.dumps(persona.get("skills", [])),
                 ),
             )
             await db.commit()
@@ -153,7 +166,7 @@ async def upsert_persona(persona: dict[str, Any]) -> bool:
             await db.execute(
                 """UPDATE personas SET display_name=?, backstory=?, voice=?, avatar_vrm=?,
                    avatar_scale=?, platforms=?, constraints=?, proactive_triggers=?,
-                   knowledge_base=?, updated_at=datetime('now') WHERE name=?""",
+                   knowledge_base=?, languages=?, skills=?, updated_at=datetime('now') WHERE name=?""",  # noqa: E501
                 (
                     persona.get("display_name", persona["name"]),
                     persona.get("backstory", ""),
@@ -164,6 +177,8 @@ async def upsert_persona(persona: dict[str, Any]) -> bool:
                     json.dumps(persona.get("constraints", [])),
                     json.dumps(persona.get("proactive_triggers", [])),
                     persona.get("knowledge_base", ""),
+                    json.dumps(persona.get("languages", [])),
+                    json.dumps(persona.get("skills", [])),
                     persona["name"],
                 ),
             )
@@ -193,6 +208,9 @@ async def delete_persona(name: str) -> bool:
 
 
 def _row_to_persona(r: aiosqlite.Row) -> dict[str, Any]:
+    def _j(v):
+        return json.loads(v) if isinstance(v, str) else v or []
+
     return {
         "id": r["id"],
         "name": r["name"],
@@ -201,16 +219,12 @@ def _row_to_persona(r: aiosqlite.Row) -> dict[str, Any]:
         "voice": r["voice"],
         "avatar_vrm": r["avatar_vrm"],
         "avatar_scale": r["avatar_scale"],
-        "platforms": json.loads(r["platforms"])
-        if isinstance(r["platforms"], str)
-        else r["platforms"],
-        "constraints": json.loads(r["constraints"])
-        if isinstance(r["constraints"], str)
-        else r["constraints"],
-        "proactive_triggers": json.loads(r["proactive_triggers"])
-        if isinstance(r["proactive_triggers"], str)
-        else r["proactive_triggers"],
+        "platforms": _j(r["platforms"]),
+        "constraints": _j(r["constraints"]),
+        "proactive_triggers": _j(r["proactive_triggers"]),
         "knowledge_base": r["knowledge_base"],
+        "languages": _j(r["languages"]) if "languages" in r else [],
+        "skills": _j(r["skills"]) if "skills" in r else [],
         "created_at": r["created_at"],
         "updated_at": r["updated_at"],
     }

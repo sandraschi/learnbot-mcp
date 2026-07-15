@@ -64,6 +64,8 @@ async def persona_create(
     constraints: str = "",
     proactive_triggers: str = "",
     knowledge_base: str = "",
+    languages: str = "",
+    skills: str = "",
 ) -> dict:
     """Create or update a chatbot persona.
 
@@ -86,6 +88,10 @@ async def persona_create(
         "constraints": json.loads(constraints) if constraints else [],
         "proactive_triggers": json.loads(proactive_triggers) if proactive_triggers else [],
         "knowledge_base": knowledge_base,
+        "languages": [lang.strip() for lang in languages.split(",") if lang.strip()]
+        if languages
+        else [],
+        "skills": [sk.strip() for sk in skills.split(",") if sk.strip()] if skills else [],
     }
     created = await upsert_persona(persona)
     log.info("Persona %s: %s", "created" if created else "updated", name)

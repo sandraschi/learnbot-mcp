@@ -553,6 +553,70 @@ async def grammar_check(text: str, source_lang: str = "ja", target_lang: str = "
     return await _gc(text=text, source_lang=source_lang, target_lang=target_lang)
 
 
+@mcp.tool(annotations=_MUTATING)
+async def lesson_create(
+    title: str,
+    description: str = "",
+    language: str = "ja",
+    level: str = "N4",
+    author: str = "",
+    duration_min: int = 15,
+    tags: str = "",
+) -> dict:
+    """Create a lesson plan. Optionally generate with AI via ``lesson_generate``."""
+    from learnbot_mcp.lessons import lesson_create as _lc
+
+    tag_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else []
+    return await _lc(
+        title=title, description=description, language=language,
+        level=level, author=author, duration_min=duration_min, tags=tag_list,
+    )
+
+
+@mcp.tool(annotations=_MUTATING)
+async def lesson_generate(
+    title: str, language: str = "ja", level: str = "N4", duration_min: int = 15
+) -> dict:
+    """Generate a complete lesson via AI — sections, vocab, quiz — and save it."""
+    from learnbot_mcp.lessons import lesson_generate as _lg
+
+    return await _lg(title=title, language=language, level=level, duration_min=duration_min)
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def lesson_list(
+    language: str = "", level: str = "", tag: str = "", limit: int = 50
+) -> dict:
+    """List lesson plans with optional filters."""
+    from learnbot_mcp.lessons import lesson_list as _ll
+
+    return await _ll(language=language, level=level, tag=tag, limit=limit)
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def lesson_get(lesson_id: int) -> dict:
+    """Get a lesson plan by ID with full content."""
+    from learnbot_mcp.lessons import lesson_get as _lg
+
+    return await _lg(lesson_id=lesson_id)
+
+
+@mcp.tool(annotations=_MUTATING)
+async def lesson_delete(lesson_id: int) -> dict:
+    """Delete a lesson plan."""
+    from learnbot_mcp.lessons import lesson_delete as _ld
+
+    return await _ld(lesson_id=lesson_id)
+
+
+@mcp.tool(annotations=_MUTATING)
+async def lesson_run(lesson_id: int, conversation_id: str) -> dict:
+    """Execute a lesson plan through an active conversation."""
+    from learnbot_mcp.lessons import lesson_run as _lr
+
+    return await _lr(lesson_id=lesson_id, conversation_id=conversation_id)
+
+
 @mcp.tool(annotations=_READ_ONLY)
 async def reading_passage(
     level: str = "N4", source_lang: str = "ja", target_lang: str = "en"

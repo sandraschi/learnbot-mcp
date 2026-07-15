@@ -403,6 +403,37 @@ async def api_voice_test(request: Request) -> JSONResponse:
     return JSONResponse(result)
 
 
+async def api_lessons_list(request: Request) -> JSONResponse:
+    from learnbot_mcp.lessons import lesson_list
+
+    lang = request.query_params.get("language", "")
+    level = request.query_params.get("level", "")
+    tag = request.query_params.get("tag", "")
+    limit = int(request.query_params.get("limit", 50))
+    result = await lesson_list(language=lang, level=level, tag=tag, limit=limit)
+    return JSONResponse(result)
+
+
+async def api_lesson_generate(request: Request) -> JSONResponse:
+    from learnbot_mcp.lessons import lesson_generate
+
+    body = await request.json()
+    result = await lesson_generate(
+        title=body.get("title", ""),
+        language=body.get("language", "ja"),
+        level=body.get("level", "N4"),
+        duration_min=int(body.get("duration_min", 15)),
+    )
+    return JSONResponse(result)
+
+
+async def api_lesson_delete(request: Request) -> JSONResponse:
+    from learnbot_mcp.lessons import lesson_delete
+
+    result = await lesson_delete(int(request.path_params["id"]))
+    return JSONResponse(result)
+
+
 async def api_proactive_tick(request: Request) -> JSONResponse:
     result = await proactive_tick()
     return JSONResponse(result)
@@ -479,6 +510,9 @@ def build_app() -> Starlette:
         Route("/api/avatar.vrm", api_avatar_vrm),
         Route("/api/avatar/vrm", api_avatar_vrm),
         Route("/api/voice/test", api_voice_test, methods=["POST"]),
+        Route("/api/lessons", api_lessons_list),
+        Route("/api/lesson/generate", api_lesson_generate, methods=["POST"]),
+        Route("/api/lesson/{id}", api_lesson_delete, methods=["DELETE"]),
         Route("/api/chat/proactive-tick", api_proactive_tick, methods=["POST"]),
         Route("/api/audit", api_audit_query),
     ]

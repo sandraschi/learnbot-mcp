@@ -12,6 +12,7 @@ import { Help } from "./pages/Help";
 import { Voices } from "./pages/Voices";
 import { Avatar } from "./pages/Avatar";
 import { Demos } from "./pages/Demos";
+import { Lessons } from "./pages/Lessons";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/voices" element={<Voices />} />
           <Route path="/avatar" element={<Avatar />} />
           <Route path="/demos" element={<Demos />} />
+          <Route path="/lessons" element={<Lessons />} />
         </Routes>
       </Layout>
     </BrowserRouter>

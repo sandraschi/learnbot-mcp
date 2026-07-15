@@ -43,6 +43,12 @@ export const api = {
     delete: (id: string) => del(`/conversations/${id}`),
   },
   compliance: () => get("/compliance"),
+  lessons: {
+    list: (params?: Record<string, string>) => {
+      const q = params ? "?" + new URLSearchParams(params).toString() : "";
+      return get(`/lessons${q}`);
+    },
+  },
   safety: {
     list: () => get("/safety/rules"),
     create: (data: Record<string, unknown>) => post("/safety/rules", data),

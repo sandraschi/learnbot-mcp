@@ -1,161 +1,171 @@
-# Distance Learning Architecture — Master/Slave Language School
+# Distance Learning Architecture — Courses, Teaching Agents, Courseware
 
 **Status**: Draft  
 **Date**: 2026-07-15
 
 ## Concept
 
-A language teacher runs a **master** learnbot-mcp instance. Students connect via a lightweight **slave** client. The teacher manages rosters, timetables, lesson plans, and progress tracking. Students get a personalized learning interface with chat, lessons, vocabulary review, and speaking practice.
+Two servers split the distance learning domain:
+
+- **classroom-mcp** (:11105) — students, classes, courses, courseware, timetables, progress, billing
+- **learnbot-mcp** (:11104) — lesson content, conversation, TTS, robot, emotion, vocabulary SR
+
+A teacher or institution runs both. Students connect to classroom-mcp's webapp to see their courses, assignments, and progress. The actual learning interaction happens through learnbot-mcp's chat interface or dedicated **teaching agents**.
+
+## Teaching Agents — New Concept
+
+A teaching agent is an AI-driven course instructor. It is not a generic chatbot — it has:
+
+- **Subject expertise** — knows the course curriculum, prerequisites, learning objectives
+- **Courseware access** — can reference the course's lecture notes, readings, problem sets
+- **Pedagogical role** — lecturer, tutor, grader, or curriculum designer
+- **Personality** — configured per course (enthusiastic STEM prof, strict economics lecturer, patient language tutor)
+- **Institutional knowledge** — knows the class roster, due dates, past performance
+
+Multiple teaching agents can collaborate on the same course:
+
+```
+Economics 101
+  ├── Lecturer Agent (prepares lectures, records video scripts)
+  ├── Tutor Agent (answers student questions, runs office hours)
+  ├── Grader Agent (evaluates assignments, provides rubric feedback)
+  └── Curriculum Designer Agent (plans syllabus, adjusts pacing)
+```
+
+A teaching agent is different from a learnbot persona — it has persistent access to course materials, can grade work, track curriculum progress, and communicate with other agents.
 
 ## Architecture
 
 ```
-MASTER (Teacher — Goliath or cloud VM)
-  learnbot-mcp
-    ├── REST API + Webapp (serves teacher + all students)
-    ├── Lesson depot (all lessons, all classes)
-    ├── Student roster (users, classes, groups)
-    ├── Timetable (scheduled lessons, assignments)
-    ├── Progress tracking (vocab mastery, quiz scores, time spent)
-    │
-    ├── speech-mcp (Gemini TTS — teacher voice demo)
-    ├── Ollama (LLM — shared across all students)
-    └── Tailscale Funnel (public HTTPS if students are external)
-          │
-          ▼
-SLAVE (Student — web browser, no install)
-  Connects to master URL. Sees only their own assignments.
-  Features:
-    ├── Chat with teacher's AI persona (language practice)
-    ├── Assigned lessons (from teacher's depot)
-    ├── Vocabulary review (spaced repetition)
-    └── Pronunciation practice (via browser Web Speech API)
-
-  (Optional) Offline mode:
-    └── Tauri shell — caches lessons locally
-    └── Tiny Ollama — offline vocab drills
+classroom-mcp (:11105)
+  ├── REST API + Teacher Webapp
+  ├── Courses and modules
+  ├── Courseware depot (lectures, readings, problem sets)
+  ├── Student roster + classes
+  ├── Teaching agent registry (which agent for which course)
+  ├── Timetable + assignments
+  ├── Progress + grades
+  └── Billing (future)
+        │
+        ├── learnbot-mcp (:11104)  — lesson delivery, chat, TTS, robot
+        │
+        └── teaching agents (LLM-driven)
+              ├── Lecturer — creates course materials
+              ├── Tutor — answers student questions
+              ├── Grader — evaluates submissions
+              └── Designer — plans curriculum
 ```
 
-## Student Management Data Model
+## Courseware Data Model
 
 ```sql
-CREATE TABLE students (
+CREATE TABLE courses (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    code        TEXT NOT NULL UNIQUE,        -- "ECON101", "CS201"
+    title       TEXT NOT NULL,
+    description TEXT,
+    subject     TEXT,                        -- "economics", "cs", "mathematics"
+    level       TEXT,                        -- "undergraduate", "graduate", "professional"
+    credits     INTEGER DEFAULT 3,
+    total_modules INTEGER DEFAULT 0,
+    created_at  TEXT NOT NULL
+);
+
+CREATE TABLE modules (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    course_id   INTEGER REFERENCES courses(id),
+    title       TEXT NOT NULL,
+    sequence    INTEGER NOT NULL,            -- module number within course
+    description TEXT,
+    learning_objectives TEXT                 -- JSON array of objectives
+);
+
+CREATE TABLE courseware (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    module_id   INTEGER REFERENCES modules(id),
+    type        TEXT NOT NULL,               -- "lecture", "reading", "problem_set", "quiz", "project"
+    title       TEXT NOT NULL,
+    content     TEXT,                        -- markdown body or external reference
+    source      TEXT DEFAULT 'ai_generated', -- ai_generated, imported, purchased, teacher_written
+    duration_min INTEGER DEFAULT 0,
+    sequence    INTEGER DEFAULT 0,
+    created_at  TEXT NOT NULL
+);
+
+CREATE TABLE teaching_agents (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    course_id   INTEGER REFERENCES courses(id),
+    role        TEXT NOT NULL,               -- "lecturer", "tutor", "grader", "designer"
     name        TEXT NOT NULL,
-    email       TEXT UNIQUE,
-    pass_hash   TEXT,              -- bcrypt, optional for simple deployments
-    language    TEXT DEFAULT 'ja',
-    level       TEXT DEFAULT 'N4',
-    timezone    TEXT DEFAULT 'UTC',
+    persona     TEXT,                        -- system prompt / personality
+    model       TEXT DEFAULT 'llama3.2:3b',
+    active      INTEGER DEFAULT 1,
     created_at  TEXT NOT NULL
 );
+```
 
-CREATE TABLE classes (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    name        TEXT NOT NULL,     -- "Monday Evening A2"
-    language    TEXT DEFAULT 'ja',
-    level       TEXT DEFAULT 'N4',
-    teacher_id  INTEGER,
-    created_at  TEXT NOT NULL
-);
+## Courseware Sources
 
-CREATE TABLE class_students (
-    class_id    INTEGER REFERENCES classes(id),
-    student_id  INTEGER REFERENCES students(id),
-    PRIMARY KEY (class_id, student_id)
-);
+| Source | Method | Quality | Cost |
+|--------|--------|---------|------|
+| **AI-generated** | LLM produces lectures, problem sets, quizzes from curriculum | Good for drafts, needs review | Free |
+| **Imported** | Teacher uploads PDF, Markdown, LaTeX, slides | Teacher's existing materials | Free |
+| **Fleet-sourced** | Shared courseware depot across classroom-mcp instances | Varies | Free |
+| **Published OER** | Imported from OpenStax, MIT OCW, etc. | High | Free |
+| **Purchased** | Publisher packs (McGraw-Hill, Pearson, etc.) | High | €€€ |
 
-CREATE TABLE assignments (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    class_id    INTEGER REFERENCES classes(id),
-    lesson_id   INTEGER REFERENCES lessons(id),
-    due_at      TEXT,               -- ISO 8601 deadline
-    assigned_at TEXT NOT NULL,
-    completed   INTEGER DEFAULT 0
-);
+The courseware table tracks the source so a teacher can see what was AI-generated (needs review) vs imported (ready to use).
 
-CREATE TABLE progress (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    student_id  INTEGER REFERENCES students(id),
-    lesson_id   INTEGER REFERENCES lessons(id),
-    quiz_score  REAL,              -- 0.0 - 1.0
-    time_spent  INTEGER,           -- seconds
-    completed_at TEXT,
-    vocab_mastered INTEGER DEFAULT 0,
-    vocab_total   INTEGER DEFAULT 0
-);
+## Teaching Agent Workflow
+
+### Course preparation
+```
+1. Teacher creates course → "ECON101: Microeconomics"
+2. Agent Designer generates syllabus (modules, objectives, readings)
+3. Agent Lecturer generates lectures for each module
+4. Agent Tutor creates practice problems and FAQs
+5. Teacher reviews AI-generated courseware, edits as needed
+6. Teacher assigns agents to class
+```
+
+### Course delivery
+```
+1. Module becomes available on schedule (timetable)
+2. Agent Lecturer introduces the module via chat or recorded lecture
+3. Students work through readings and problem sets
+4. Agent Tutor answers questions and runs office hours
+5. Agent Grader evaluates submissions against rubric
+6. Progress recorded to classroom-mcp
+```
+
+### Course iteration
+```
+1. End-of-module survey (student feedback on materials)
+2. Agents propose improvements based on common student mistakes
+3. Curriculum designer adjusts pacing for next cohort
 ```
 
 ## Deployment Tiers
 
-| Tier | Setup | Cost | Who |
-|------|-------|------|-----|
-| **1 — Local** | Master on Goliath, students on LAN | Free | Family, friends |
-| **2 — Tailscale** | Master + Tailscale Funnel for external access | Free | Remote students |
-| **3 — Cloud VM** | Master on $5/mo VPS (Hetzer/Linode) | ~$5-15/mo | Small classes |
-| **4 — Managed** | Auth, payments, multiple teachers | Business | Language school |
+| Tier | Setup | Courses | Students | Cost |
+|------|-------|---------|----------|------|
+| **1 — Personal** | Goliath + Tailscale | 1-3 | 1-10 | Free |
+| **2 — Small class** | $10/mo VPS | 1-5 | 10-50 | ~$15/mo |
+| **3 — Institution** | $50/mo VPS or dedicated | 10-50 | 50-500 | ~$60/mo |
+| **4 — Multi-tenant** | Cloud autoscale | Unlimited | Unlimited | Custom |
 
-Tier 1 and 2 require zero additional infrastructure — the code already runs on Goliath.
-Tier 3 needs a cloud VM with Ollama + the stack. Tier 4 is a full SaaS product.
+## Revenue Model
 
-## Student "Slave" Options
-
-| Option | Install | Offline | STT | Cost |
-|--------|---------|---------|-----|------|
-| **Web browser** (PWA) | None | Limited (cached pages) | Web Speech API | Free |
-| **Tauri desktop app** | Download 5MB | Full (cached lessons) | speech-mcp | Free |
-| **Tiny Ollama on slave** | `ollama pull` | Offline vocab drills | Web Speech | Student's HW |
-
-The PWA is the default — works immediately, no install, no config. The Tauri slave adds offline resilience. Tiny Ollama adds offline LLM for spaced repetition drills when the master is unreachable.
-
-## Teacher Interface (Webapp)
-
-### Roster page
-- Add/remove students, assign to classes
-- Import via CSV (email, name, level)
-- Each student gets a login link (simple: ?student_id=X&token=Y)
-
-### Timetable page  
-- Calendar view with lesson assignments per class
-- Drag lesson from depot onto a date slot → creates assignment
-- Students see "Upcoming: Lesson X — due Friday"
-
-### Progress dashboard
-- Grid: students × lessons → completion status + quiz score + time
-- Export to CSV for report cards
-- Vocab mastery heatmap (which words each student struggles with)
-
-### Lesson planner
-- Existing Lessons page + "Assign to class" button
-- Scheduled release: lessons become available at a set time
-
-## Implementation Order
-
-| Phase | What | Depends on |
-|-------|------|-----------|
-| **P1** | Student CRUD + class CRUD + basic auth | — |
-| **P2** | Assignment system + timetable | P1 |
-| **P3** | Student-facing restricted view (only their assignments) | P2 |
-| **P4** | Progress tracking + quiz scoring | P3 |
-| **P5** | Export/CSV for report cards | P4 |
-| **P6** | Tauri slave client with offline mode | P3 |
-| **P7** | Payment tier (Stripe) for multi-teacher | P6 |
-
-## Revenue Model (if applicable)
-
-- **Tier 1-2**: Free (personal use)
-- **Tier 3**: €10/teacher/month (cloud hosting included)
-- **Tier 4**: €50/school/month (multi-teacher, analytics, priority support)
+€3/student/month for Tier 2+. At 30 students = €90/mo. Covers hosting + your time.
+Optional: €10 flat per course for AI-generated courseware packs (microeconomics, python, etc.).
 
 ## Open Questions
 
-- Auth: simple token-based or full OAuth?
-- Student isolation: same webapp with role-based views or separate build?
-- Real-time: WebSocket for teacher seeing student progress during a lesson?
-- Voice: student submits audio for speaking drills → teacher reviews async?
+- Should teaching agents be MCP servers themselves (agent-mcp)? Or just personas in learnbot-mcp with additional tools?
+- Courseware marketplace — share AI-generated courses between classroom-mcp instances?
+- Student-facing mobile app for offline courseware access?
 
 ## Related
 
 - [PRD.md](PRD.md)
-- [SPEC.md](SPEC.md)
-- [TODO.md](../TODO.md)
+- [classroom-mcp](https://github.com/sandraschi/classroom-mcp) — scaffold repo

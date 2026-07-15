@@ -6,13 +6,12 @@ import logging
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
-from starlette.responses import FileResponse
 from typing import Any
 
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
-from starlette.responses import HTMLResponse, JSONResponse
+from starlette.responses import FileResponse, HTMLResponse, JSONResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
@@ -236,7 +235,8 @@ async def api_conversations_send(request: Request) -> JSONResponse:
         history.append({"role": "user", "content": (redacted or content)[:4000]})
         system = (persona["backstory"] if persona else "") + (
             "\n\nPrefix your response with ONE bracketed emotion tag matching your feeling. "
-            "Examples: [cheerfully] [sympathetically] [excited] [softly] [thoughtful] [playful] [serious] [warmly] [sad] [laughs]"  # noqa: E501
+            "Examples: [cheerfully] [sympathetically] [excited] [softly] [thoughtful] [playful] [serious] [warmly] [sad] [laughs] "  # noqa: E501
+            "The tag drives both voice tone and robot motion."  # noqa: E501
         )
         response_text = ""
         try:
@@ -273,6 +273,12 @@ async def api_conversations_send(request: Request) -> JSONResponse:
             if _tags:
                 _speech = f"[{_tags[0]}] {_speech}"
             asyncio.create_task(speech_say(text=_speech[:2000], voice=persona["voice"]))
+
+        # Robot emotion expression (fire-and-forget)
+        if _tags:
+            from learnbot_mcp.robot_orchestrator import execute_emotion
+
+            asyncio.create_task(execute_emotion(emotion_tag=_tags[0]))
 
         return JSONResponse({"response": _display_text, "safety_verdict": "passed"})
     except Exception as e:
@@ -467,9 +473,9 @@ def build_app() -> Starlette:
         Route("/api/safety/rules/{id}", api_safety_rule_delete, methods=["DELETE"]),
         Route("/api/compliance", api_compliance),
         Route("/api/voices", api_voices),
-            Route("/api/avatar.vrm", api_avatar_vrm),
-            Route("/api/avatar/vrm", api_avatar_vrm),
-            Route("/api/voice/test", api_voice_test, methods=["POST"]),
+        Route("/api/avatar.vrm", api_avatar_vrm),
+        Route("/api/avatar/vrm", api_avatar_vrm),
+        Route("/api/voice/test", api_voice_test, methods=["POST"]),
         Route("/api/chat/proactive-tick", api_proactive_tick, methods=["POST"]),
         Route("/api/audit", api_audit_query),
     ]

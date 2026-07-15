@@ -248,7 +248,7 @@ async def chat_send(
     _emo_tag_instr = (
         "\n\nIMPORTANT: Prefix your response with ONE bracketed emotion tag that best matches your feeling. "  # noqa: E501
         "Examples: [cheerfully] [sympathetically] [excited] [softly] [thoughtful] [playful] [serious] [warmly] [sad] [laughs] "  # noqa: E501
-        "The tag tells the voice synthesis how to speak. Do NOT use tags in short answers."
+        "The tag drives voice tone and robot motion. Do NOT use tags in short answers."
     )
     system_prompt = (system_prompt or "") + _emo_tag_instr
 
@@ -301,6 +301,12 @@ async def chat_send(
         import asyncio
 
         asyncio.create_task(speech_say(text=_speech_text, voice=persona["voice"]))
+
+        # Robot emotion expression (fire-and-forget)
+        if _tags:
+            from learnbot_mcp.robot_orchestrator import execute_emotion
+
+            asyncio.create_task(execute_emotion(emotion_tag=_tags[0]))
 
     # Strip emotion tags from displayed response
     response_text = _re.sub(

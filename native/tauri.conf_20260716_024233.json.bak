@@ -4,7 +4,7 @@
     "version": "0.1.0",
     "identifier": "ai.fleet.learnbot-mascot",
     "build": {
-        "frontendDist": "../webapp/dist",
+        "frontendDist": "../web_sota/dist",
         "devUrl": "http://localhost:11102",
         "beforeDevCommand": "",
         "beforeBuildCommand": "pwsh -NoProfile -File ../scripts/build-desktop.ps1"

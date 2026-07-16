@@ -62,16 +62,9 @@ async def lesson_create(
             """INSERT INTO lessons (title, description, language, level, author, sections, vocab, quiz, duration_min, tags)
                VALUES (?,?,?,?,?,?,?,?,?,?)""",  # noqa: E501
             (
-                title,
-                description,
-                language,
-                level,
-                author,
-                json.dumps(sections or []),
-                json.dumps(vocab or []),
-                json.dumps(quiz or []),
-                duration_min,
-                json.dumps(tags or []),
+                title, description, language, level, author,
+                json.dumps(sections or []), json.dumps(vocab or []),
+                json.dumps(quiz or []), duration_min, json.dumps(tags or []),
             ),
         )
         await db.commit()
@@ -119,18 +112,7 @@ async def lesson_list(language: str = "", level: str = "", tag: str = "", limit:
 async def lesson_update(lesson_id: int, **kwargs) -> dict:
     """Update lesson fields. Pass only the fields to change."""
     await ensure_lessons_table()
-    allowed = {
-        "title",
-        "description",
-        "language",
-        "level",
-        "author",
-        "sections",
-        "vocab",
-        "quiz",
-        "duration_min",
-        "tags",
-    }  # noqa: E501
+    allowed = {"title", "description", "language", "level", "author", "sections", "vocab", "quiz", "duration_min", "tags"}  # noqa: E501
     sets = []
     params: list[Any] = []
     for key, value in kwargs.items():
@@ -159,9 +141,7 @@ async def lesson_delete(lesson_id: int) -> dict:
     return {"success": cur.rowcount > 0, "deleted": cur.rowcount > 0}
 
 
-async def lesson_generate(
-    title: str, language: str = "ja", level: str = "N4", duration_min: int = 15
-) -> dict:  # noqa: E501
+async def lesson_generate(title: str, language: str = "ja", level: str = "N4", duration_min: int = 15) -> dict:  # noqa: E501
     """Generate a complete lesson plan via LLM and save it."""
     prompt = (
         f"Create a {language} lesson plan at JLPT {level} level lasting approximately {duration_min} minutes. "  # noqa: E501
@@ -182,94 +162,15 @@ async def lesson_generate(
         raw = result.get("response", "{}").replace("```json", "").replace("```", "").strip()
         data = json.loads(raw)
         return await lesson_create(
-            title=title,
-            description=data.get("description", ""),
-            language=language,
-            level=level,
-            sections=data.get("sections", []),
-            vocab=data.get("vocab", []),
-            quiz=data.get("quiz", []),
-            duration_min=duration_min,
+            title=title, description=data.get("description", ""),
+            language=language, level=level,
+            sections=data.get("sections", []), vocab=data.get("vocab", []),
+            quiz=data.get("quiz", []), duration_min=duration_min,
             tags=data.get("tags", []),
         )
     except Exception as e:
         log.warning("Lesson generation failed: %s", e)
         return {"success": False, "error": str(e), "title": title}
-
-
-async def lesson_differentiate(
-    lesson_id: int,
-    target_level: str,
-    language: str = "ja",
-    duration_min: int | None = None,
-) -> dict:
-    """Adapt an existing lesson for a different proficiency level.
-
-    Reads the source lesson, sends it to the LLM to rework explanations,
-    vocabulary, and quiz for the target JLPT level, and saves as a new lesson.
-    The original is unchanged.
-    """
-    result = await lesson_get(lesson_id)
-    if not result.get("success"):
-        return result
-    src = result["lesson"]
-    new_duration = duration_min or src.get("duration_min", 15)
-    sections_text = json.dumps(src.get("sections", []), ensure_ascii=False, indent=2)
-    vocab_text = json.dumps(src.get("vocab", []), ensure_ascii=False, indent=2)
-    quiz_text = json.dumps(src.get("quiz", []), ensure_ascii=False, indent=2)
-
-    prompt = (
-        f"Adapt this {src['level']} lesson to JLPT {target_level} (language: {language}).\n"
-        f"Original title: '{src['title']}'\n"
-        f"Target duration: ~{new_duration} min\n\n"
-        "Keep the same topic and structure, but adjust for the new level:\n"
-        "- Simpler vocab and grammar for lower levels; more advanced for higher\n"
-        "- Adjust explanation depth (more scaffolding for lower, concise for higher)\n"
-        "- Rewrite dialogue/exercises to match target proficiency\n"
-        "- Adjust quiz difficulty\n\n"
-        f"### Existing Sections\n{sections_text}\n\n"
-        f"### Existing Vocabulary\n{vocab_text}\n\n"
-        f"### Existing Quiz\n{quiz_text}\n\n"
-        "Return ONLY a JSON object with:\n"
-        "- `description`: 1-2 sentence summary of the *adapted* lesson\n"
-        "- `sections`: array of {type, content, duration_min}\n"
-        "- `vocab`: array of {word, reading, definition} (5-8 items)\n"
-        "- `quiz`: array of {question, options: [4 strings], answer} (3 questions)\n"
-        "- `tags`: array of topic strings\n"
-        "Do not include markdown fences in the response."
-    )
-    try:
-        result_llm = await chat_completion(
-            messages=[{"role": "user", "content": prompt}],
-            system_prompt=(
-                "You are an expert language curriculum designer. Adapt lessons "
-                "precisely to JLPT levels. Adjust vocabulary, grammar complexity, "
-                "and explanation depth without changing the core topic."
-            ),
-        )
-        raw = result_llm.get("response", "{}").replace("```json", "").replace("```", "").strip()
-        data = json.loads(raw)
-        adapted_title = f"{src['title']} ({target_level})"
-        return await lesson_create(
-            title=adapted_title,
-            description=data.get("description", src.get("description", "")),
-            language=language,
-            level=target_level,
-            author=f"adapted from {src.get('author', '?')}",
-            sections=data.get("sections", src.get("sections", [])),
-            vocab=data.get("vocab", src.get("vocab", [])),
-            quiz=data.get("quiz", src.get("quiz", [])),
-            duration_min=new_duration,
-            tags=data.get("tags", src.get("tags", [])),
-        )
-    except Exception as e:
-        log.warning("Lesson differentiation failed for #%s → %s: %s", lesson_id, target_level, e)
-        return {
-            "success": False,
-            "error": str(e),
-            "source_lesson_id": lesson_id,
-            "target_level": target_level,
-        }
 
 
 async def lesson_run(lesson_id: int, conversation_id: str) -> dict:
@@ -284,7 +185,6 @@ async def lesson_run(lesson_id: int, conversation_id: str) -> dict:
     lesson = result["lesson"]
     # Post lesson intro as system message
     from learnbot_mcp.database import get_db as _db
-
     stamp = datetime.now(UTC).isoformat()
     async with _db() as db:
         cur = await db.execute("SELECT state FROM conversations WHERE id=?", (conversation_id,))
@@ -297,24 +197,20 @@ async def lesson_run(lesson_id: int, conversation_id: str) -> dict:
             "INSERT INTO turns (id, conversation_id, role, content, timestamp, platform, safety_verdict) VALUES (?,?,'assistant',?,?,?,?)",  # noqa: E501
             (str(lesson_id), conversation_id, intro, stamp, "lesson", "passed"),
         )
-        await db.execute(
-            "UPDATE conversations SET turn_count=turn_count+1, updated_at=? WHERE id=?",
-            (stamp, conversation_id),
-        )  # noqa: E501
+        await db.execute("UPDATE conversations SET turn_count=turn_count+1, updated_at=? WHERE id=?", (stamp, conversation_id))  # noqa: E501
         await db.commit()
     # Build a lesson prompt for the LLM
     sections_text = "\n\n".join(
-        f"[{s.get('type', 'section').upper()}] {s['content']}" for s in lesson.get("sections", [])
+        f"[{s.get('type', 'section').upper()}] {s['content']}"
+        for s in lesson.get("sections", [])
     )
     vocab_text = "\n".join(
         f"  {v.get('word', '?')} ({v.get('reading', '')}) = {v.get('definition', '')}"
         for v in lesson.get("vocab", [])
     )
-    quiz_text = (
-        "\n".join(f"  Q: {q.get('question', '?')}" for q in lesson.get("quiz", []))
-        if lesson.get("quiz")
-        else "No quiz."
-    )
+    quiz_text = "\n".join(
+        f"  Q: {q.get('question', '?')}" for q in lesson.get("quiz", [])
+    ) if lesson.get("quiz") else "No quiz."
     lesson_prompt = (
         f"## Lesson: {lesson['title']}\n"
         f"**Level**: {lesson['level']} | **Duration**: {lesson['duration_min']}min\n\n"
@@ -324,22 +220,6 @@ async def lesson_run(lesson_id: int, conversation_id: str) -> dict:
         "Guide the student through this lesson. Teach each section interactively, "
         "ask questions, check understanding, and quiz at the end. Be encouraging."
     )
-
-    # Persist as the conversation's active lesson so chat_send merges it into
-    # the system prompt on every subsequent turn, until a new lesson_run
-    # replaces it or the conversation ends.
-    import json as _json
-
-    async with _db() as db:
-        await db.execute(
-            "UPDATE conversations SET metadata=? WHERE id=?",
-            (
-                _json.dumps({"active_lesson_id": lesson_id, "lesson_prompt": lesson_prompt}),
-                conversation_id,
-            ),
-        )
-        await db.commit()
-
     return {
         "success": True,
         "lesson_id": lesson_id,
@@ -354,7 +234,6 @@ async def lesson_run(lesson_id: int, conversation_id: str) -> dict:
 def _row_to_lesson(r) -> dict:
     def _j(v):
         return json.loads(v) if isinstance(v, str) else v or []
-
     return {
         "id": r["id"],
         "title": r["title"],

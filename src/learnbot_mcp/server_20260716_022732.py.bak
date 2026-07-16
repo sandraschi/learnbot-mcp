@@ -246,21 +246,6 @@ async def chat_send(
     persona = await get_persona(conv["persona_name"])
     system_prompt = persona["backstory"] if persona else "You are a helpful assistant."
 
-    # If a lesson is active for this conversation (via lesson_run), fold its
-    # prompt in so the LLM actually teaches it instead of lesson_run's output
-    # being a dead end.
-    import json as _json
-
-    conv_metadata = conv.get("metadata")
-    if conv_metadata:
-        try:
-            meta = _json.loads(conv_metadata)
-        except (TypeError, ValueError):
-            meta = {}
-        lesson_prompt = meta.get("lesson_prompt")
-        if lesson_prompt:
-            system_prompt = (system_prompt or "") + "\n\n" + lesson_prompt
-
     _emo_tag_instr = (
         "\n\nIMPORTANT: Prefix your response with ONE bracketed emotion tag that best matches your feeling. "  # noqa: E501
         "Examples: [cheerfully] [sympathetically] [excited] [softly] [thoughtful] [playful] [serious] [warmly] [sad] [laughs] "  # noqa: E501
@@ -480,8 +465,7 @@ async def chatbot_help() -> dict:
             "safety_rule_create, safety_rule_list, safety_rule_delete",
             "audit_query, platform_send",
             "vocab_quiz, vocab_submit, grammar_check, reading_passage",
-            "lesson_create, lesson_differentiate, lesson_generate, lesson_list,",
-            "lesson_get, lesson_update, lesson_delete, lesson_run",
+            "lesson_create, lesson_generate, lesson_list, lesson_get, lesson_update, lesson_delete, lesson_run",
             "chat_proactive_tick",
         ],
         "message": "See SPEC.md for full documentation.",
@@ -630,34 +614,8 @@ async def lesson_create(
 
     tag_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else []
     return await _lc(
-        title=title,
-        description=description,
-        language=language,
-        level=level,
-        author=author,
-        duration_min=duration_min,
-        tags=tag_list,
-    )
-
-
-@mcp.tool(annotations=_MUTATING)
-async def lesson_differentiate(
-    lesson_id: int, target_level: str, language: str = "ja", duration_min: int | None = None
-) -> dict:
-    """Adapt an existing lesson for a different JLPT level and save as new lesson.
-
-    The original lesson is unchanged. The adapted version gets a new title
-    like "Original (N5)" and is created as a separate entry.
-
-    ## Return Format
-    {"success": bool, "lesson": dict,
-     "source_lesson_id": int, "source_level": str,
-     "target_level": str}
-    """
-    from learnbot_mcp.lessons import lesson_differentiate as _ld
-
-    return await _ld(
-        lesson_id=lesson_id, target_level=target_level, language=language, duration_min=duration_min
+        title=title, description=description, language=language,
+        level=level, author=author, duration_min=duration_min, tags=tag_list,
     )
 
 
@@ -672,11 +630,37 @@ async def lesson_generate(
 
 
 @mcp.tool(annotations=_READ_ONLY)
-async def lesson_list(language: str = "", level: str = "", tag: str = "", limit: int = 50) -> dict:
+async def lesson_list(
+    language: str = "", level: str = "", tag: str = "", limit: int = 50
+) -> dict:
     """List lesson plans with optional filters."""
     from learnbot_mcp.lessons import lesson_list as _ll
 
     return await _ll(language=language, level=level, tag=tag, limit=limit)
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def lesson_get(lesson_id: int) -> dict:
+    """Get a lesson plan by ID with full content."""
+    from learnbot_mcp.lessons import lesson_get as _lg
+
+    return await _lg(lesson_id=lesson_id)
+
+
+@mcp.tool(annotations=_MUTATING)
+async def lesson_delete(lesson_id: int) -> dict:
+    """Delete a lesson plan."""
+    from learnbot_mcp.lessons import lesson_delete as _ld
+
+    return await _ld(lesson_id=lesson_id)
+
+
+@mcp.tool(annotations=_MUTATING)
+async def lesson_run(lesson_id: int, conversation_id: str) -> dict:
+    """Execute a lesson plan through an active conversation."""
+    from learnbot_mcp.lessons import lesson_run as _lr
+
+    return await _lr(lesson_id=lesson_id, conversation_id=conversation_id)
 
 
 @mcp.tool(annotations=_READ_ONLY)

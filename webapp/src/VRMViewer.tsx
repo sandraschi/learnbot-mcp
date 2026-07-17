@@ -110,6 +110,20 @@ export function VRMViewer({
 
         if (vrm.lookAt) vrm.lookAt.target = lookAtTarget;
 
+        // Natural rest pose: VRM models load in T-pose (arms straight out).
+        // Normalized humanoid rig: identity = T-pose, left arm along +X,
+        // right along -X, world Z toward viewer. Rotating about Z drops the
+        // arms: left needs negative z, right positive. ~69 degrees down plus
+        // a relaxed elbow. (If a model ever salutes the sky, flip the signs.)
+        const ARM_DOWN = 1.2;
+        const bones = {
+          leftUpper: vrm.humanoid?.getNormalizedBoneNode("leftUpperArm") ?? null,
+          rightUpper: vrm.humanoid?.getNormalizedBoneNode("rightUpperArm") ?? null,
+          leftLower: vrm.humanoid?.getNormalizedBoneNode("leftLowerArm") ?? null,
+          rightLower: vrm.humanoid?.getNormalizedBoneNode("rightLowerArm") ?? null,
+          spine: vrm.humanoid?.getNormalizedBoneNode("spine") ?? null,
+        };
+
         // Expression blending state
         const current: Record<string, number> = {};
         // Auto-blink state
@@ -166,6 +180,14 @@ export function VRMViewer({
               activeViseme = null;
             }
           }
+
+          // Idle pose: arms down with a barely-visible breathing sway
+          const sway = Math.sin(t * 1.4) * 0.015;
+          if (bones.leftUpper) bones.leftUpper.rotation.z = -(ARM_DOWN + sway);
+          if (bones.rightUpper) bones.rightUpper.rotation.z = ARM_DOWN + sway;
+          if (bones.leftLower) bones.leftLower.rotation.z = -0.15;
+          if (bones.rightLower) bones.rightLower.rotation.z = 0.15;
+          if (bones.spine) bones.spine.rotation.x = Math.sin(t * 1.1) * 0.012;
 
           // Eyes: detach target when look-at is off
           if (vrm.lookAt) vrm.lookAt.target = lookAtRef.current ? lookAtTarget : null;

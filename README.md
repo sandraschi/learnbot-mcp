@@ -1,60 +1,68 @@
 # learnbot-mcp
 
-AI chatbot orchestrator — define personas, run conversations with safety guardrails, speak via TTS, log everything.
+AI chatbot orchestrator — personas, safety-guarded conversations, spoken
+TTS, an interactive VRM avatar, and structured language lessons (any
+language, with deep Japanese/JLPT support) — all logged and auditable.
 
-```json
-// opencode.json
-{
-  "mcpServers": {
-    "learnbot-mcp": {
-      "command": "uv",
-      "args": ["run", "--directory", "D:/Dev/repos/learnbot-mcp", "python", "-m", "learnbot_mcp"]
-    }
-  }
-}
-```
+## Preview
 
-## Quick start
+| Dashboard | Avatar |
+|-----------|--------|
+| ![Dashboard](docs/screenshots/cua-dashboard.png) | ![Avatar](docs/screenshots/cua-avatar.png) |
 
-```bash
-uv sync              # install deps
-uv run python -m learnbot_mcp.api   # REST API on :11101
-cd web_sota && bun run dev          # webapp on :11102
-```
+*The webapp is a 12-page control panel (Personas, Chat, Avatar, Lessons,
+Japanese, Safety, Audit, Compliance, Voices, Demos, Help) — this is the
+human side of what the MCP tools drive for agents.*
 
-Or double-click `start.bat`.
+## Features
 
-## What it does
+- **Personas** — define AI characters with backstory, voice, languages, skills, and scheduled proactive messages
+- **Safety-guarded chat** — topic blocking, rate limiting, PII redaction, full conversation audit log
+- **Interactive VRM avatar** (`/avatar`) — three.js viewer with orbit/zoom, facial expressions, auto-blink, look-at-cursor; served from `GET /api/avatar.vrm`
+- **Language-agnostic lessons** — AI-generated lesson plans, spaced-repetition vocab quizzes (SM-2), grammar check, graded readers; every tool takes `source_lang`/`target_lang`, not just Japanese
+- **Deep Japanese/JLPT toolset** (`/japanese`) — bundled kanji, JMdict, JLPT vocab (N5–N1), and example-sentence lookups run on local SQLite, no external service required — plus 11 linked practice games (kanji drills, flashcards, karuta, listening) from a separate optional `games-app`
+- **Multi-platform output** — speak via TTS (Gemini prosody via speech-mcp, falls back to Windows SAPI5), or send to Discord/Resonite bridges
+- **35 MCP tools** across personas, conversations, lessons, language tools, safety, and audit — see [docs/TOOLS.md](docs/TOOLS.md)
 
-| Tool | What |
-|------|------|
-| `persona_create` | Define chatbot personality, voice, backstory |
-| `chat_start/send` | Run conversations with safety checks + LLM |
-| `platform_send` | Speak via TTS (speech-mcp or Windows SAPI5) |
-| `safety_rule_*` | Topic blocking, rate limiting, PII redaction |
-| `audit_query` | Full conversation log with verdicts |
-| `chat_proactive_tick` | Bot initiates conversations on schedule |
-
-## Architecture
+## Quick Install
 
 ```
-learnbot-mcp → local-llm-mcp / Ollama (LLM)
-            → speech-mcp / Windows SAPI5 (TTS)
-            → SQLite (conversations, personas, audit)
-            → React webapp (6 pages)
+Drag learnbot-mcp-{version}.mcpb onto Claude Desktop.
 ```
 
-## Ethics & Safety
+See [INSTALL.md](INSTALL.md) for all install paths (drag-and-drop, mcpb
+CLI, manual config, dev mode) — manual config is what's actually verified
+working today.
 
-This server includes configurable regulatory compliance (China/EU/none),
-topic-based content filtering, rate limiting, and full audit logging.
-See [docs/chatbot-ethics.md](docs/chatbot-ethics.md) for a discussion of
-addiction pathways, pseudohuman dynamics, and regulatory context.
+## What You Can Do
 
-## Docs
+> "Create a persona named Miko who teaches Japanese, start a chat with her, and quiz me on N5 vocabulary."
 
-- [PRD.md](PRD.md) — Product requirements
-- [SPEC.md](SPEC.md) — Architecture specification
-- [docs/chatbot-ethics.md](docs/chatbot-ethics.md) — Ethics, addiction, regulation
-- [AGENTS.md](AGENTS.md) — Coding agent guide
-- [CHANGELOG.md](CHANGELOG.md) — Release history
+> "Show me the VRM avatar with a happy expression and have her say hello."
+
+> "Generate a beginner Spanish lesson on ordering food, then run it in a new conversation."
+
+## Documentation
+
+| Doc | Contents |
+|-----|----------|
+| [Installation](INSTALL.md) | All install methods, prerequisites |
+| [Configuration](docs/CONFIGURATION.md) | Env vars, config options |
+| [Tool Reference](docs/TOOLS.md) | All 35 MCP tools |
+| [Development](docs/DEVELOPMENT.md) | Contributing, local setup, tests |
+| [Troubleshooting](docs/TROUBLESHOOTING.md) | Common issues |
+| [Japanese Learning Guide](docs/JAPANESE_LEARNING.md) | Full-spectrum Japanese learning — four skills, phased workflow, JLPT comparison |
+| [Distance Learning](docs/DISTANCE_LEARNING.md) | Paired with `classroom-mcp` — courses, teaching agents, courseware |
+| [Arabic → German Integration](docs/INTEGRATION_AR.md) | دليل بالعربية — learn German for Austrian daily life |
+| [Chatbot Ethics](docs/chatbot-ethics.md) | Addiction, regulation, pseudohuman dynamics |
+
+## Requirements
+
+- Claude Desktop (or another MCP client) + Python 3.12+
+- Node.js, for the webapp
+- Windows for the TTS SAPI5 fallback; core features are OS-agnostic
+- Optional: [local-llm-mcp](https://github.com/sandraschi/local-llm-mcp) or Ollama, for AI-generated lessons/grammar-check/reading passages — the dictionary/kanji/JLPT tools need no LLM at all
+
+## License
+
+MIT — see [LICENSE](LICENSE).

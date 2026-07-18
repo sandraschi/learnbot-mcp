@@ -403,6 +403,46 @@ async def api_voice_test(request: Request) -> JSONResponse:
     return JSONResponse(result)
 
 
+async def api_kanji_search(request: Request) -> JSONResponse:
+    from learnbot_mcp.games_integration import kanji_search
+
+    q = request.query_params
+    result = await kanji_search(
+        query=q.get("q", ""),
+        jlpt=q.get("jlpt", ""),
+        grade=q.get("grade", ""),
+        category=q.get("category", ""),
+        limit=int(q.get("limit", 20)),
+    )
+    return JSONResponse(result)
+
+
+async def api_vocab_lookup(request: Request) -> JSONResponse:
+    from learnbot_mcp.games_integration import vocab_lookup
+
+    q = request.query_params
+    result = await vocab_lookup(
+        search=q.get("search", ""), jlpt=q.get("jlpt", ""), limit=int(q.get("limit", 20))
+    )
+    return JSONResponse(result)
+
+
+async def api_example_sentences(request: Request) -> JSONResponse:
+    from learnbot_mcp.games_integration import example_sentences
+
+    q = request.query_params
+    result = await example_sentences(word=q.get("word", ""), limit=int(q.get("limit", 5)))
+    return JSONResponse(result)
+
+
+async def api_jlpt_quiz(request: Request) -> JSONResponse:
+    from learnbot_mcp.games_integration import jlpt_quiz
+
+    q = request.query_params
+    result = await jlpt_quiz(level=q.get("level", "N5"), limit=int(q.get("limit", 5)))
+    return JSONResponse(result)
+
+
 async def api_lessons_list(request: Request) -> JSONResponse:
     from learnbot_mcp.lessons import lesson_list
 
@@ -422,6 +462,7 @@ async def api_lesson_generate(request: Request) -> JSONResponse:
         title=body.get("title", ""),
         language=body.get("language", "ja"),
         level=body.get("level", "N4"),
+        framework=body.get("framework", ""),
         duration_min=int(body.get("duration_min", 15)),
     )
     return JSONResponse(result)
@@ -476,18 +517,38 @@ async def api_audit_query(request: Request) -> JSONResponse:
         return JSONResponse({"error": str(e), "detail": tb}, status_code=500)
 
 
+def _find_dist() -> Path:
+    """Find webapp dist directory — works in dev, PyInstaller, and Tauri."""
+    import sys
+    # PyInstaller frozen: check _MEIPASS
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        mp = Path(sys._MEIPASS)
+        # Check various relative paths
+        for p in [mp / "webapp" / "dist", mp.parent / "webapp" / "dist"]:
+            if (p / "index.html").is_file():
+                return p
+    # Dev mode: relative to this file
+    p = Path(__file__).resolve().parents[2] / "webapp" / "dist"
+    if (p / "index.html").is_file():
+        return p
+    # Last resort: exe-relative (Tauri installed)
+    if hasattr(sys, 'executable'):
+        p = Path(sys.executable).parent.parent / "resources" / "webapp" / "dist"
+        if (p / "index.html").is_file():
+            return p
+    return Path()
+
+
 def _spa_fallback(request: Request) -> HTMLResponse:
-    dist = Path(__file__).resolve().parents[2] / "web_sota" / "dist"
+    dist = _find_dist()
     index = dist / "index.html"
     if index.is_file():
         return HTMLResponse(index.read_text(encoding="utf-8"))
-    return HTMLResponse(
-        "<h1>Frontend not built. Run: cd web_sota && bun run build</h1>", status_code=503
-    )
+    return HTMLResponse("Frontend not available", status_code=503)
 
 
 def build_app() -> Starlette:
-    dist = Path(__file__).resolve().parents[2] / "web_sota" / "dist"
+    dist = _find_dist()
     _routes = [
         Route("/health", api_health),
         Route("/api/health", api_health),
@@ -511,6 +572,10 @@ def build_app() -> Starlette:
         Route("/api/avatar/vrm", api_avatar_vrm),
         Route("/api/voice/test", api_voice_test, methods=["POST"]),
         Route("/api/lessons", api_lessons_list),
+        Route("/api/kanji/search", api_kanji_search),
+        Route("/api/vocab/lookup", api_vocab_lookup),
+        Route("/api/examples/search", api_example_sentences),
+        Route("/api/jlpt/quiz", api_jlpt_quiz),
         Route("/api/lesson/generate", api_lesson_generate, methods=["POST"]),
         Route("/api/lesson/{id}", api_lesson_delete, methods=["DELETE"]),
         Route("/api/chat/proactive-tick", api_proactive_tick, methods=["POST"]),

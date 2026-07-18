@@ -483,8 +483,19 @@ async def chatbot_help() -> dict:
             "lesson_create, lesson_differentiate, lesson_generate, lesson_list,",
             "lesson_get, lesson_update, lesson_delete, lesson_run",
             "chat_proactive_tick",
+            "kanji_search, vocab_lookup, jlpt_vocab_by_level, example_sentences, jlpt_quiz",
+            "graded_reader",
         ],
         "message": "See SPEC.md for full documentation.",
+        "japanese_learning": (
+            "learnbot-mcp includes a Japanese learning subsystem. "
+            "Tools: vocab_quiz (SM-2 spaced repetition), vocab_submit, "
+            "grammar_check (sentence correction with JLPT level), "
+            "reading_passage (JLPT-graded text), lesson_generate, "
+            "lesson_run, lesson_differentiate. "
+            "Start with: lesson_generate(title='...') to create a lesson, "
+            "then lesson_run() into a chat with a bilingual persona (e.g. Miko-chan)."
+        ),
     }
 
 
@@ -663,12 +674,21 @@ async def lesson_differentiate(
 
 @mcp.tool(annotations=_MUTATING)
 async def lesson_generate(
-    title: str, language: str = "ja", level: str = "N4", duration_min: int = 15
+    title: str,
+    language: str = "ja",
+    level: str = "N4",
+    framework: str = "",
+    duration_min: int = 15,
 ) -> dict:
-    """Generate a complete lesson via AI — sections, vocab, quiz — and save it."""
+    """Generate a complete lesson via AI — sections, vocab, quiz — and save it.
+
+    Framework-aware: pass 'CEFR', 'JLPT', 'HSK', 'DELF', etc. to target that standard.
+    The LLM uses the framework to calibrate content difficulty and focus areas."""
     from learnbot_mcp.lessons import lesson_generate as _lg
 
-    return await _lg(title=title, language=language, level=level, duration_min=duration_min)
+    return await _lg(
+        title=title, language=language, level=level, framework=framework, duration_min=duration_min
+    )
 
 
 @mcp.tool(annotations=_READ_ONLY)
@@ -681,16 +701,144 @@ async def lesson_list(language: str = "", level: str = "", tag: str = "", limit:
 
 @mcp.tool(annotations=_READ_ONLY)
 async def reading_passage(
-    level: str = "N4", source_lang: str = "ja", target_lang: str = "en"
+    level: str = "N4",
+    source_lang: str = "ja",
+    target_lang: str = "en",
+    framework: str = "",
 ) -> dict:
-    """Generate a JLPT-graded reading passage with comprehension questions.
+    """Generate a graded reading passage with comprehension questions.
+
+    Works for any language pair. Pass framework='CEFR', 'JLPT', 'HSK', etc.
+    to target a specific standard. For Arabic speakers learning German:
+    reading_passage(level='A1', source_lang='de', target_lang='ar', framework='CEFR')
 
     ## Return Format
     {"success": bool, "passage": str, "vocabulary": list, "questions": list}
     """
     from learnbot_mcp.learn_tools import reading_passage as _rp
 
-    return await _rp(level=level, source_lang=source_lang, target_lang=target_lang)
+    return await _rp(
+        level=level, source_lang=source_lang, target_lang=target_lang, framework=framework
+    )
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def graded_reader(
+    language: str = "de",
+    level: str = "A1",
+    framework: str = "CEFR",
+    target_lang: str = "ar",
+    topic: str = "",
+) -> dict:
+    """Generate a graded reader — leveled text + vocabulary + comprehension + discussion.
+
+    Unlike reading_passage (single text + questions), graded_reader produces
+    a structured reader for extensive reading practice with pre-reading vocab,
+    comprehension questions, and open-ended discussion prompts.
+
+    Optimised for any language pair. Example: language='de', target_lang='ar',
+    level='A1', framework='CEFR' for Arabic speakers learning German at beginner level.
+
+    ## Return Format
+    {"success": bool, "title": str, "text": str, "vocabulary": list,
+     "questions": list, "discussion": list}
+    """
+    from learnbot_mcp.learn_tools import graded_reader as _gr
+
+    return await _gr(
+        language=language,
+        level=level,
+        framework=framework,
+        target_lang=target_lang,
+        topic=topic,
+    )
+
+
+# -- Japanese reference data (bundled locally, see data/ATTRIBUTION.md) --------
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def kanji_search(
+    query: str = "",
+    jlpt: str = "",
+    grade: str = "",
+    category: str = "",
+    limit: int = 20,
+) -> dict:
+    """Search kanji by meaning, JLPT level, grade, or category.
+
+    Sources from bundled data/kanji.db (jouyou + jinmeiyou, 13K+ characters).
+    Local SQLite query, no external service required.
+
+    ## Return Format
+    {"success": bool, "kanji": list, "count": int}
+    """
+    from learnbot_mcp.games_integration import kanji_search as _ks
+
+    return await _ks(query=query, jlpt=jlpt, grade=grade, category=category, limit=limit)
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def vocab_lookup(search: str = "", jlpt: str = "", limit: int = 20) -> dict:
+    """Look up Japanese vocabulary from JMdict or JLPT-graded lists.
+
+    search= queries the official JMdict dictionary (214K+ entries).
+    jlpt= queries the JLPT-graded vocabulary list (8K+ entries) instead.
+    Sources from bundled data/kanji.db. Local SQLite query, no external
+    service required.
+
+    ## Return Format
+    {"success": bool, "vocab": list, "count": int}
+    """
+    from learnbot_mcp.games_integration import vocab_lookup as _vl
+
+    return await _vl(search=search, jlpt=jlpt, limit=limit)
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def jlpt_vocab_by_level(jlpt: str = "N5", limit: int = 20) -> dict:
+    """Get a JLPT-graded vocabulary list for a specific level (N5-N1).
+
+    Sources from bundled data/kanji.db's jlpt_vocabulary table (8K+ entries).
+    Local SQLite query, no external service required.
+
+    ## Return Format
+    {"success": bool, "vocab": list, "count": int}
+    """
+    from learnbot_mcp.games_integration import jlpt_vocab_by_level as _jvl
+
+    return await _jvl(jlpt=jlpt, limit=limit)
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def example_sentences(word: str, limit: int = 5) -> dict:
+    """Get example sentences for a Japanese word.
+
+    Sources from bundled data/kanji.db's Tatoeba sentence table (278K+ pairs,
+    CC BY 2.0 FR — see data/ATTRIBUTION.md). Local SQLite query, no
+    external service required.
+
+    ## Return Format
+    {"success": bool, "examples": list, "count": int}
+    """
+    from learnbot_mcp.games_integration import example_sentences as _es
+
+    return await _es(word=word, limit=limit)
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def jlpt_quiz(level: str = "N5", limit: int = 5) -> dict:
+    """Get JLPT practice questions for a given level (N5-N1).
+
+    Sources from bundled data/jlpt_questions.db (600 questions, 12 test
+    sets per level). Local SQLite query, no external service required.
+
+    ## Return Format
+    {"success": bool, "questions": list, "count": int}
+    """
+    from learnbot_mcp.games_integration import jlpt_quiz as _jq
+
+    return await _jq(level=level, limit=limit)
 
 
 def main():

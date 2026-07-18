@@ -1,5 +1,82 @@
 # Changelog
 
+## [0.6.0] — 2026-07-17
+
+### Changed
+- **Japanese reference data (kanji, JMdict, JLPT vocab, Tatoeba examples,
+  JLPT questions) moved from games-app HTTP integration to bundled local
+  SQLite files.** `kanji_search`, `vocab_lookup`, `jlpt_vocab_by_level`,
+  `example_sentences`, `jlpt_quiz` now query `data/kanji.db` and
+  `data/jlpt_questions.db` directly via aiosqlite — no running games-app
+  required. Eliminates a real port collision: the old defaults
+  (`LEARNBOT_GAMES_APP_API_URL`=:11003, `LEARNBOT_GAMES_APP_JLPT_URL`=:11001)
+  matched games-app's actual kanji-api/jlpt-api ports, but those exact
+  ports are also allocated to unrelated fleet hardware-control servers
+  (power-supply-mcp, function-generator-mcp) per WEBAPP_PORTS.md.
+- `games_integration.py` rewritten: httpx calls → direct aiosqlite queries
+  against the bundled files. Same function signatures and return shapes,
+  no caller-side changes needed.
+- Removed `LEARNBOT_GAMES_APP_API_URL` / `LEARNBOT_GAMES_APP_JLPT_URL`
+  config fields (no longer meaningful).
+- `jlpt_vocab_by_level` — previously implemented but never registered as
+  an MCP tool — now wired into `server.py`.
+- Added REST routes (`/api/kanji/search`, `/api/vocab/lookup`,
+  `/api/examples/search`, `/api/jlpt/quiz`) so the webapp can actually
+  reach this data — previously zero REST exposure existed for any of it.
+- `webapp/src/pages/Japanese.tsx` rewritten: added a real inline
+  dictionary/kanji search UI backed by the new local API. The 11
+  external games-app game links (kanji-master, flashcards, karuta, etc.)
+  stay as optional external links, now honestly labeled as such and with
+  a health check pointed at games-app's actual port (:10987, was
+  incorrectly checking :11003/:11001 — the visible links and the status
+  indicator were checking different things).
+- Added `data/ATTRIBUTION.md` — JMdict (EDRDG licence) and Tatoeba
+  (CC BY 2.0 FR) attribution.
+
+### Fixed
+- `_version.py` was still 0.4.0 despite pyproject.toml/README/AGENTS.md
+  already at 0.5.0 — synced.
+
+## [0.5.0] — 2026-07-16
+
+### Added
+- `kanji_search`, `vocab_lookup`, `example_sentences`, `jlpt_quiz` — MCP tools
+  integrating games-app's kanji DB, JMdict (214K), JLPT vocab (8K), Tatoeba (278K),
+  and JLPT practice questions (600). Configurable via LEARNBOT_GAMES_APP_API_URL.
+- `graded_reader` — structured graded reader for any language: leveled text,
+  pre-reading vocabulary, comprehension questions, discussion prompts.
+- `framework` parameter on `lesson_generate` and `reading_passage` — target CEFR,
+  HSK, DELF, DELE, Goethe, etc. alongside existing JLPT support.
+- Japanese learning page in webapp (`/japanese`) with 11 linked games-app tools.
+- `docs/JAPANESE_LEARNING.md` — full-spectrum Japanese learning guide.
+- README.md — Table of Contents, Arabic→German persona preset for Austrian
+  integration context (Layla, AR/DE bilingual).
+- classroom-mcp: `framework` field on students/classes, `syllabus_generate` (AI
+  curriculum per framework), `courseware_generate_ai`, `assignment_create_with_lesson`
+  (calls learnbot-mcp via LEARNBOT_URL — bridge now wired).
+
+### Changed
+- `_version.py` and `pyproject.toml` bumped to 0.5.0.
+- Removed duplicate `except` block in `_generate_fresh_quiz`.
+
+## [0.4.1] — 2026-07-16
+
+### Fixed
+- JSON extraction from LLM responses — `_generate_fresh_quiz`, `_generate_distractors`,
+  `grammar_check`, `reading_passage`, `lesson_generate`, `lesson_differentiate` all
+  now handle prose-wrapped JSON (LLM wraps arrays/objects in explanatory text).
+  Added shared `_clean_llm_json()` and `_extract_json_array()` helpers.
+- `{overdue_count}` variable now resolved in proactive triggers — queries
+  `vocab_items` table for `COUNT(*) WHERE due_at <= now` instead of being
+  a planned-but-unimplemented feature.
+- STATUS.md port corrected from 11104 to 11101.
+- `_version.py` and `pyproject.toml` version bumped to 0.4.0.
+- TODO.md P2 checkboxes fixed for completed items.
+
+### Added
+- 4 regression tests: duplicate tool registration guard, lesson round-trip,
+  due vocab item appears in quiz, distractor correctness guard.
+
 ## [0.4.0] — 2026-07-15
 
 ### Added

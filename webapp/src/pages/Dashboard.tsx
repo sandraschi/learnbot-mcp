@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Bot, MessageSquare, Shield, Activity } from "lucide-react";
 import { api } from "../api";
 
@@ -21,6 +21,16 @@ function KpiCard({ icon: Icon, label, value, testid }: { icon: React.ElementType
 export function Dashboard() {
   const [health, setHealth] = useState<any>(null);
   const [err, setErr] = useState("");
+  const [restarting, setRestarting] = useState(false);
+
+  const refresh = useCallback(async () => {
+    try {
+      const h = await api.health();
+      setHealth(h);
+      setErr("");
+      setRestarting(false);
+    } catch { /* backoff handles retry */ }
+  }, []);
 
   useEffect(() => {
     let attempts = 0;
@@ -29,6 +39,7 @@ export function Dashboard() {
         const h = await api.health();
         setHealth(h);
         setErr("");
+        attempts = 0;
       } catch {
         attempts++;
         const delay = Math.min(1000 * Math.pow(2, attempts), 16000);
@@ -36,6 +47,34 @@ export function Dashboard() {
       }
     };
     fn();
+    const interval = setInterval(fn, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+    (async () => {
+      try {
+        const { listen } = await import("@tauri-apps/api/event");
+        unlisten = await listen<string>("backend-status", (event) => {
+          if (event.payload === "ready") {
+            refresh();
+          } else if (typeof event.payload === "string" && event.payload.startsWith("error:")) {
+            setErr(event.payload);
+            setRestarting(false);
+          }
+        });
+      } catch { /* not in Tauri */ }
+    })();
+    return () => { if (unlisten) unlisten(); };
+  }, [refresh]);
+
+  const restartBackend = useCallback(async () => {
+    setRestarting(true);
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("start_backend");
+    } catch { setRestarting(false); }
   }, []);
 
   if (!health) {
@@ -57,6 +96,15 @@ export function Dashboard() {
         <span className="text-xs text-zinc-500">
           {err ? "Offline" : health ? "Connected" : "Connecting..."}
         </span>
+        {err && (
+          <button
+            onClick={restartBackend}
+            disabled={restarting}
+            className="ml-2 px-2 py-1 text-xs bg-amber-500/10 text-amber-500 rounded hover:bg-amber-500/20"
+          >
+            {restarting ? "Restarting..." : "Restart Backend"}
+          </button>
+        )}
       </div>
       <h1 className="text-xl font-bold mb-6">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -68,7 +116,6 @@ export function Dashboard() {
       <div className="mt-4 text-sm text-zinc-600">
         learnbot-mcp v{health.version} &middot; {err && <span className="text-red-400">{err}</span>}
       </div>
-      <div className="mt-8" data-testid="dashboard" />
     </div>
   );
 }

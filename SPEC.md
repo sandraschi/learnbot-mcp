@@ -47,7 +47,7 @@ behavioral_constraints:
     action: "redact"            # strip from logs
 proactive_triggers:             # bot can start conversations
   - schedule: "0 8 * * 1-5"     # weekday 8am
-    prompt: "Good morning! Your TBR pile has {overdue_count} items."
+    prompt: "Good morning! Your TBR pile has {overdue_count} items."  # resolved at runtime from vocab_items
 knowledge_base: ""              # optional RAG context source
 ```
 

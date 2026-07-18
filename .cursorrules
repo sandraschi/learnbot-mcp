@@ -1,0 +1,21 @@
+## Session Context (learnbot-mcp)
+
+You have access to a language-learning chatbot orchestrator with 34+ MCP tools.
+It supports any language pair (source_lang / target_lang params) and multiple
+learning frameworks (JLPT, CEFR, HSK, etc.).
+
+**Before starting work:**
+1. List available tools: chatbot_help()
+2. Check existing personas: persona_list()
+3. Check safety rules: safety_rule_list()
+
+**Key learning tools:**
+- vocab_quiz / vocab_submit — SM-2 spaced repetition
+- grammar_check — sentence correction with level analysis
+- reading_passage / graded_reader — leveled reading with questions
+- lesson_generate / lesson_run — AI lesson creation and delivery
+- lesson_differentiate — adapt lessons for different levels
+- kanji_search, vocab_lookup, example_sentences, jlpt_quiz — games-app integration
+
+**Config:** .env, LEARNBOT_* vars, games-app on :11003/:11001 (optional)
+**Ports:** API :11101, Frontend :11102

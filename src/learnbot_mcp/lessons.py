@@ -12,6 +12,12 @@ from learnbot_mcp.llm_client import chat_completion
 
 log = logging.getLogger(__name__)
 
+
+def _clean_llm_json(text: str) -> str:
+    """Strip markdown fences from LLM output."""
+    return text.replace("```json", "").replace("```", "").strip()
+
+
 _LESSON_SCHEMA = """
 CREATE TABLE IF NOT EXISTS lessons (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -160,11 +166,19 @@ async def lesson_delete(lesson_id: int) -> dict:
 
 
 async def lesson_generate(
-    title: str, language: str = "ja", level: str = "N4", duration_min: int = 15
-) -> dict:  # noqa: E501
+    title: str,
+    language: str = "ja",
+    level: str = "N4",
+    framework: str = "",
+    duration_min: int = 15,
+) -> dict:
     """Generate a complete lesson plan via LLM and save it."""
+    framework_hint = ""
+    if framework:
+        framework_hint = f" ({framework} framework)"
     prompt = (
-        f"Create a {language} lesson plan at JLPT {level} level lasting approximately {duration_min} minutes. "  # noqa: E501
+        f"Create a {language} lesson plan at {level}{framework_hint} level"
+        f" lasting approximately {duration_min} minutes. "
         f"Title: '{title}'.\n\n"
         "Return a JSON object with:\n"
         "- `description`: 1-2 sentence summary\n"
@@ -179,7 +193,7 @@ async def lesson_generate(
             messages=[{"role": "user", "content": prompt}],
             system_prompt="You are an expert language curriculum designer. Create engaging, pedagogically sound lessons.",  # noqa: E501
         )
-        raw = result.get("response", "{}").replace("```json", "").replace("```", "").strip()
+        raw = _clean_llm_json(result.get("response", "{}"))
         data = json.loads(raw)
         return await lesson_create(
             title=title,
@@ -247,7 +261,7 @@ async def lesson_differentiate(
                 "and explanation depth without changing the core topic."
             ),
         )
-        raw = result_llm.get("response", "{}").replace("```json", "").replace("```", "").strip()
+        raw = _clean_llm_json(result_llm.get("response", "{}"))
         data = json.loads(raw)
         adapted_title = f"{src['title']} ({target_level})"
         return await lesson_create(

@@ -18,8 +18,9 @@
 - [x] `vocab_quiz` — spaced-repetition vocab from conversation context
 - [x] `grammar_check` — LLM corrects learner's sentence, explains grammar
 - [x] `reading_passage` — generate JLPT-graded text + comprehension questions
-- [ ] `lesson_generate` — ✅ DONE (AI generates full lesson from title)
-- [ ] `lesson_runner` — ✅ DONE (injects lesson into conversation)
+- [x] `lesson_generate` — AI generates full lesson from title
+- [x] `lesson_run` — injects lesson into conversation
+- [x] `lesson_differentiate` — adapt lesson for different JLPT level
 - [ ] `speaking_drill` — speech-mcp prompts, listens (STT), rates pronunciation
 - [ ] `writing_practice` — gimp-mcp renders learner text as annotated image
 

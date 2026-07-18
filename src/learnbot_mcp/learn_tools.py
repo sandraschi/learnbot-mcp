@@ -12,6 +12,29 @@ from learnbot_mcp.llm_client import chat_completion
 
 log = logging.getLogger(__name__)
 
+
+def _clean_llm_json(text: str) -> str:
+    """Strip markdown fences and surrounding prose from LLM output."""
+    cleaned = text.replace("```json", "").replace("```", "").strip()
+    return cleaned
+
+
+def _extract_json_array(text: str) -> list:
+    """Extract a JSON array from LLM response text."""
+    cleaned = _clean_llm_json(text)
+    start = cleaned.find("[")
+    end = cleaned.rfind("]")
+    if start != -1 and end != -1 and end > start:
+        cleaned = cleaned[start : end + 1]
+    try:
+        parsed = json.loads(cleaned)
+        if isinstance(parsed, list):
+            return parsed
+    except (json.JSONDecodeError, ValueError):
+        pass
+    return []
+
+
 REVIEW_INTERVALS = [1, 3, 7, 14, 30]  # days for spaced repetition
 
 
@@ -138,9 +161,7 @@ async def grammar_check(text: str, source_lang: str = "ja", target_lang: str = "
             system_prompt="You are a professional language teacher. Be precise but encouraging.",
             model="",
         )
-        raw = result.get("response", "{}")
-        # Strip markdown code fences if present
-        raw = raw.replace("```json", "").replace("```", "").strip()
+        raw = _clean_llm_json(result.get("response", "{}"))
         data = json.loads(raw)
         return {
             "success": True,
@@ -159,18 +180,26 @@ async def reading_passage(
     level: str = "N4",
     source_lang: str = "ja",
     target_lang: str = "en",
+    framework: str = "",
 ) -> dict:
     """Generate a graded reading passage with comprehension questions.
+
+    Works for any language pair. Pass framework='CEFR', 'JLPT', 'HSK', etc.
+    to target a specific standard. For example: level='A1', framework='CEFR',
+    source_lang='de' gives beginner German.
 
     ## Return Format
     {"success": bool, "passage": str, "vocabulary": list[dict], "questions": list[dict]}
     """
+    framework_hint = f" ({framework})" if framework else ""
     prompt = (
-        f"Create a {source_lang} reading passage at JLPT {level} level (~100-200 words). "
+        f"Create a {source_lang} reading passage at {level}{framework_hint} level"
+        f" (~100-200 words). "
         f"Also provide {target_lang} translations for 5 key vocabulary items and 3 comprehension questions.\n\n"  # noqa: E501
         "Return JSON with:\n"
         "- `title`: passage title in both languages\n"
-        "- `passage`: the {source_lang} text with furigana for hard kanji in parentheses\n"
+        "- `passage`: the {source_lang} text"
+        f"{' with furigana for hard kanji in parentheses' if source_lang == 'ja' else ''}\n"
         "- `vocabulary`: array of {`word`, `reading`, `definition`} for 5 key items\n"
         "- `questions`: array of {`question`, `options` (4), `answer`} in {target_lang}"
     )
@@ -179,11 +208,75 @@ async def reading_passage(
             messages=[{"role": "user", "content": prompt}],
             system_prompt="You are a JLPT preparation teacher. Generate accurate, level-appropriate content.",  # noqa: E501
         )
-        raw = result.get("response", "{}").replace("```json", "").replace("```", "").strip()
+        raw = _clean_llm_json(result.get("response", "{}"))
         data = json.loads(raw)
         return {"success": True, **data}
     except Exception as e:
         log.warning("Reading passage failed: %s", e)
+        return {"success": False, "error": str(e)}
+
+
+async def graded_reader(
+    language: str = "de",
+    level: str = "A1",
+    framework: str = "CEFR",
+    target_lang: str = "ar",
+    topic: str = "",
+) -> dict:
+    """Generate a graded reader — a leveled reading text with vocabulary and questions.
+
+    Unlike reading_passage which generates one-off texts, graded_reader produces
+    a structured reader suitable for extensive reading practice:
+    - Full text at the target level
+    - Pre-reading vocabulary with translations
+    - While-reading comprehension questions
+    - Post-reading discussion prompts
+
+    Optimised for any language pair. Example: language='de', target_lang='ar',
+    level='A1' for Arabic speakers learning German.
+
+    ## Return Format
+    {"success": bool, "title": str, "text": str, "vocabulary": list,
+     "questions": list, "discussion": list}
+    """
+    framework_hint = f" ({framework})" if framework else ""
+    topic_hint = f" about '{topic}'" if topic else ""
+    prompt = (
+        f"Create a graded reader in {language} at {level}{framework_hint} level{topic_hint}.\n\n"
+        "The reader should use controlled vocabulary and grammar appropriate for this level.\n\n"
+        "Return JSON with:\n"
+        "- `title`: title in {language}\n"
+        f"- `text`: ~150-250 word passage in {language}\n"
+        f"- `vocabulary`: array of 8-12 {{`word`, `reading` (if needed), `definition` (in {target_lang})}} for key vocabulary\n"  # noqa: E501
+        "- `questions`: array of 5 {{`question` (in {language}), `options` (4 strings), `answer` (correct option), `explanation` (in {target_lang})}}\n"  # noqa: E501
+        f"- `discussion`: array of 3 open-ended prompts in {target_lang} for deeper reflection\n\n"  # noqa: E501
+        f"For {language} at {level} level: keep sentences short, use high-frequency words, "
+        "repeat key vocabulary, and avoid complex subordinate clauses."
+    )
+    try:
+        result = await chat_completion(
+            messages=[{"role": "user", "content": prompt}],
+            system_prompt=(
+                f"You are an expert in teaching {language} to {target_lang} speakers. "
+                "Create pedagogically sound graded readers following recognised "
+                "extensive reading principles."
+            ),
+        )
+        raw = _clean_llm_json(result.get("response", "{}"))
+        data = json.loads(raw)
+        return {
+            "success": True,
+            "title": data.get("title", ""),
+            "text": data.get("text", ""),
+            "vocabulary": data.get("vocabulary", []),
+            "questions": data.get("questions", []),
+            "discussion": data.get("discussion", []),
+            "level": level,
+            "framework": framework,
+            "language": language,
+        }
+    except Exception as e:
+        log.warning("Graded reader failed: %s", e)
         return {"success": False, "error": str(e)}
 
 
@@ -200,12 +293,11 @@ async def _generate_distractors(
             messages=[{"role": "user", "content": prompt}],
             system_prompt="You are a language quiz generator.",
         )
-        raw = result.get("response", "[]").replace("```json", "").replace("```", "").strip()
-        distractors = json.loads(raw)
+        distractors = _extract_json_array(result.get("response", "[]"))
         if isinstance(distractors, list) and len(distractors) >= count:
             return distractors[:count]
-    except Exception:
-        pass
+    except Exception as e:
+        log.warning("Distractor generation failed for '%s': %s", word, e)
     return ["(generation failed)"] * count
 
 
@@ -220,11 +312,11 @@ async def _generate_fresh_quiz(user_id: str, src: str, tgt: str, count: int) -> 
             messages=[{"role": "user", "content": prompt}],
             system_prompt="You are a language teacher creating study materials.",
         )
-        raw = result.get("response", "[]").replace("```json", "").replace("```", "").strip()
-        items = json.loads(raw)
+        items = _extract_json_array(result.get("response", "{}"))
         if not isinstance(items, list):
             items = []
-    except Exception:
+    except Exception as e:
+        log.warning("Fresh quiz generation failed: %s", e)
         items = []
     quiz = []
     for item in items[:count]:
@@ -240,8 +332,8 @@ async def _generate_fresh_quiz(user_id: str, src: str, tgt: str, count: int) -> 
                     (user_id, word, reading, definition, example, src, tgt),
                 )
                 await db.commit()
-            except Exception:
-                pass
+            except Exception as e:
+                log.warning("Failed to save vocab item '%s': %s", word, e)
         # Generate distractors
         distractors = await _generate_distractors(word, definition, src, tgt, count=3)
         options = distractors + [definition]

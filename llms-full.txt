@@ -82,6 +82,6 @@ See `.env.example` for full list.
 uv sync                    # install deps
 just serve                 # start MCP server (stdio)
 just serve-rest            # start REST API (:11101)
-cd web_sota && bun run dev # start frontend (:11102)
+cd webapp && bun run dev # start frontend (:11102)
 just test                  # run 8 tests
 ```

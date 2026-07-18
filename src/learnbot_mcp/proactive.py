@@ -159,6 +159,17 @@ async def proactive_tick() -> dict[str, Any]:
                     "{time_of_day}",
                     "morning" if datetime.now(UTC).hour < 12 else "afternoon",
                 )
+            if "{overdue_count}" in resolved_prompt:
+                from learnbot_mcp.learn_tools import ensure_vocab_table
+
+                await ensure_vocab_table()
+                async with get_db() as db_voc:
+                    cur = await db_voc.execute(
+                        "SELECT COUNT(*) AS cnt FROM vocab_items WHERE due_at <= datetime('now')"
+                    )
+                    row = await cur.fetchone()
+                    count = row["cnt"] if row else 0
+                resolved_prompt = resolved_prompt.replace("{overdue_count}", str(count))
 
             from learnbot_mcp.server import chat_send
 

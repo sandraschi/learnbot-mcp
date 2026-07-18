@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Info, Shield, BookOpen, FileText, MessageCircle } from "lucide-react";
+import { Info, Shield, BookOpen, FileText, MessageCircle, JapaneseYen } from "lucide-react";
 
 const tabs = [
   {
@@ -64,6 +64,47 @@ Set \`LEARNBOT_REGULATORY_REGIME\` in .env:
 - \`none\`: no extra restrictions
 - \`china\`: real-name auth, topic blocklists, retention
 - \`eu\`: AI disclosure, opt-out, full logging`,
+  },
+  {
+    id: "japanese",
+    label: "Japanese",
+    icon: JapaneseYen,
+    content: `## Japanese Learning — Full-Spectrum Language Acquisition
+
+learnbot-mcp covers ALL four language skills. The JLPT only tests two (reading, listening) and tests neither speaking nor writing.
+
+### Skills Coverage
+
+| Skill | JLPT | learnbot-mcp |
+|-------|------|-------------|
+| Reading | Multiple-choice | Full texts (reading_passage), interactive lessons |
+| Listening | Canned audio, MC | TTS with emotion prosody, listening game |
+| Speaking | NOT TESTED | Live conversation with Miko-chan (bilingual JA/EN) |
+| Writing | NOT TESTED | Chat composition + grammar_check feedback |
+
+### Tools
+
+vocab_quiz — SM-2 spaced repetition vocabulary quiz
+vocab_submit — submit quiz result, schedule next review
+grammar_check — analyse a sentence, return corrections + JLPT level
+reading_passage — generate JLPT-graded text with comprehension questions
+lesson_generate — AI generates full lesson from a title
+lesson_run — inject lesson into a conversation as active curriculum
+lesson_differentiate — adapt lesson for a different JLPT level
+kanji_search — search kanji by meaning/JLPT level/grade (requires games-app)
+vocab_lookup — dictionary lookup or JLPT-graded vocab list (requires games-app)
+
+### Workflow
+
+lesson_generate → lesson_run (into chat with Miko-chan) → practice via conversation → reinforce with vocab_quiz / grammar_check
+
+### Data Sources (via games-app)
+
+JMdict: 214K entries | JLPT vocab: 8K words | Kanji: 13K characters | Tatoeba: 278K sentences
+
+### Learn more
+
+See docs/JAPANESE_LEARNING.md for the full guide with phased workflow from beginner to conversational.`,
   },
   {
     id: "ethics",

@@ -1,13 +1,13 @@
-# chatbot-mcp recipes
+# learnbot-mcp recipes
 default: serve
 
 # Run the MCP server (stdio)
 serve:
-    uv run python -m chatbot_mcp
+    uv run python -m learnbot_mcp
 
 # Run the REST API (for health checks, fleet hub)
 serve-rest:
-    uv run python -m chatbot_mcp.api
+    uv run python -m learnbot_mcp.api
 
 # Run lint
 lint:
@@ -23,5 +23,25 @@ test:
 
 # Sync deps
 deps:
-    uv add uvicorn starlette
     uv sync
+
+# Build the MCPB bundle for Claude Desktop
+mcpb-pack:
+    mcpb pack . dist/learnbot-mcp.mcpb
+
+# Build the PyInstaller backend exe
+build-sidecar:
+    pwsh -NoProfile -File native\build.ps1
+
+# Build the Tauri NSIS desktop installer
+build-native: build-sidecar
+    Set-Location native
+    npx @tauri-apps/cli build --bundles nsis
+
+# Run CUA-NSIS smoke test
+cua-nsis-test:
+    uv run python scripts/cua-smoke.py
+
+# Run E2E Playwright tests
+e2e:
+    cd webapp && npx playwright test

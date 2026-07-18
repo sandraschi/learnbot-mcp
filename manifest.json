@@ -1,0 +1,61 @@
+{
+  "manifest_version": "0.2",
+  "name": "learnbot-mcp",
+  "version": "0.5.0",
+  "description": "AI chatbot orchestrator — persona management, conversation lifecycle, safety guardrails, multi-platform output, language learning",
+  "author": {
+    "name": "Sandra Schipal"
+  },
+  "server": {
+    "type": "python",
+    "entry_point": "src/learnbot_mcp/server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run", "--directory", "${__dirname}", "python", "-m", "learnbot_mcp"],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  },
+  "tools": [
+    { "name": "persona_create", "description": "Create or update a chatbot persona" },
+    { "name": "persona_get", "description": "Get a persona by name" },
+    { "name": "persona_list", "description": "List all registered personas" },
+    { "name": "persona_delete", "description": "Delete a persona" },
+    { "name": "chat_start", "description": "Start a new conversation with a persona" },
+    { "name": "chat_send", "description": "Send a message in an active conversation" },
+    { "name": "chat_hibernate", "description": "Pause a conversation" },
+    { "name": "chat_resume", "description": "Resume a hibernated conversation" },
+    { "name": "chat_destroy", "description": "Delete a conversation and all turns" },
+    { "name": "chat_list", "description": "List conversations" },
+    { "name": "chat_proactive_tick", "description": "Check all personas for due proactive triggers" },
+    { "name": "safety_rule_create", "description": "Create a safety rule" },
+    { "name": "safety_rule_list", "description": "List all safety rules" },
+    { "name": "safety_rule_delete", "description": "Delete a safety rule" },
+    { "name": "audit_query", "description": "Query the audit log" },
+    { "name": "platform_send", "description": "Send content to a platform bridge" },
+    { "name": "vocab_quiz", "description": "SM-2 spaced repetition vocabulary quiz" },
+    { "name": "vocab_submit", "description": "Submit quiz result, schedule next review" },
+    { "name": "grammar_check", "description": "LLM-based sentence correction with level analysis" },
+    { "name": "reading_passage", "description": "Generate graded reading passage with questions" },
+    { "name": "graded_reader", "description": "Structured graded reader with vocab + comprehension + discussion" },
+    { "name": "lesson_create", "description": "Create a lesson plan" },
+    { "name": "lesson_generate", "description": "AI generates full lesson from a title" },
+    { "name": "lesson_run", "description": "Inject lesson into conversation as active curriculum" },
+    { "name": "lesson_differentiate", "description": "Adapt lesson for a different proficiency level" },
+    { "name": "lesson_get", "description": "Get a lesson plan by ID" },
+    { "name": "lesson_list", "description": "List lesson plans with filters" },
+    { "name": "lesson_update", "description": "Update lesson title/level/language" },
+    { "name": "lesson_delete", "description": "Delete a lesson plan" },
+    { "name": "kanji_search", "description": "Search kanji by meaning/JLPT level/grade" },
+    { "name": "vocab_lookup", "description": "Dictionary search or JLPT-graded vocab list" },
+    { "name": "example_sentences", "description": "Example sentences for a Japanese word" },
+    { "name": "jlpt_quiz", "description": "JLPT practice questions N5-N1" },
+    { "name": "chatbot_help", "description": "Show all available tools and usage" }
+  ],
+  "compatibility": {
+    "platforms": ["win32", "darwin", "linux"]
+  },
+  "keywords": ["chatbot", "language-learning", "japanese", "persona", "fastmcp", "fleet"],
+  "license": "MIT"
+}

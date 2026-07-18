@@ -14,4 +14,8 @@ node_modules/
 data/
 web_sota/node_modules/
 web_sota/dist/
-data/
+*.mcpb
+*.bak
+native/target/
+native/gen/
+native/resources/*.exe

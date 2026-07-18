@@ -18,7 +18,7 @@ class TestSmoke:
     def test_version(self):
         from learnbot_mcp._version import __version__
 
-        assert __version__ == "0.3.0"
+        assert __version__ == "0.4.0"
 
     def test_config_loads(self):
         from learnbot_mcp.config import get_settings

@@ -1,18 +1,29 @@
 # learnbot-mcp
 
+<p align="center">
+  <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff"></a>
+  <a href="https://python.org"><img src="https://img.shields.io/badge/Python-3.12+-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"></a>
+  <a href="https://github.com/PrefectHQ/fastmcp"><img src="https://img.shields.io/badge/FastMCP-3.4-7c5cfc?style=flat-square" alt="FastMCP"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License"></a>
+</p>
+
 AI chatbot orchestrator — personas, safety-guarded conversations, spoken
 TTS, an interactive VRM avatar, and structured language lessons (any
 language, with deep Japanese/JLPT support) — all logged and auditable.
 
 ## Preview
 
-| Dashboard | Avatar |
-|-----------|--------|
-| ![Dashboard](docs/screenshots/cua-dashboard.png) | ![Avatar](docs/screenshots/cua-avatar.png) |
-
-*The webapp is a 12-page control panel (Personas, Chat, Avatar, Lessons,
+The webapp is a 12-page control panel (Personas, Chat, Avatar, Lessons,
 Japanese, Safety, Audit, Compliance, Voices, Demos, Help) — this is the
-human side of what the MCP tools drive for agents.*
+human side of what the MCP tools drive for agents.
+
+> No working screenshots exist yet. The previous `docs/screenshots/`
+> batch (13 files from an automated CUA smoke-test capture) turned out
+> to be broken on inspection — mostly `ERR_CONNECTION_REFUSED`/
+> `ERR_ADDRESS_INVALID` pages from the backend not being up during
+> capture, plus a few unrelated screenshots, and has been removed rather
+> than left showing a non-working app. Real screenshots need retaking
+> against a running instance.
 
 ## Features
 

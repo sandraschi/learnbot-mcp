@@ -520,8 +520,9 @@ async def api_audit_query(request: Request) -> JSONResponse:
 def _find_dist() -> Path:
     """Find webapp dist directory — works in dev, PyInstaller, and Tauri."""
     import sys
+
     # PyInstaller frozen: check _MEIPASS
-    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
         mp = Path(sys._MEIPASS)
         # Check various relative paths
         for p in [mp / "webapp" / "dist", mp.parent / "webapp" / "dist"]:
@@ -532,7 +533,7 @@ def _find_dist() -> Path:
     if (p / "index.html").is_file():
         return p
     # Last resort: exe-relative (Tauri installed)
-    if hasattr(sys, 'executable'):
+    if hasattr(sys, "executable"):
         p = Path(sys.executable).parent.parent / "resources" / "webapp" / "dist"
         if (p / "index.html").is_file():
             return p

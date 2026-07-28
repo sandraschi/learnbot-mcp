@@ -62,10 +62,17 @@ class TestLessons:
         result = await lesson_create(
             title="Test Lesson",
             description="A test",
-            language="ja", level="N5",
+            language="ja",
+            level="N5",
             sections=[{"type": "explanation", "content": "Hello", "duration_min": 5}],
             vocab=[{"word": "こんにちは", "reading": "konnichiwa", "definition": "hello"}],
-            quiz=[{"question": "What is こんにちは?", "options": ["hello", "goodbye"], "answer": "hello"}],
+            quiz=[
+                {
+                    "question": "What is こんにちは?",
+                    "options": ["hello", "goodbye"],
+                    "answer": "hello",
+                }
+            ],
         )
         assert result["success"] is True
         lid = result["lesson"]["id"]
@@ -106,7 +113,7 @@ class TestLessons:
 
     @pytest.mark.asyncio
     async def test_update(self, db):
-        from learnbot_mcp.lessons import lesson_create, lesson_update, lesson_get
+        from learnbot_mcp.lessons import lesson_create, lesson_get, lesson_update
 
         r = await lesson_create(title="Original", level="N5")
         lid = r["lesson"]["id"]

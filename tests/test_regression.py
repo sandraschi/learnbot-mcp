@@ -21,10 +21,11 @@ class TestNoDuplicateToolRegistration:
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 for deco in node.decorator_list:
-                    if (isinstance(deco, ast.Call) and
-                            getattr(deco.func, "attr", None) == "tool"):
-                        names.append(node.name)
-                    elif isinstance(deco, ast.Attribute) and deco.attr == "tool":
+                    if (
+                        (isinstance(deco, ast.Call) and getattr(deco.func, "attr", None) == "tool")
+                        or isinstance(deco, ast.Attribute)
+                        and deco.attr == "tool"
+                    ):
                         names.append(node.name)
         return names
 
@@ -40,20 +41,22 @@ class TestLessonRoundTrip:
 
     @pytest.mark.asyncio
     async def test_lesson_metadata_injected_into_chat_send(self, db):
-        from learnbot_mcp.database import upsert_persona, get_db
+        from learnbot_mcp.database import get_db, upsert_persona
 
-        await upsert_persona({
-            "name": "regression-test",
-            "display_name": "Regression Test",
-            "backstory": "You are a test assistant.",
-            "voice": "",
-            "platforms": [],
-            "constraints": [],
-            "proactive_triggers": [],
-            "knowledge_base": "",
-            "languages": ["en"],
-            "skills": [],
-        })
+        await upsert_persona(
+            {
+                "name": "regression-test",
+                "display_name": "Regression Test",
+                "backstory": "You are a test assistant.",
+                "voice": "",
+                "platforms": [],
+                "constraints": [],
+                "proactive_triggers": [],
+                "knowledge_base": "",
+                "languages": ["en"],
+                "skills": [],
+            }
+        )
 
         from learnbot_mcp.server import chat_start
 
@@ -66,7 +69,8 @@ class TestLessonRoundTrip:
         lesson = await lesson_create(
             title="Regression Lesson",
             description="Test lesson for regression guard",
-            language="ja", level="N5",
+            language="ja",
+            level="N5",
             sections=[{"type": "explanation", "content": "Test content", "duration_min": 5}],
             vocab=[{"word": "test", "reading": "test", "definition": "test"}],
             quiz=[{"question": "Q?", "options": ["A", "B"], "answer": "A"}],
@@ -93,8 +97,8 @@ class TestVocabQuizDueItem:
 
     @pytest.mark.asyncio
     async def test_due_item_appears_in_quiz(self, db):
-        from learnbot_mcp.learn_tools import ensure_vocab_table, vocab_quiz
         from learnbot_mcp.database import get_db
+        from learnbot_mcp.learn_tools import ensure_vocab_table, vocab_quiz
 
         await ensure_vocab_table()
         async with get_db() as db_v:

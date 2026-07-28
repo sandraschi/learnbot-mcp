@@ -1,3 +1,5 @@
+set windows-shell := ["powershell.exe", "-NoProfile", "-Command"]
+
 # learnbot-mcp recipes
 default: serve
 
@@ -31,7 +33,7 @@ mcpb-pack:
 
 # Build the PyInstaller backend exe
 build-sidecar:
-    pwsh -NoProfile -File native\build.ps1
+    powershell.exe -NoProfile -File native\build.ps1
 
 # Build the Tauri NSIS desktop installer
 build-native: build-sidecar

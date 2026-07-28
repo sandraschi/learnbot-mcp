@@ -31,6 +31,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "SIM", "UP"]
+ignore = ["E501"]
 
 [dependency-groups]
 dev = [
@@ -40,5 +41,5 @@ dev = [
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
     "pywinauto>=0.6.9",
-    "ruff>=0.15.22",
+    "ruff>=0.16.0,<0.17",
 ]

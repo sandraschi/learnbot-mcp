@@ -49,7 +49,7 @@ if (Test-Path $specFile) {
     Write-Host "  Frozen binary smoke test PASSED" -ForegroundColor Green
     Pop-Location
 } else {
-    Write-Host "  WARNING: No spec file at $specFile — skipping PyInstaller" -ForegroundColor DarkYellow
+    Write-Host "  WARNING: No spec file at $specFile - skipping PyInstaller" -ForegroundColor DarkYellow
 }
 
 # Step 3: Embed backend
@@ -57,12 +57,12 @@ Write-Host "-> [3/4] Embedding backend..." -ForegroundColor Yellow
 $src = "$Root\dist\learnbot-mcp-backend.exe"
 if (Test-Path $src) {
     $sizeMB = (Get-Item $src).Length / 1MB
-    if ($sizeMB -lt 5) { throw "Backend exe is only $([math]::Round($sizeMB,1)) MB — broken build" }
+    if ($sizeMB -lt 5) { throw "Backend exe is only $([math]::Round($sizeMB,1)) MB - broken build" }
     Copy-Item $src "$ResourceDir\learnbot-mcp-backend.exe" -Force
     Copy-Item $src "$DevDir\learnbot-mcp-backend-$Triple.exe" -Force
     Write-Host "  Backend exe: $([math]::Round($sizeMB,1)) MB" -ForegroundColor Green
 } else {
-    Write-Host "  WARNING: No backend exe at $src — Tauri will run without embedded backend" -ForegroundColor DarkYellow
+    Write-Host "  WARNING: No backend exe at $src - Tauri will run without embedded backend" -ForegroundColor DarkYellow
 }
 
 # Bundle .env.example

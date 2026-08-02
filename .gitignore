@@ -17,6 +17,7 @@ web_sota/dist/
 *.mcpb
 *.bak
 reports/
+cua-reports/
 native/target/
 native/gen/
 native/resources/*.exe

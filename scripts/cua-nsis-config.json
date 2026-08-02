@@ -1,11 +1,39 @@
 {
-    "product_name": "LearnBot MCP",
-    "backend_port": 11101,
-    "frontend_port": 11102,
-    "nsis_glob": "LearnBot MCP_*_x64-setup.exe",
-    "window_title": "LearnBot MCP",
-    "backend_health_path": "/health",
-    "backend_timeout": 30,
-    "install_timeout": 60,
-    "uninstall_globs": ["LearnBot MCP*"]
+  "product_name": "LearnBot MCP",
+  "backend_port": 11101,
+  "nsis_glob": "LearnBot MCP_*_x64-setup.exe",
+  "window_title": "LearnBot MCP",
+  "backend_health_path": "/health",
+  "backend_timeout": 30,
+  "install_timeout": 60,
+  "uninstall_globs": [
+    "LearnBot MCP*"
+  ],
+  "frontend_port": 11102,
+  "nav_routes": [
+    [
+      "Dashboard",
+      "Dashboard"
+    ],
+    [
+      "Chat",
+      "Chat"
+    ],
+    [
+      "Personas",
+      "Personas"
+    ],
+    [
+      "Safety",
+      "Safety"
+    ],
+    [
+      "Lessons",
+      "Lessons"
+    ],
+    [
+      "Help",
+      "Help"
+    ]
+  ]
 }

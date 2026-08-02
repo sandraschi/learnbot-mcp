@@ -84,4 +84,7 @@ just serve                 # start MCP server (stdio)
 just serve-rest            # start REST API (:11101)
 cd webapp && bun run dev # start frontend (:11102)
 just test                  # run 8 tests
+just cua-nsis-test         # NSIS smoke test: install -> launch -> nav walk -> uninstall
+just cua-webapp-test       # pre-Tauri browser walk: stack, Connected badge, nav click-through
+just ci                    # ruff + format check + pytest + tsc
 ```

@@ -60,3 +60,7 @@ bootstrap:
     uv sync --group dev
     uv run pre-commit install
     Write-Host "Pre-commit hooks installed." -ForegroundColor Green
+
+# Run CUA webapp test (pre-Tauri: start.ps1 stack + nav walk in browser)
+cua-webapp-test:
+    powershell.exe -NoProfile -File "{{justfile_directory()}}\scripts\just\cua-webapp-test.ps1"

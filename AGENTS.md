@@ -6,7 +6,14 @@
 - **Purpose**: AI chatbot orchestrator — persona management, conversation lifecycle, safety guardrails, multi-platform output, language learning (any language)
 - **Owner**: Sandra Schipal, Vienna
 - **Ports**: Backend 11101, Frontend 11102
-- **Version**: 0.5.0
+- **Version**: 0.6.0
+
+## Verification recipes
+
+- `just serve-rest` — REST API + webapp backend (:11101)
+- `just cua-nsis-test` — NSIS smoke test (install → launch → nav walk → uninstall); nav phase uses `descendants(title=label)`
+- `just cua-webapp-test` — pre-Tauri browser walk (start.ps1 -Headless stack, Connected-badge wait, nav click-through) — fleet reference impl
+- `just ci` — ruff + format check + pytest + tsc
 
 ## Architecture
 

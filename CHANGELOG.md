@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.6.0] — 2026-08-02 (fleet hardening pass)
+
+### Fixed
+- **Installed Tauri app now reaches the backend** — `VITE_API_ORIGIN` absolute-origin
+  pattern (`native/build.ps1` sets it before `bun run build`); the webview at
+  `tauri://localhost` previously fetched relative `/api` and the UI was empty/broken
+  in the installed app (v0.5.0 shipped with this bug).
+- **Vite dev server binds IPv4** — `host: 127.0.0.1` in `vite.config.ts` (`::1`-only
+  bind caused `ERR_CONNECTION_REFUSED` on `http://127.0.0.1:11102`; this was the
+  original "no webapp started" report).
+- **CUA-NSIS smoke test now walks the app** — `scripts/cua-smoke.py` nav phase uses
+  `descendants(title=label)` (pywinauto UIA Name); the old `text=` criteria threw
+  and silently produced 12 identical dashboard screenshots. 6/6 PASS.
+- **tsc gates** — `@types/three`, `vite-env.d.ts`, Tauri 2.11 `getCurrentWebview().setZoom`.
+
+### Added
+- **`just cua-webapp-test`** — pre-Tauri browser walk (stack via `start.ps1 -Headless`,
+  Connected-badge wait, sidebar nav click-through). Reference impl for the fleet.
+- **GitHub Actions CI** — ruff, pytest, tsc, biome.
+- **12 real webapp screenshots** — captured against a running install; README Preview restored.
+
 ## [0.6.0] — 2026-07-17
 
 ### Changed

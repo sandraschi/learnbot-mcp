@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: oven-sh/setup-bun@v2
+      - name: Python lint
+        run: |
+          uv sync
+          uv run ruff check src/
+          uv run ruff format src/ --check
+      - name: Python tests
+        run: uv run pytest tests/ -q
+      - name: Frontend lint + typecheck
+        run: |
+          cd webapp
+          bun install
+          bunx tsc --noEmit
+          bunx biome check .

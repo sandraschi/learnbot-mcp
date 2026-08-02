@@ -1,6 +1,6 @@
 [package]
 name = "learnbot-mcp-native"
-version = "0.5.0"
+version = "0.6.0"
 description = "Tauri 2.0 desktop app for LearnBot MCP"
 edition = "2021"
 

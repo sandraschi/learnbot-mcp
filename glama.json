@@ -1,6 +1,6 @@
 {
   "name": "learnbot-mcp",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "AI chatbot orchestrator — persona management, conversation lifecycle, safety guardrails, multi-platform output, language learning",
   "repository": "https://github.com/sandraschi/learnbot-mcp",
   "server_type": "python",

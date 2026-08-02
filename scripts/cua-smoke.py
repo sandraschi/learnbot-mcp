@@ -212,8 +212,8 @@ def phase_nav_clickthrough() -> bool:
     for item in NAV_ITEMS:
         _log("5-nav", f"Navigating to {item}...")
         try:
-            # Find the link element by its accessible text
-            link = win.descendants(text=item)
+            # UIA Name maps to title= in pywinauto criteria (text= is not valid)
+            link = win.descendants(title=item)
             if link:
                 link[0].click_input()
             else:
@@ -223,7 +223,7 @@ def phase_nav_clickthrough() -> bool:
                 if el:
                     el[0].click_input()
                 else:
-                    nav_failures.append((item, "no link found by text or control_type"))
+                    nav_failures.append((item, "no link found by title or control_type"))
                     _log("5-nav", f"  WARN: no link found for '{item}', taking screenshot anyway")
         except Exception as e:
             nav_failures.append((item, str(e)))

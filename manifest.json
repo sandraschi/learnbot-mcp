@@ -1,7 +1,7 @@
 {
   "manifest_version": "0.2",
   "name": "learnbot-mcp",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "AI chatbot orchestrator — persona management, conversation lifecycle, safety guardrails, multi-platform output, language learning",
   "author": {
     "name": "Sandra Schipal"

@@ -12,6 +12,8 @@ Write-Host "-> [1/4] Building frontend..." -ForegroundColor Yellow
 $frontend = Join-Path $Root "webapp"
 Push-Location $frontend
 bun install --silent 2>$null
+# Absolute API origin: embedded Tauri webview (tauri://localhost) cannot use relative /api
+$env:VITE_API_ORIGIN = "http://127.0.0.1:11101"
 bun run build
 if ($LASTEXITCODE -ne 0) { throw "Frontend build failed" }
 Pop-Location

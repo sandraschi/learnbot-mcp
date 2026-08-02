@@ -14,16 +14,15 @@ language, with deep Japanese/JLPT support) — all logged and auditable.
 ## Preview
 
 The webapp is a 12-page control panel (Personas, Chat, Avatar, Lessons,
-Japanese, Safety, Audit, Compliance, Voices, Demos, Help) — this is the
+Japanese, Safety, Audit, Compliance, Voices, Demos, Help) - this is the
 human side of what the MCP tools drive for agents.
 
-> No working screenshots exist yet. The previous `docs/screenshots/`
-> batch (13 files from an automated CUA smoke-test capture) turned out
-> to be broken on inspection — mostly `ERR_CONNECTION_REFUSED`/
-> `ERR_ADDRESS_INVALID` pages from the backend not being up during
-> capture, plus a few unrelated screenshots, and has been removed rather
-> than left showing a non-working app. Real screenshots need retaking
-> against a running instance.
+| Dashboard | Chat | Japanese |
+|-----------|------|----------|
+| ![Dashboard](docs/screenshots/cua-dashboard.png) | ![Chat](docs/screenshots/cua-chat.png) | ![Japanese](docs/screenshots/cua-japanese.png) |
+
+*Captured 2026-08-02 by the CUA-NSIS smoke test against the installed app
+(12 pages, live API data - see `docs/screenshots/cua-*.png`).*
 
 ## Features
 

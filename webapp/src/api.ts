@@ -1,4 +1,5 @@
-const BASE = "/api";
+const origin = (import.meta.env.VITE_API_ORIGIN as string | undefined)?.replace(/\/$/, "") ?? "";
+const BASE = `${origin}/api`;
 
 async function get(path: string) {
   const r = await fetch(`${BASE}${path}`);

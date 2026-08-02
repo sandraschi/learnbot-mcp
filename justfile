@@ -23,6 +23,13 @@ fmt:
 test:
     uv run pytest tests/ -q -v
 
+# CI parity: lint + format check + tests + frontend typecheck
+ci:
+    uv run ruff check src/
+    uv run ruff format src/ --check
+    uv run pytest tests/ -q
+    cd webapp && bunx tsc --noEmit
+
 # Sync deps
 deps:
     uv sync

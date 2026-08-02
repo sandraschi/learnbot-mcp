@@ -31,7 +31,7 @@ for ($i = 0; $i -lt 30; $i++) {
 # Start frontend
 if (-not $NoFrontend) {
     $WebRoot = Join-Path $Root "webapp"
-    Start-Process -NoNewWindow -FilePath "bun" -ArgumentList "run dev" -WorkingDirectory $WebRoot
+    Start-Process -NoNewWindow -FilePath "C:\Users\sandr\.bun\bin\bun.exe" -ArgumentList "run dev" -WorkingDirectory $WebRoot
     Start-Sleep 3
     if (-not $Headless) { Start-Process "http://127.0.0.1:$FrontendPort" }
 }

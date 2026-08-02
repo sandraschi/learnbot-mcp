@@ -34,7 +34,7 @@ let the next session work off it) is producing good results — keep doing it.
 
 ## New since last handoff
 
-`games_integration.py` — connects to games-app's kanji-api/jlpt-api for real
+`games_integration.py` — connects to ai-games-collection's kanji-api/jlpt-api for real
 JMdict/JLPT/Tatoeba data (kanji search, vocab lookup, example sentences,
 JLPT quiz questions) instead of LLM-hallucinated vocab. Good addition —
 verified 4 of 5 functions are wired as MCP tools and use real data with

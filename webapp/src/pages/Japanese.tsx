@@ -174,16 +174,16 @@ export function Japanese() {
       {/* Extra practice games — separate app, optional */}
       <h2 className="text-sm font-semibold text-zinc-200 mb-1">Extra Practice Games</h2>
       <p className="text-zinc-500 text-xs mb-3">
-        Optional — a separate app (games-app), not required for the dictionary/kanji lookup above.
+        Optional — a separate app (ai-games-collection), not required for the dictionary/kanji lookup above.
       </p>
-      {gamesAppOk === null && <p className="text-zinc-500 text-sm mb-4">Checking games-app...</p>}
+      {gamesAppOk === null && <p className="text-zinc-500 text-sm mb-4">Checking ai-games-collection...</p>}
       {gamesAppOk === false && (
         <p className="text-amber-500 text-sm mb-4">
-          games-app not reachable on :10987. Start it from its own repo if you want these extra games —
+          ai-games-collection not reachable on :10987. Start it from its own repo if you want these extra games —
           they're not needed for the dictionary/kanji lookup above.
         </p>
       )}
-      {gamesAppOk === true && <p className="text-green-500 text-sm mb-4">games-app connected</p>}
+      {gamesAppOk === true && <p className="text-green-500 text-sm mb-4">ai-games-collection connected</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {gameLinks.map(({ href, icon: Icon, label, desc }) => (

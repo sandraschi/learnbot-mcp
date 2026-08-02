@@ -53,7 +53,7 @@ All learning tools accept `source_lang`/`target_lang`/`level`/`framework` — la
 | `src/learnbot_mcp/server.py` | MCP tool registrations |
 | `src/learnbot_mcp/learn_tools.py` | Vocab, grammar, reading, graded reader |
 | `src/learnbot_mcp/lessons.py` | Lesson CRUD + AI generation |
-| `src/learnbot_mcp/games_integration.py` | games-app API wrappers |
+| `src/learnbot_mcp/games_integration.py` | ai-games-collection API wrappers |
 | `src/learnbot_mcp/config.py` | Settings (pydantic-settings) |
 | `docs/JAPANESE_LEARNING.md` | Japanese learning guide |
 | `SPEC.md` | Architecture specification |

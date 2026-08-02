@@ -30,7 +30,7 @@ human side of what the MCP tools drive for agents.
 - **Safety-guarded chat** — topic blocking, rate limiting, PII redaction, full conversation audit log
 - **Interactive VRM avatar** (`/avatar`) — three.js viewer with orbit/zoom, facial expressions, auto-blink, look-at-cursor; served from `GET /api/avatar.vrm`
 - **Language-agnostic lessons** — AI-generated lesson plans, spaced-repetition vocab quizzes (SM-2), grammar check, graded readers; every tool takes `source_lang`/`target_lang`, not just Japanese
-- **Deep Japanese/JLPT toolset** (`/japanese`) — bundled kanji, JMdict, JLPT vocab (N5–N1), and example-sentence lookups run on local SQLite, no external service required — plus 11 linked practice games (kanji drills, flashcards, karuta, listening) from a separate optional `games-app`
+- **Deep Japanese/JLPT toolset** (`/japanese`) — bundled kanji, JMdict, JLPT vocab (N5–N1), and example-sentence lookups run on local SQLite, no external service required — plus 11 linked practice games (kanji drills, flashcards, karuta, listening) from a separate optional `ai-games-collection`
 - **Multi-platform output** — speak via TTS (Gemini prosody via speech-mcp, falls back to Windows SAPI5), or send to Discord/Resonite bridges
 - **35 MCP tools** across personas, conversations, lessons, language tools, safety, and audit — see [docs/TOOLS.md](docs/TOOLS.md)
 

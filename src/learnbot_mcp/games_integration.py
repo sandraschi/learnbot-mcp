@@ -1,14 +1,14 @@
 """Japanese reference data — kanji, JMdict, JLPT vocab, Tatoeba examples, JLPT questions.
 
-Was games-app integration over HTTP (kanji-api :11003, jlpt-api :11001).
-Now queries local bundled snapshots directly — no running games-app
+Was ai-games-collection integration over HTTP (kanji-api :11003, jlpt-api :11001).
+Now queries local bundled snapshots directly — no running ai-games-collection
 required, no port dependency (11001/11003 also collide with unrelated
 fleet hardware-control servers per WEBAPP_PORTS.md; local queries sidestep
 that entirely). See data/ATTRIBUTION.md for data sources and licensing.
 
 Data files: data/kanji.db (kanji, jmdict, jlpt_vocabulary, examples tables),
 data/jlpt_questions.db (questions, question_options tables). Both are
-read-only snapshots of games-app's data — re-copy from games-app/data/ to
+read-only snapshots of ai-games-collection's data — re-copy from ai-games-collection/data/ to
 refresh; do not write to these files from learnbot-mcp.
 """
 
@@ -39,7 +39,7 @@ def _parse_json(value: str | None) -> list:
 def _missing_db(path: Path) -> dict:
     return {
         "success": False,
-        "error": f"{path.name} not found at {path}. Copy it from games-app/data/ "
+        "error": f"{path.name} not found at {path}. Copy it from ai-games-collection/data/ "
         f"— see data/ATTRIBUTION.md.",
     }
 

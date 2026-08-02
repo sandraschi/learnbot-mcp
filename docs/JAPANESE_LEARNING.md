@@ -6,7 +6,7 @@
 
 | Skill | JLPT N5-N1 | learnbot-mcp |
 |-------|-----------|-------------|
-| **Reading** | Multiple-choice kanji/vocab/grammar recognition | `reading_passage` (JLPT-graded full texts), `lesson_run` (interactive curriculum), games-app Kanji Master/table/flashcards |
+| **Reading** | Multiple-choice kanji/vocab/grammar recognition | `reading_passage` (JLPT-graded full texts), `lesson_run` (interactive curriculum), ai-games-collection Kanji Master/table/flashcards |
 | **Listening** | Canned audio, multiple-choice | TTS via speech-mcp (20+ Gemini voices with emotion prosody), `japanese-listening.html` game |
 | **Speaking** | **Not tested at any level** | Live conversation with Miko-chan (bilingual JA/EN persona), `grammar_check` for corrective feedback, `vocab_quiz` for recall practice |
 | **Writing** | **Not tested at any level** | Chat composition (free-form output), `grammar_check` analyses sentences, lesson exercises require constructed responses |
@@ -36,7 +36,7 @@ The core learning loop is conversation with a bilingual persona (Miko-chan, JA/E
 - `kanji_search(jlpt="N5")` — search jouyou kanji by level, grade, meaning, or category
 
 ### Kanji
-- games-app kanji master — reading/meaning drill with spaced repetition, stroke order animation
+- ai-games-collection kanji master — reading/meaning drill with spaced repetition, stroke order animation
 - kanji table — filterable reference by JLPT level, grade, stroke count, category
 - kanji 3D visualiser — spatial exploration of the kanji cosmos
 
@@ -58,7 +58,7 @@ The core learning loop is conversation with a bilingual persona (Miko-chan, JA/E
 
 ### Phase 3 — Reading + Listening
 1. `reading_passage(level="N4")` — graded text + comprehension questions
-2. Games-app JLPT practice tests per level
+2. ai-games-collection JLPT practice tests per level
 3. Listening practice with TTS + Japanese listening game
 
 ### Phase 4 — Active Production
@@ -126,14 +126,14 @@ Requires Ollama running locally (default model `llama3.2:3b`) for LLM-based tool
 Dictionary, kanji, and JLPT tools (`kanji_search`, `vocab_lookup`,
 `jlpt_vocab_by_level`, `example_sentences`, `jlpt_quiz`) need no external
 service — they query `data/kanji.db` and `data/jlpt_questions.db` directly,
-bundled snapshots of games-app's reference data (JMdict, jouyou kanji, JLPT
+bundled snapshots of ai-games-collection's reference data (JMdict, jouyou kanji, JLPT
 vocab, Tatoeba sentences). See [data/ATTRIBUTION.md](../data/ATTRIBUTION.md)
-for sources and licensing, and re-copy from `games-app/data/` if you want to
+for sources and licensing, and re-copy from `ai-games-collection/data/` if you want to
 refresh the snapshot.
 
-The webapp's Japanese page also links out to games-app's own interactive
+The webapp's Japanese page also links out to ai-games-collection's own interactive
 practice games (kanji flashcards, JLPT test format, karuta, etc.) — those
-are optional and require games-app running separately on :10987; they are
+are optional and require ai-games-collection running separately on :10987; they are
 not needed for any of the tools above.
 
 ## See Also

@@ -35,13 +35,13 @@ shows nothing.
 `avatar_vrm` explicitly when creating/updating the persona
 (`persona_create(..., avatar_vrm="C:/path/to/your.vrm")`).
 
-## Japanese page: "games-app not reachable"
+## Japanese page: "ai-games-collection not reachable"
 **Cause**: The built-in dictionary/kanji search (top of `/japanese`) does
 **not** need this — it queries local SQLite files directly. This warning
 only affects the 11 linked extra-practice games (kanji-master, flashcards,
-karuta, etc.), which live in a separate `games-app` repo/process on port
+karuta, etc.), which live in a separate `ai-games-collection` repo/process on port
 `10987`.
-**Fix**: If you want the extra games, start `games-app` separately. If you
+**Fix**: If you want the extra games, start `ai-games-collection` separately. If you
 just want the dictionary/kanji/JLPT-quiz tools, ignore this warning — they
 already work.
 

@@ -91,14 +91,14 @@ reading_passage — generate JLPT-graded text with comprehension questions
 lesson_generate — AI generates full lesson from a title
 lesson_run — inject lesson into a conversation as active curriculum
 lesson_differentiate — adapt lesson for a different JLPT level
-kanji_search — search kanji by meaning/JLPT level/grade (requires games-app)
-vocab_lookup — dictionary lookup or JLPT-graded vocab list (requires games-app)
+kanji_search — search kanji by meaning/JLPT level/grade (requires ai-games-collection)
+vocab_lookup — dictionary lookup or JLPT-graded vocab list (requires ai-games-collection)
 
 ### Workflow
 
 lesson_generate → lesson_run (into chat with Miko-chan) → practice via conversation → reinforce with vocab_quiz / grammar_check
 
-### Data Sources (via games-app)
+### Data Sources (via ai-games-collection)
 
 JMdict: 214K entries | JLPT vocab: 8K words | Kanji: 13K characters | Tatoeba: 278K sentences
 

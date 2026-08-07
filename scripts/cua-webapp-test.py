@@ -112,10 +112,17 @@ def start_stack():
     if start_ps1.exists():
         try:
             log("Starting stack via start.ps1 -Headless...")
+            # Fleet unified launcher requires probe mode env (same as fleet-webapp-start-probe.ps1)
+            env = dict(os.environ)
+            for v in ("VIRTUAL_ENV", "PYTHONPATH", "UV_PROJECT_ENVIRONMENT"):
+                env.pop(v, None)
+            env["FLEET_PROBE_RUN"] = "1"
+            env["FLEET_PROBE_LOG_DIR"] = str(repo_root / "cua-reports" / "logs")
             subprocess.Popen(
                 ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass",
                  "-File", str(start_ps1), "-Headless"],
-                cwd=str(repo_root), creationflags=subprocess.CREATE_NO_WINDOW)
+                cwd=str(repo_root), stdin=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NO_WINDOW, env=env)
             return True
         except Exception as e:
             log(f"start.ps1 -Headless failed ({e}), falling back to direct spawn")
@@ -130,7 +137,7 @@ def start_stack():
         ["powershell.exe", "-NoProfile", "-Command",
          f"Set-Location '{repo_root}'; $env:BACKEND_PORT='{BACKEND_PORT}'; "
          f"uv run python -m {module}"],
-        cwd=str(repo_root), creationflags=subprocess.CREATE_NO_WINDOW)
+        cwd=str(repo_root), stdin=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)
     return True
 
 

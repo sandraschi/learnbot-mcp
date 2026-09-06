@@ -28,7 +28,7 @@ ci:
     uv run ruff check src/
     uv run ruff format src/ --check
     uv run pytest tests/ -q
-    cd webapp && bunx tsc --noEmit
+    cd webapp; bunx tsc --noEmit
 
 # Sync deps
 deps:
@@ -44,8 +44,7 @@ build-sidecar:
 
 # Build the Tauri NSIS desktop installer
 build-native: build-sidecar
-    Set-Location native
-    npx @tauri-apps/cli build --bundles nsis
+    Set-Location native; npx @tauri-apps/cli build --bundles nsis
 
 # Run CUA-NSIS smoke test
 cua-nsis-test:
@@ -53,7 +52,7 @@ cua-nsis-test:
 
 # Run E2E Playwright tests
 e2e:
-    cd webapp && npx playwright test
+    cd webapp; npx playwright test
 
 # Bootstrap: install dev deps + pre-commit hook
 bootstrap:

@@ -7,14 +7,21 @@ New-Item -ItemType Directory -Force -Path $ResourceDir, $DevDir | Out-Null
 
 Write-Host "=== learnbot-mcp Tauri Release Build ===" -ForegroundColor Cyan
 
+# Naked `bun` inherits whatever PATH the invoking shell happened to have,
+# which can predate bun's installer PATH registration in an already-open
+# shell (BUG-045). Resolve a qualified path once instead.
+$bunExe = Join-Path $env:USERPROFILE ".bun\bin\bun.exe"
+if (-not (Test-Path $bunExe)) { $bunExe = (Get-Command bun -ErrorAction SilentlyContinue).Source }
+if (-not $bunExe) { throw "bun not found — install from https://bun.sh" }
+
 # Step 1: Frontend build
 Write-Host "-> [1/4] Building frontend..." -ForegroundColor Yellow
 $frontend = Join-Path $Root "webapp"
 Push-Location $frontend
-bun install --silent 2>$null
+& $bunExe install --silent 2>$null
 # Absolute API origin: embedded Tauri webview (tauri://localhost) cannot use relative /api
 $env:VITE_API_ORIGIN = "http://127.0.0.1:11101"
-bun run build
+& $bunExe run build
 if ($LASTEXITCODE -ne 0) { throw "Frontend build failed" }
 Pop-Location
 

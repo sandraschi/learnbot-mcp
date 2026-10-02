@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard, MessageCircle, Users2, ShieldAlert, ShieldCheck, ScrollText,
   HelpCircle, Mic2, Accessibility, Play, BookOpen, ChevronLeft, ChevronRight, Bot, JapaneseYen,
+  Headset,
 } from "lucide-react";
 import { useZoom } from "./useZoom";
 
@@ -17,6 +18,7 @@ const nav = [
   { to: "/japanese", icon: JapaneseYen, label: "Japanese" },
   { to: "/lessons", icon: BookOpen, label: "Lessons" },
   { to: "/avatar", icon: Accessibility, label: "Avatar" },
+  { to: "/vr", icon: Headset, label: "VR" },
   { to: "/voices", icon: Mic2, label: "Voices" },
   { to: "/help", icon: HelpCircle, label: "Help" },
 ];
@@ -56,7 +58,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </nav>
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center justify-center p-3 border-t border-zinc-800 text-zinc-500 hover:text-zinc-300"
+          className="flex items-center justify-center p-3 border-t border-zinc-800 text-zinc-400 hover:text-zinc-300"
         >
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>

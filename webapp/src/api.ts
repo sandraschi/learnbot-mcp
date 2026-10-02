@@ -59,4 +59,7 @@ export const api = {
     const q = params ? "?" + new URLSearchParams(params).toString() : "";
     return get(`/audit${q}`);
   },
+  vr: {
+    status: () => get("/vr/status"),
+  },
 };

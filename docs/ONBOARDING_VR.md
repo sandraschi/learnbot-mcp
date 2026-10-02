@@ -82,12 +82,26 @@ VR page (chatbox delivery, ≤144 chars per message). Fleet ports for vrchat-mcp
 are currently unclaimed (config 0/0, README claims 10795/10796) — resolved in
 Phase 4 before this track goes live.
 
-### Track C — Overte self-hosted (Phase 4, classroom future)
+### Track C — Overte self-hosted (Phase 4 live, classroom future)
 
-Install Overte client + server, start `domain-server.exe`, set a local admin
-at `http://localhost:40100/settings`, load `scripts/overte-mcp-bridge.js` in
-Interface. Miko arrives as a GLB entity (VRM must be converted first —
-Overte cannot load VRM directly).
+No anti-cheat, no accounts on someone else's server, no Secure Boot drama —
+you host the domain yourself:
+
+1. Download the Overte client + `domain-server.exe` from overte.org and
+   install both.
+2. Start `domain-server.exe`. Open `http://localhost:40100/settings` and set a
+   local admin account (default `admin/admin` — change it, local-only anyway).
+3. Start Interface, log into your local domain (`localhost`).
+4. In Interface: Developer > Script Manager > From Disk, load
+   `D:/Dev/repos/overte-mcp/scripts/overte-mcp-bridge.js`. Until this runs,
+   overte-mcp reports `simulated` — the VR page shows it amber, never green.
+5. Start overte-mcp (`cd D:/Dev/repos/overte-mcp`, `./start.ps1`, backend
+   :11110). The Overte card flips green when the domain answers.
+6. Pick your Miko, press **Summon Miko**: learnbot spawns a temporary
+   greeting-sign Text entity in-world (`permanent=False`), speaks the line,
+   and logs the audit turn. Check Entities in overte-mcp to see it tracked.
+7. Classroom preview (Phase 5): the same spawn with `permanent=True` plus a
+   welcome script becomes the persistent Miko classroom on your domain.
 
 ## 5. Pitfalls
 

@@ -585,7 +585,7 @@ async def vr_summon(
 ) -> dict:
     """Summon Miko into a VR world: greeting + receipts + audit turn.
 
-    Phase 2 supports platform="resonite" (vrchat/overte land in Phase 4).
+    Live for platform="resonite" and "overte" (vrchat lands in Phase 6).
     variant: "classic" (shared miko persona) or "genki" (miko-vr).
 
     ## Return Format

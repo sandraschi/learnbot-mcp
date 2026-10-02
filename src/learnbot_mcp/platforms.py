@@ -112,4 +112,14 @@ async def platform_send(
             "voice": spoken,
             "note": "Spoken via speech-mcp. For session probe + expression + audit, use vr_summon.",
         }
+    if platform == "overte":
+        # Phase 4: spoken line always works; domain probe + greeting-sign
+        # spawn run through vr_summon (live/simulated surfaced honestly).
+        spoken = await speech_say(text=content, voice=voice or "Leda")
+        return {
+            "success": bool(spoken.get("success")),
+            "platform": "overte",
+            "voice": spoken,
+            "note": "Spoken via speech-mcp. For domain probe + greeting sign + audit, use vr_summon.",
+        }
     return {"success": False, "error": f"Unknown platform: {platform}"}

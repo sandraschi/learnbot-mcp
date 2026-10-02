@@ -185,14 +185,14 @@ export function VR() {
         <button
           data-testid="vr-summon-miko"
           onClick={doSummon}
-          disabled={summoning || openTrack !== "resonite"}
-          title={openTrack !== "resonite" ? "Resonite summon only in Phase 2 - VRChat/Overte land in Phase 4" : undefined}
+          disabled={summoning || openTrack === "vrchat"}
+          title={openTrack === "vrchat" ? "VRChat summon lands in Phase 6 (last)" : undefined}
           className="mt-3 w-full px-4 py-2 text-sm bg-amber-600 hover:bg-amber-500 disabled:bg-zinc-800 disabled:text-zinc-500 rounded-lg disabled:cursor-not-allowed"
         >
           {summoning ? "Summoning Miko..." : "Summon Miko"}
         </button>
-        {openTrack !== "resonite" && (
-          <p className="text-xs text-zinc-500 mt-2">Summon targets Resonite in Phase 2 — switch to the Resonite track to summon.</p>
+        {openTrack === "vrchat" && (
+          <p className="text-xs text-zinc-500 mt-2">VRChat summon lands in Phase 6 (last) — Resonite and Overte summon are live.</p>
         )}
         {summon && (
           <div className="mt-3 text-sm bg-zinc-800 border border-zinc-700 rounded-lg p-3 space-y-2">

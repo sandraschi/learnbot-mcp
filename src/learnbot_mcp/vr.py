@@ -119,15 +119,20 @@ MIKO_SCRIPTS: dict[str, dict[str, str]] = {
 }
 
 
-async def _resonite_post(path: str, payload: dict) -> tuple[bool, str]:
-    """POST to resonite-mcp backend. Returns (ok, detail). Never raises."""
-    cfg = get_settings()
-    target = f"{cfg.resonite_mcp_url.rstrip('/')}{path}"
+async def _companion_post(base_url: str, path: str, payload: dict) -> tuple[bool, str]:
+    """POST to a companion backend. Returns (ok, detail). Never raises."""
+    target = f"{base_url.rstrip('/')}{path}"
     try:
         async with httpx.AsyncClient(timeout=_PROBE_TIMEOUT_S) as client:
             resp = await client.post(target, json=payload)
             if resp.status_code < 400:
-                return True, f"HTTP {resp.status_code}"
+                try:
+                    body = resp.json()
+                    src = body.get("source", "")
+                    src_note = f" source={src}" if src else ""
+                except Exception:
+                    src_note = ""
+                return True, f"HTTP {resp.status_code}{src_note}"
             try:
                 detail = resp.json().get("detail", resp.text[:160])
             except Exception:
@@ -135,6 +140,41 @@ async def _resonite_post(path: str, payload: dict) -> tuple[bool, str]:
             return False, f"HTTP {resp.status_code}: {detail}"
     except Exception as e:
         return False, f"{type(e).__name__}: {e}"
+
+
+async def _resonite_post(path: str, payload: dict) -> tuple[bool, str]:
+    """POST to resonite-mcp backend. Returns (ok, detail). Never raises."""
+    return await _companion_post(get_settings().resonite_mcp_url, path, payload)
+
+
+async def overte_domain_live() -> tuple[bool, str]:
+    """True when the Overte domain-server answers :40100 via overte-mcp."""
+    cfg = get_settings()
+    target = f"{cfg.overte_mcp_url.rstrip('/')}/api/overte/status"
+    try:
+        async with httpx.AsyncClient(timeout=_PROBE_TIMEOUT_S) as client:
+            resp = await client.get(target)
+            if resp.status_code == 200:
+                return True, "domain-server answered via overte-mcp"
+            return False, f"HTTP {resp.status_code}"
+    except Exception as e:
+        return False, f"{type(e).__name__}: overte-mcp not detected"
+
+
+async def overte_spawn_greeting(text: str) -> tuple[bool, str]:
+    """Spawn a temporary Text entity with the greeting. Surfaces live/simulated."""
+    cfg = get_settings()
+    return await _companion_post(
+        cfg.overte_mcp_url,
+        "/api/overte/spawn",
+        {
+            "type": "Text",
+            "name": "Miko greeting",
+            "position": [0.0, 1.5, 0.0],
+            "permanent": False,
+            "extra_properties": {"text": text},
+        },
+    )
 
 
 async def resonite_session_linked() -> tuple[bool, str]:
@@ -160,8 +200,8 @@ async def vr_summon(
 ) -> dict:
     """Summon Miko: greeting script + delivery receipts + audit turn.
 
-    Phase 2 supports platform="resonite". vrchat/overte return a
-    "lands in Phase 4" receipt instead of failing. Never raises.
+    Live for platform="resonite" and "overte". vrchat returns a
+    "lands in Phase 6" receipt instead of failing. Never raises.
     """
     from learnbot_mcp.compliance import disclosure_message
     from learnbot_mcp.database import get_db
@@ -211,12 +251,26 @@ async def vr_summon(
         persona = await get_persona(persona_name)
     receipts: list[dict] = []
 
-    if platform != "resonite":
+    if platform == "overte":
+        live, live_detail = await overte_domain_live()
+        receipts.append({"step": "domain", "ok": live, "detail": live_detail})
+        if live:
+            ok, detail = await overte_spawn_greeting(f"{script['ja']} [{script['romaji']}]")
+            receipts.append({"step": "greeting-sign", "ok": ok, "detail": detail})
+        else:
+            receipts.append(
+                {
+                    "step": "greeting-sign",
+                    "ok": False,
+                    "detail": "Skipped: start domain-server.exe, load overte-mcp-bridge.js in Interface, then retry.",
+                }
+            )
+    elif platform == "vrchat":
         receipts.append(
             {
-                "step": platform,
+                "step": "vrchat",
                 "ok": False,
-                "detail": f"{platform} summon lands in Phase 4 - Resonite only for now.",
+                "detail": "VRChat summon lands in Phase 6 (last) - Resonite/Overte only for now.",
             }
         )
     else:

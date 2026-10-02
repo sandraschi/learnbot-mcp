@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard, MessageCircle, Users2, ShieldAlert, ShieldCheck, ScrollText,
   HelpCircle, Mic2, Accessibility, Play, BookOpen, ChevronLeft, ChevronRight, Bot, JapaneseYen,
-  Headset,
+  Headset, Settings as SettingsIcon,
 } from "lucide-react";
 import { useZoom } from "./useZoom";
 
@@ -20,6 +20,7 @@ const nav = [
   { to: "/avatar", icon: Accessibility, label: "Avatar" },
   { to: "/vr", icon: Headset, label: "VR" },
   { to: "/voices", icon: Mic2, label: "Voices" },
+  { to: "/settings", icon: SettingsIcon, label: "Settings" },
   { to: "/help", icon: HelpCircle, label: "Help" },
 ];
 

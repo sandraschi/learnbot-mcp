@@ -20,7 +20,7 @@ from learnbot_mcp.compliance import disclosure_message, refusal_templates, requi
 from learnbot_mcp.config import get_settings
 from learnbot_mcp.platforms import speech_say
 from learnbot_mcp.proactive import proactive_tick
-from learnbot_mcp.vr import api_vr_status
+from learnbot_mcp.vr import api_vr_status, api_vr_summon
 
 # Gemini TTS voices with character descriptions (from speech-mcp)
 GEMINI_VOICES = [
@@ -583,6 +583,7 @@ def build_app() -> Starlette:
         Route("/api/chat/proactive-tick", api_proactive_tick, methods=["POST"]),
         Route("/api/audit", api_audit_query),
         Route("/api/vr/status", api_vr_status),
+        Route("/api/vr/summon", api_vr_summon, methods=["POST"]),
     ]
     if dist.is_dir() and (dist / "index.html").is_file():
         _routes.append(Mount("/assets", StaticFiles(directory=str(dist / "assets")), name="assets"))

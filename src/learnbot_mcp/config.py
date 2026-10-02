@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     speech_mcp_url: str = Field(default="http://127.0.0.1:10909", alias="LEARNBOT_SPEECH_MCP_URL")
     avatar_mcp_url: str = Field(default="http://127.0.0.1:10792", alias="LEARNBOT_AVATAR_MCP_URL")
     resonite_mcp_url: str = Field(
-        default="http://127.0.0.1:10978", alias="LEARNBOT_RESONITE_MCP_URL"
+        default="http://127.0.0.1:10979", alias="LEARNBOT_RESONITE_MCP_URL"
     )
     vrchat_mcp_url: str = Field(default="http://127.0.0.1:10795", alias="LEARNBOT_VRCHAT_MCP_URL")
     overte_mcp_url: str = Field(default="http://127.0.0.1:11110", alias="LEARNBOT_OVERTE_MCP_URL")

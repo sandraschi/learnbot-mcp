@@ -96,10 +96,20 @@ async def platform_send(
             "platform": "opencode",
             "message": "Delivered via opencode context",
         }
-    if platform in ("discord", "resonite", "avatar"):
+    if platform in ("discord", "avatar"):
         return {
             "success": False,
             "platform": platform,
             "error": f"{platform} bridge not implemented",
+        }
+    if platform == "resonite":
+        # Phase 2: spoken line always works; in-world avatar steps run
+        # through vr_summon (session probe + expression + audit turn).
+        spoken = await speech_say(text=content, voice=voice or "Leda")
+        return {
+            "success": bool(spoken.get("success")),
+            "platform": "resonite",
+            "voice": spoken,
+            "note": "Spoken via speech-mcp. For session probe + expression + audit, use vr_summon.",
         }
     return {"success": False, "error": f"Unknown platform: {platform}"}

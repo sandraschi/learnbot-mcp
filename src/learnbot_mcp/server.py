@@ -565,6 +565,37 @@ async def platform_send(
     )
 
 
+@mcp.tool(annotations=_READ_ONLY)
+async def vr_status() -> dict:
+    """VR companion health (resonite/vrchat/overte) for the /vr page.
+
+    ## Return Format
+    {"companions": {...}, "can_summon": bool, "summon_note": str}
+    """
+    from learnbot_mcp.vr import vr_status_payload
+
+    return await vr_status_payload()
+
+
+@mcp.tool(annotations=_MUTATING)
+async def vr_summon(
+    platform: str = "resonite",
+    variant: str = "genki",
+    user_id: str = "",
+) -> dict:
+    """Summon Miko into a VR world: greeting + receipts + audit turn.
+
+    Phase 2 supports platform="resonite" (vrchat/overte land in Phase 4).
+    variant: "classic" (shared miko persona) or "genki" (miko-vr).
+
+    ## Return Format
+    {"success": bool, "greeting_ja": str, "receipts": [...], "conversation_id": str}
+    """
+    from learnbot_mcp.vr import vr_summon as _summon
+
+    return await _summon(platform=platform, variant=variant, user_id=user_id)
+
+
 @mcp.tool(annotations=_MUTATING)
 async def chat_proactive_tick() -> dict:
     """Check all personas for due proactive triggers and fire them.

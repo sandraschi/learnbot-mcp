@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     vrchat_mcp_url: str = Field(default="http://127.0.0.1:10795", alias="LEARNBOT_VRCHAT_MCP_URL")
     overte_mcp_url: str = Field(default="http://127.0.0.1:11110", alias="LEARNBOT_OVERTE_MCP_URL")
     miko_avatar_path: str = Field(default="", alias="LEARNBOT_MIKO_AVATAR_PATH")
+    miko_glb_url: str = Field(
+        default="http://localhost:11110/models/Nekomimi-chan.glb",
+        alias="LEARNBOT_MIKO_GLB_URL",
+    )
     memops_url: str = Field(default="http://127.0.0.1:10732", alias="LEARNBOT_MEMOPS_URL")
 
     safety_rate_limit_per_minute: int = Field(default=30, alias="LEARNBOT_RATE_LIMIT")

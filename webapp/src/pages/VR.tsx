@@ -69,6 +69,11 @@ export function VR() {
   const [headsetOpen, setHeadsetOpen] = useState(false);
   const [summoning, setSummoning] = useState(false);
   const [summon, setSummon] = useState<any | null>(null);
+  const [level, setLevel] = useState("N5");
+  const [step, setStep] = useState<any | null>(null);
+  const [stepBusy, setStepBusy] = useState(false);
+  const [score, setScore] = useState({ asked: 0, correct: 0 });
+  const [room, setRoom] = useState<any | null>(null);
 
   useEffect(() => {
     api.vr.status().then(setStatus).catch(() => {});
@@ -77,6 +82,36 @@ export function VR() {
   const companions = status?.companions ?? {};
   const anyReachable = Object.values(companions).some((c) => c.reachable);
 
+  const fetchStep = async (answer = "", questionId = 0) => {
+    setStepBusy(true);
+    try {
+      const r = await fetch("/api/vr/lesson-step", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ level, answer, question_id: questionId }),
+      });
+      const d = await r.json();
+      if (d.success && d.graded?.ok && d.graded.correct !== undefined) {
+        setScore((s) => ({
+          asked: s.asked + 1,
+          correct: s.correct + (d.graded.correct ? 1 : 0),
+        }));
+      }
+      setStep(d);
+    } catch {
+      setStep({ success: false, error: "Lesson step failed - is the backend running?" });
+    }
+    setStepBusy(false);
+  };
+
+  const ensureRoom = async () => {
+    try {
+      const r = await fetch("/api/vr/classroom-ensure", { method: "POST" });
+      setRoom(await r.json());
+    } catch {
+      setRoom({ success: false, error: "Classroom request failed." });
+    }
+  };
   const doSummon = async () => {
     setSummoning(true);
     setSummon(null);
@@ -217,6 +252,80 @@ export function VR() {
               </>
             ) : (
               <div className="text-red-400 text-xs">Summon failed: {summon.error}</div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div data-testid="vr-practice" className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-6">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-sm font-semibold text-zinc-300">Practice step — classroom loop</h2>
+          <span className="text-xs text-zinc-500">Score {score.correct}/{score.asked}</span>
+        </div>
+        <p className="text-xs text-zinc-500 mb-3">
+          Bundled JLPT items, fully local. Miko reads each question aloud. Answer here or in Chat.
+        </p>
+        <div className="flex items-center gap-2 mb-3">
+          <select
+            value={level}
+            onChange={(e) => setLevel(e.target.value)}
+            className="text-sm bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1"
+          >
+            {["N5", "N4", "N3", "N2", "N1"].map((l) => (
+              <option key={l} value={l}>{l}</option>
+            ))}
+          </select>
+          <button
+            onClick={() => fetchStep()}
+            disabled={stepBusy}
+            className="text-sm bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 px-3 py-1 rounded-lg"
+          >
+            {stepBusy ? "..." : step ? "Next question" : "Start"}
+          </button>
+          <button
+            onClick={ensureRoom}
+            title="Spawn the persistent classroom (Overte domain + bridge required)"
+            className="text-sm bg-zinc-800 hover:bg-zinc-700 px-3 py-1 rounded-lg"
+          >
+            Prepare classroom
+          </button>
+        </div>
+        {step && !step.success && (
+          <div className="text-xs text-red-400">{step.error}</div>
+        )}
+        {step?.graded?.ok && (
+          <div className={`text-sm mb-2 ${step.graded.correct ? "text-green-400" : "text-amber-400"}`}>
+            {step.graded.correct ? "せいかい！ " : "おしい！ "}
+            <span className="text-xs text-zinc-400">
+              ({step.graded.given} → {step.graded.expected}) {step.graded.explanation}
+            </span>
+          </div>
+        )}
+        {step?.item && (
+          <div className="text-sm bg-zinc-800 border border-zinc-700 rounded-lg p-3">
+            <div className="font-medium mb-2">{step.item.question}</div>
+            <div className="grid grid-cols-1 gap-1">
+              {Object.entries(step.item.options as Record<string, string>).map(([k, v]) => (
+                <button
+                  key={k}
+                  onClick={() => fetchStep(k, step.item.id)}
+                  disabled={stepBusy}
+                  className="text-left text-sm bg-zinc-900 hover:bg-zinc-700 border border-zinc-700 rounded-lg px-3 py-1.5 disabled:opacity-50"
+                >
+                  <span className="font-mono text-amber-500 mr-2">{k}</span>{v as string}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {room && (
+          <div className="text-xs text-zinc-400 mt-2 space-y-1">
+            {room.success ? (
+              room.receipts?.map((r: any, i: number) => (
+                <div key={i} className={r.ok ? "text-green-400" : ""}>· {r.step}: {r.detail}</div>
+              ))
+            ) : (
+              <div className="text-red-400">Classroom failed: {room.error}</div>
             )}
           </div>
         )}

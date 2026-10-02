@@ -596,6 +596,38 @@ async def vr_summon(
     return await _summon(platform=platform, variant=variant, user_id=user_id)
 
 
+@mcp.tool(annotations=_READ_ONLY)
+async def vr_lesson_step(
+    user_id: str = "",
+    level: str = "N5",
+    answer: str = "",
+    question_id: int = 0,
+) -> dict:
+    """One VR classroom loop step: present a bundled JLPT item, grade answers.
+
+    Call with no answer for the next item; call again with answer + question_id
+    to grade (spoken praise or encouragement included).
+
+    ## Return Format
+    {"success": bool, "item": {...}, "graded": {...} or None}
+    """
+    from learnbot_mcp.vr import vr_lesson_step as _step
+
+    return await _step(user_id=user_id, level=level, answer=answer, question_id=question_id)
+
+
+@mcp.tool(annotations=_MUTATING)
+async def vr_classroom_ensure() -> dict:
+    """Spin up the persistent Miko classroom (Overte permanent entities first).
+
+    ## Return Format
+    {"success": bool, "receipts": [...]}
+    """
+    from learnbot_mcp.vr import vr_classroom_ensure as _ensure
+
+    return await _ensure()
+
+
 @mcp.tool(annotations=_MUTATING)
 async def chat_proactive_tick() -> dict:
     """Check all personas for due proactive triggers and fire them.

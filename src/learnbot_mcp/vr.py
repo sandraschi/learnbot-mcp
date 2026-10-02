@@ -378,3 +378,196 @@ async def api_vr_summon(request: Request) -> JSONResponse:
     except Exception as e:
         log.warning("vr_summon failed: %s", e)
         return JSONResponse({"success": False, "error": str(e)}, status_code=200)
+
+
+# --- Phase 5: classroom loop + classroom world ----------------------------
+
+
+async def _jlpt_question_by_id(question_id: int) -> dict | None:
+    """Fetch one bundled JLPT question + options by id. Local only, never raises."""
+    import aiosqlite
+
+    from learnbot_mcp.games_integration import JLPT_DB_PATH
+
+    if not JLPT_DB_PATH.exists():
+        return None
+    try:
+        async with aiosqlite.connect(f"file:{JLPT_DB_PATH}?mode=ro", uri=True) as conn:
+            conn.row_factory = aiosqlite.Row
+            cur = await conn.execute(
+                "SELECT id, level, question_type, question_text, correct_answer FROM questions WHERE id=?",
+                (question_id,),
+            )
+            row = await cur.fetchone()
+            if not row:
+                return None
+            opt_cur = await conn.execute(
+                "SELECT option_letter, option_text, explanation FROM question_options WHERE question_id=?",
+                (row["id"],),
+            )
+            opts = await opt_cur.fetchall()
+            return {
+                "id": row["id"],
+                "level": row["level"],
+                "type": row["question_type"],
+                "question": row["question_text"],
+                "correct": row["correct_answer"],
+                "options": {o["option_letter"]: o["option_text"] for o in opts},
+                "explanations": {o["option_letter"]: o["explanation"] for o in opts},
+            }
+    except Exception as e:
+        log.warning("jlpt by-id failed: %s", e)
+        return None
+
+
+async def vr_lesson_step(
+    user_id: str = "",
+    level: str = "N5",
+    answer: str = "",
+    question_id: int = 0,
+    speak: bool = True,
+) -> dict:
+    """One classroom loop step. No answer -> present next item (spoken by Miko).
+    With answer + question_id -> grade it, explain, and present the next item.
+    Fully local (bundled JLPT db + speech-mcp). Never raises.
+    """
+    from learnbot_mcp.games_integration import jlpt_quiz
+    from learnbot_mcp.platforms import speech_say
+
+    result: dict = {"success": True, "level": level, "graded": None}
+    if answer and question_id:
+        prev = await _jlpt_question_by_id(question_id)
+        if prev is None:
+            result["graded"] = {"ok": False, "detail": "Question not found - fetch a fresh item."}
+        else:
+            keys = list(prev["options"].keys())  # DB order = display order, never sort
+            raw = (answer or "").strip()
+            # Accept the shown key (katakana アイウエ) or 1-4 / A-D position.
+            if len(raw) == 1 and ("A" <= raw.upper() <= "D" or "1" <= raw <= "4"):
+                idx = (ord(raw.upper()) - ord("A")) if raw.upper() > "9" else (int(raw) - 1)
+                given = keys[idx] if 0 <= idx < len(keys) else raw
+            else:
+                given = raw[:1]
+            correct = (prev["correct"] or "").strip().upper()[:1]
+            hit = given == correct and given != ""
+            result["graded"] = {
+                "ok": True,
+                "correct": hit,
+                "given": given,
+                "expected": correct,
+                "explanation": prev["explanations"].get(correct, ""),
+                "say": "せいかい！すごい！" if hit else "おしい！つぎ、がんばろう！",
+            }
+            if speak:
+                await speech_say(text=result["graded"]["say"], voice="Leda", provider="gemini")
+
+    nxt = await jlpt_quiz(level=level, limit=1)
+    questions = (nxt.get("questions") or []) if nxt.get("success") else []
+    if not questions:
+        result["success"] = False
+        result["error"] = "No quiz items available (bundled JLPT db missing?)"
+        return result
+    q = questions[0]
+    result["item"] = {
+        "id": q["id"],
+        "level": q["level"],
+        "type": q["type"],
+        "question": q["question"],
+        "options": q["options"],
+    }
+    if speak:
+        opts_spoken = " ".join(f"{k}. {v}" for k, v in q["options"].items())
+        tts = await speech_say(
+            text=f"{q['question']} {opts_spoken}", voice="Leda", provider="gemini"
+        )
+        result["spoken"] = {"ok": bool(tts.get("success")), "provider": tts.get("provider")}
+    return result
+
+
+async def api_vr_lesson_step(request: Request) -> JSONResponse:
+    """POST /api/vr/lesson-step {user_id, level, answer, question_id} - classroom loop."""
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    try:
+        return JSONResponse(
+            await vr_lesson_step(
+                user_id=str(body.get("user_id", "")),
+                level=str(body.get("level", "N5")),
+                answer=str(body.get("answer", "")),
+                question_id=int(body.get("question_id", 0) or 0),
+            )
+        )
+    except Exception as e:
+        log.warning("vr_lesson_step failed: %s", e)
+        return JSONResponse({"success": False, "error": str(e)}, status_code=200)
+
+
+async def vr_classroom_ensure() -> dict:
+    """Spin up the persistent Miko classroom (Overte first, Resonite best-effort).
+
+    Overte: permanent greeting-sign Text + Miko GLB Model on the domain
+    (needs domain + bridge; otherwise honest down receipts).
+    Resonite: session probe only - hosted classroom session stays manual
+    until inventory is reliable. Never raises.
+    """
+    cfg = get_settings()
+    receipts: list[dict] = []
+    live, live_detail = await overte_domain_live()
+    receipts.append({"step": "overte-domain", "ok": live, "detail": live_detail})
+    if live:
+        ok, detail = await _companion_post(
+            cfg.overte_mcp_url,
+            "/api/overte/spawn",
+            {
+                "type": "Text",
+                "name": "Miko classroom sign",
+                "position": [0.0, 2.0, -2.0],
+                "permanent": True,
+                "extra_properties": {
+                    "text": "ミコのきょうしつへようこそ！ Miko's classroom - Nihongo practice here!"
+                },
+            },
+        )
+        receipts.append({"step": "classroom-sign", "ok": ok, "detail": detail})
+        ok, detail = await _companion_post(
+            cfg.overte_mcp_url,
+            "/api/overte/spawn",
+            {
+                "type": "Model",
+                "name": "Miko",
+                "position": [1.5, 0.0, -2.0],
+                "model_url": cfg.miko_glb_url,
+                "permanent": True,
+            },
+        )
+        receipts.append({"step": "classroom-miko", "ok": ok, "detail": detail})
+    else:
+        receipts.append(
+            {
+                "step": "classroom-sign",
+                "ok": False,
+                "detail": "Skipped: start your Overte domain + bridge first (ONBOARDING_VR Track C).",
+            }
+        )
+    linked, link_detail = await resonite_session_linked()
+    receipts.append(
+        {
+            "step": "resonite-classroom",
+            "ok": linked,
+            "detail": "Resonite linked - host the classroom session manually for now."
+            if linked
+            else f"Resonite classroom stays manual: {link_detail}",
+        }
+    )
+    return {"success": True, "receipts": receipts}
+
+
+async def api_vr_classroom_ensure(request: Request) -> JSONResponse:
+    """POST /api/vr/classroom-ensure - spin up the persistent classroom."""
+    try:
+        return JSONResponse(await vr_classroom_ensure())
+    except Exception as e:
+        log.warning("vr_classroom_ensure failed: %s", e)
+        return JSONResponse({"success": False, "error": str(e)}, status_code=200)

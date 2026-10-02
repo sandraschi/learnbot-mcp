@@ -13,8 +13,8 @@ language, with deep Japanese/JLPT support) — all logged and auditable.
 
 ## Preview
 
-The webapp is a 12-page control panel (Personas, Chat, Avatar, Lessons,
-Japanese, Safety, Audit, Compliance, Voices, Demos, Help) - this is the
+The webapp is a 13-page control panel (Personas, Chat, Avatar, Lessons,
+Japanese, Safety, Audit, Compliance, Voices, Demos, VR, Help) - this is the
 human side of what the MCP tools drive for agents.
 
 | Dashboard | Chat | Japanese |
@@ -31,8 +31,9 @@ human side of what the MCP tools drive for agents.
 - **Interactive VRM avatar** (`/avatar`) — three.js viewer with orbit/zoom, facial expressions, auto-blink, look-at-cursor; served from `GET /api/avatar.vrm`
 - **Language-agnostic lessons** — AI-generated lesson plans, spaced-repetition vocab quizzes (SM-2), grammar check, graded readers; every tool takes `source_lang`/`target_lang`, not just Japanese
 - **Deep Japanese/JLPT toolset** (`/japanese`) — bundled kanji, JMdict, JLPT vocab (N5–N1), and example-sentence lookups run on local SQLite, no external service required — plus 11 linked practice games (kanji drills, flashcards, karuta, listening) from a separate optional `ai-games-collection`
-- **Multi-platform output** — speak via TTS (Gemini prosody via speech-mcp, falls back to Windows SAPI5), or send to Discord/Resonite bridges
-- **35 MCP tools** across personas, conversations, lessons, language tools, safety, and audit — see [docs/TOOLS.md](docs/TOOLS.md)
+- **Multi-platform output** — speak via TTS (Gemini prosody via speech-mcp, falls back to Windows SAPI5), or send to Discord/Resonite/Overte/VRChat bridges
+- **Learn in VR** (`/vr`) — Dashboard quick-action + launchpad page: Resonite summon (live), Overte greeting-sign spawn (live), classroom quiz loop with spoken JLPT items, VRChat chatbox handoff (last) — see [docs/ONBOARDING_VR.md](docs/ONBOARDING_VR.md)
+- **39 MCP tools** across personas, conversations, lessons, language tools, safety, VR, and audit — see [docs/TOOLS.md](docs/TOOLS.md)
 
 ## Quick Install
 
@@ -52,6 +53,8 @@ working today.
 
 > "Generate a beginner Spanish lesson on ordering food, then run it in a new conversation."
 
+> "Summon Miko into Resonite and quiz me on N5 vocabulary in VR."
+
 ## Documentation
 
 | Doc | Contents |
@@ -65,6 +68,20 @@ working today.
 | [Distance Learning](docs/DISTANCE_LEARNING.md) | Paired with `classroom-mcp` — courses, teaching agents, courseware |
 | [Arabic → German Integration](docs/INTEGRATION_AR.md) | دليل بالعربية — learn German for Austrian daily life |
 | [Chatbot Ethics](docs/chatbot-ethics.md) | Addiction, regulation, pseudohuman dynamics |
+| [VR Onboarding](docs/ONBOARDING_VR.md) | Learn-in-VR setup: Resonite/Overte/VRChat tracks, Miko summon, classroom |
+
+## Fleet Crossconnects (Companions)
+
+learnbot-mcp works standalone. These optional companions unlock the VR tracks:
+
+| Companion | Ports | Feature | Required? |
+|-----------|-------|---------|-----------|
+| [resonite-mcp](https://github.com/sandraschi/resonite-mcp) | 10979 backend / 10978 frontend | In-world Miko summon (avatar + expression) + classroom session | Optional |
+| [overte-mcp](https://github.com/sandraschi/overte-mcp) | 11110 backend / 11111 frontend, domain :40100 | Greeting-sign spawn + persistent classroom entities | Optional |
+| [vrchat-mcp](https://github.com/sandraschi/vrchat-mcp) | 10712 transport (MCP `/mcp`) | Chatbox lesson prompts + avatar params (last track) | Optional |
+| [speech-mcp](https://github.com/sandraschi/speech-mcp) | 10909 backend / 10908 frontend | JP TTS voice (Gemini Leda default) | Recommended |
+
+Install any companion with its own `start.ps1`, then open learnbot's `/vr` page — status dots flip green with zero learnbot restarts.
 
 ## Requirements
 

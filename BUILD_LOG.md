@@ -1,5 +1,26 @@
 # learnbot-mcp — Build Log
 
+## 2026-10-02 — Learn-in-VR feature run (no NSIS build)
+
+**Commits**: Phase 0 spike (mcd plan) → Phase 1 page shell → Phase 2 Resonite summon → Phase 3 voice lock → Phase 4 Overte summon → Phase 5 classroom loop → Phase 6 VRChat handoff + polish. No installer built; webapp verified via `tsc --noEmit` (exit 0), backend via live REST probes + `pytest tests/test_smoke.py` (23 passed).
+
+### Regressions Encountered & Fixed
+
+| Issue | Root Cause | Fix |
+|-------|-----------|-----|
+| **Stale `test_version` assertion (`0.4.0` vs `0.6.0`)** | Test pinned an old version; code is 0.6.0 per AGENTS.md | Bumped assertion to `0.6.0` (pre-existing red gate, not VR-caused) |
+| **`vr_summon` audit FK failure on fresh DB** | `conversations.persona_name REFERENCES personas(name)`; Joe has zero personas | Summon auto-seeds minimal miko/miko-vr + self-heals languages/skills migration on old DBs |
+| **Lesson grading always False** | `correct_answer` is katakana (アイウエ), code compared ASCII `upper()[:1]` | Accept shown key + 1-4/A-D position mapping in display order; live-verified exactly one True |
+| **One-shot CLI scripts hang at exit** | Pooled aiosqlite worker thread joins forever at interpreter shutdown (Windows) | Scripts must call `close_db_pool()` + run with `-u`; server process unaffected |
+| **VR.tsx TSX break (double brace)** | Edit-tool line-boundary merge | Fixed + `tsc` green; lesson: never end old/newString at a line edge |
+| **platforms.py orphaned stub shadowed resonite/overte** | Line-boundary insert left dead `return` before live branches | Restructured tail; behavior verified per platform |
+
+### Deferred (declared, not hidden)
+
+- VR page screenshot (`docs/screenshots/cua-vr.png`) needs a `cua-webapp-test` pass with `/vr` in the nav walk — nav list + `data-testid="vr-page"` are ready.
+- VRChat README ports (10795/10796) are stale; code default + registry agree on 10712. Companion-side fix, not this repo.
+- VoiceStudio sidecar down (`:3900`); ranking accounts for it. Ear confirmation of Leda samples is Sandra's (`docs/audio/`).
+
 ## 2026-08-02 — v0.6.0 NSIS Build
 
 **Build**: `LearnBot MCP_0.6.0_x64-setup.exe` (36.1 MB)

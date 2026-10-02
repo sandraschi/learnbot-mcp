@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Info, Shield, BookOpen, FileText, MessageCircle, JapaneseYen } from "lucide-react";
+import { Info, Shield, BookOpen, FileText, MessageCircle, JapaneseYen, Headset } from "lucide-react";
 
 const tabs = [
   {
@@ -105,6 +105,25 @@ JMdict: 214K entries | JLPT vocab: 8K words | Kanji: 13K characters | Tatoeba: 2
 ### Learn more
 
 See docs/JAPANESE_LEARNING.md for the full guide with phased workflow from beginner to conversational.`,
+  },
+  {
+    id: "vr",
+    label: "VR",
+    icon: Headset,
+    content: `## Learn in VR
+
+The /vr page is a launchpad, not a VR renderer: pick Resonite (start here), Overte (self-hosted), or VRChat (last), follow the steps, and press Summon Miko.
+
+### Tracks
+- **Resonite**: Steam + free account, desktop mode, enable ResoniteLink (Dash > Session > Settings), start resonite-mcp (:10979). Summon loads avatar (optional path), sets Happy, speaks the greeting.
+- **Overte**: domain-server + Interface + bridge script, start overte-mcp (:11110). Summon spawns a greeting-sign Text entity (live or simulated, honestly labeled).
+- **VRChat**: 2FA login in vrchat-mcp, private instance, Secure Boot + Memory Integrity for EAC. Summon prepares numbered chatbox chunks (144 chars) you paste in order.
+
+### Classroom loop
+Practice step asks bundled JLPT items (N5-N1, local, no LLM), grades answers including katakana keys, speaks praise. Prepare classroom spawns persistent Overte entities.
+
+### First time?
+See docs/ONBOARDING_VR.md — windowed-mode trick (Win+Shift+Arrow), cost table (core path free), pitfalls.`,
   },
   {
     id: "ethics",

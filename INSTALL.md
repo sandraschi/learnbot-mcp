@@ -92,7 +92,22 @@ of personas back.
 
 To check the webapp side, open `http://127.0.0.1:11101/` after starting
 the REST API — you should land on the Dashboard with a sidebar linking to
-Personas, Chat, Avatar, Lessons, Japanese, and more.
+Personas, Chat, Avatar, Lessons, Japanese, VR, and more.
+
+## Optional Companions (Learn in VR)
+
+learnbot-mcp works standalone. For the `/vr` page tracks, start any of:
+
+```powershell
+cd D:/Dev/repos/resonite-mcp; just serve      # :10979 - Resonite summon
+cd D:/Dev/repos/overte-mcp; ./start.ps1       # :11110 - Overte greeting signs
+# vrchat-mcp last: needs 2FA login + Secure Boot (see below)
+```
+
+First time in VR? Read [docs/ONBOARDING_VR.md](docs/ONBOARDING_VR.md) before
+expecting Miko to appear in-world (ResoniteLink checkbox, windowed-mode
+notes, per-track setup). For Claude Desktop, register each companion per its
+own README next to learnbot-mcp in `claude_desktop_config.json`.
 
 ## Troubleshooting
 

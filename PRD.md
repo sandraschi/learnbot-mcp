@@ -1,7 +1,7 @@
 # learnbot-mcp - PRD
 
-**Status**: Draft  
-**Date**: 2026-07-15  
+**Status**: Draft (Learn-in-VR shipped 2026-10-02, see below)
+**Date**: 2026-07-15
 **Owner**: Sandra Schipal
 
 ## Problem
@@ -22,6 +22,11 @@ One MCP server that lets you define a chatbot persona once, then spawn it across
 - **Multi-platform output**: Resonite (visible avatar + gestures), Discord, web chat, TTS call
 - **Regulatory compliance**: configurable - China real-name auth, conversation retention, refusal templates; EU AI Act; or unconstrained
 - **Proactive chat**: bot can initiate conversation based on triggers (time, event, context)
+- **Learn in VR (shipped 2026-10-02)**: `/vr` launchpad + `vr_summon` /
+  `vr_lesson_step` / `vr_classroom_ensure` — Miko greets in-world (Resonite
+  avatar + expression, Overte greeting sign, VRChat chatbox handoff), spoken
+  JLPT quiz loop, persistent Overte classroom. Full plan:
+  `mcp-central-docs/projects/learnbot-mcp/VR_LEARN_IN_VR_PLAN.md`.
 
 ### Out of scope (delegates to fleet infra)
 
@@ -29,6 +34,8 @@ One MCP server that lets you define a chatbot persona once, then spawn it across
 - **TTS/STT**: delegates to `speech-mcp`
 - **Avatar rendering/VRM**: delegates to `avatar-mcp`
 - **Resonite world state**: delegates to `resonite-mcp`
+- **Overte domain/entities**: delegates to `overte-mcp`
+- **VRChat runtime**: delegates to `vrchat-mcp` (chatbox/OSC only, last track)
 - **Long-term memory / RAG**: delegates to `advanced-memory-mcp`
 
 ## User Stories
@@ -39,6 +46,7 @@ One MCP server that lets you define a chatbot persona once, then spawn it across
 4. As Sandra, the bot refuses topics I configure (gore, politics, etc.) with configurable refusal messages.
 5. As Sandra, the bot can proactively start a conversation ("Good morning, your TBR pile has 3 items due").
 6. As a fleet user, I deploy learnbot-mcp in China-compliant mode - real-name auth, 30-day retention, topic blocklist.
+7. As Joe Greybeardy (no headset, no VR background), I press Learn in VR, follow the Resonite track, and Miko greets me in Japanese with romaji + English — no BIOS changes, no headset, no credit card.
 
 ## Success Metrics
 
@@ -47,3 +55,4 @@ One MCP server that lets you define a chatbot persona once, then spawn it across
 - Conversation flows across platforms (Resonite → same persona on Discord)
 - Audit log captures every turn with requestor identity
 - Safety rules block configured topics with logged refusal
+- Joe completes a desktop Resonite join + Miko greeting unaided (VR success metric)

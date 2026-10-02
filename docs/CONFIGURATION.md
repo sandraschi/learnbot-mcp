@@ -18,7 +18,11 @@ Verified against `src/learnbot_mcp/config.py` (pydantic-settings, `.env`-backed)
 | `LEARNBOT_LLM_MODEL` | *(empty)* | Model name override (e.g. `llama3.2:3b`) |
 | `LEARNBOT_SPEECH_MCP_URL` | `http://127.0.0.1:10909` | speech-mcp TTS/STT bridge URL |
 | `LEARNBOT_AVATAR_MCP_URL` | `http://127.0.0.1:10792` | avatar-mcp bridge URL |
-| `LEARNBOT_RESONITE_MCP_URL` | `http://127.0.0.1:10978` | resonite-mcp bridge URL |
+| `LEARNBOT_RESONITE_MCP_URL` | `http://127.0.0.1:10979` | resonite-mcp bridge URL (backend — `:10978` is the Vite frontend, no `/health`) |
+| `LEARNBOT_VRCHAT_MCP_URL` | `http://127.0.0.1:10712` | vrchat-mcp transport URL (MCP `/mcp`; chatbox via MCP/OSC, not REST) |
+| `LEARNBOT_OVERTE_MCP_URL` | `http://127.0.0.1:11110` | overte-mcp bridge URL (domain admin `:40100`) |
+| `LEARNBOT_MIKO_AVATAR_PATH` | *(empty)* | Miko's Resonite inventory path for summon avatar-load (empty = skip with hint) |
+| `LEARNBOT_MIKO_GLB_URL` | `http://localhost:11110/models/Nekomimi-chan.glb` | Miko GLB for Overte classroom entities |
 | `LEARNBOT_MEMOPS_URL` | `http://127.0.0.1:10732` | memops (basic-memory) bridge URL |
 | `LEARNBOT_RATE_LIMIT` | `30` | Safety rate limit, messages per minute |
 | `LEARNBOT_API_KEY` | *(empty)* | API key for REST endpoints, if enforced |
@@ -48,8 +52,8 @@ Create a `.env` file in the repo root (see `.env.example`), or set them in
 - `LEARNBOT_LLM_BASE_URL` defaults to `local-llm-mcp`'s port (10832), not
   Ollama directly — if you're pointing straight at Ollama, override it to
   `http://127.0.0.1:11434`.
-- All four bridge URLs (`speech`, `avatar`, `resonite`, `memops`) point to
-  other fleet MCP servers. learnbot-mcp degrades gracefully if any of them
-  aren't running — features that need them (TTS, avatar VRM, Resonite
-  export, long-term memory) just won't do anything, they don't hard-fail
-  the whole server.
+- All six bridge URLs (`speech`, `avatar`, `resonite`, `vrchat`, `overte`,
+  `memops`) point to other fleet MCP servers. learnbot-mcp degrades gracefully
+  if any of them aren't running — features that need them (TTS, avatar VRM,
+  Resonite/Overte/VRChat summon, long-term memory) report dialogic hints,
+  they don't hard-fail the whole server. The `/vr` page shows live status.

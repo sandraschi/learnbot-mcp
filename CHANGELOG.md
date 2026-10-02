@@ -1,5 +1,35 @@
 # Changelog
 
+## [Unreleased] - Learn in VR (2026-10-02)
+
+### Added
+- **`/vr` launchpad page + Dashboard "Learn in VR" quick-action** - three
+  tracks (Resonite first, Overte self-hosted, VRChat last), companion status
+  dots, Miko Classic/Genki picker, headset-later accordion, mock sessions.
+- **`vr_summon` / `POST /api/vr/summon`** - Miko greeting (JP + romaji + EN),
+  per-step delivery receipts, persona auto-seed, audit turn. Live on Resonite
+  (avatar-load optional path + Happy expression) and Overte (Text
+  greeting-sign, live/simulated labeled); VRChat returns numbered chatbox
+  chunks as an honest handoff (chatbox is MCP/OSC-only there).
+- **`vr_lesson_step` / classroom loop** - bundled JLPT items (N5-N1, local),
+  katakana + 1-4/A-D grading, spoken praise, score tracking on the VR page.
+- **`vr_classroom_ensure`** - persistent Overte classroom (permanent sign +
+  Miko GLB); `vr_status` health aggregation; `platform_send` speaks on
+  resonite/overte/vrchat via speech-mcp.
+- **Voice ranking locked by A/B** - Gemini Leda for JP (4.3 s sample in
+  `docs/audio/`), Kokoro EN-only gloss fallback; Qwen needs clone ref audio,
+  VoiceStudio sidecar pending.
+- **Docs** - `docs/ONBOARDING_VR.md` (3 tracks, windowed-mode answer,
+  Secure Boot/HVCI gate for VRChat), crossconnects table, 39 tools documented.
+
+### Fixed
+- `resonite_mcp_url` default `:10978` (frontend) to `:10979` (backend health).
+- `vrchat_mcp_url` default to `:10712` (transport default + registry agree;
+  README 10795/10796 belong to other repos).
+- Stale `test_version` 0.4.0 to 0.6.0; summon audit FK on fresh DBs
+  (auto-seed); katakana grading always-False; one-shot CLI shutdown hang
+  (needs `close_db_pool()` + `-u`). Full list in BUILD_LOG.md.
+
 ## [0.6.0] — 2026-08-02 (fleet hardening pass)
 
 ### Fixed

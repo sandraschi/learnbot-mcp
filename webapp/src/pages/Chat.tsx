@@ -103,10 +103,10 @@ export function Chat() {
         >
           {convId ? "Chatting" : "Start"}
         </button>
-        <button onClick={exportChat} disabled={msgs.length === 0} data-testid="chat-export" className="text-zinc-500 hover:text-zinc-300 p-1.5 disabled:opacity-30">
+        <button onClick={exportChat} disabled={msgs.length === 0} data-testid="chat-export" className="text-zinc-400 hover:text-zinc-300 p-1.5 disabled:opacity-30">
           <Download className="w-4 h-4" />
         </button>
-        <button onClick={clear} disabled={msgs.length === 0} data-testid="chat-clear" className="text-zinc-500 hover:text-zinc-300 p-1.5 disabled:opacity-30">
+        <button onClick={clear} disabled={msgs.length === 0} data-testid="chat-clear" className="text-zinc-400 hover:text-zinc-300 p-1.5 disabled:opacity-30">
           <Eraser className="w-4 h-4" />
         </button>
         {err && <span className="text-red-400 text-xs ml-auto">{err}</span>}
@@ -114,7 +114,7 @@ export function Chat() {
 
       <div className="flex-1 overflow-auto space-y-3 mb-4 pr-2" data-testid="chat-messages">
         {msgs.length === 0 && (
-          <div className="text-center text-zinc-600 mt-16">
+          <div className="text-center text-zinc-400 mt-16">
             <Bot className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p>Select a persona and start a conversation.</p>
           </div>
@@ -124,7 +124,7 @@ export function Chat() {
             <div className={`max-w-[80%] p-3 rounded-xl text-sm ${
               m.role === "user" ? "bg-amber-600/20 border border-amber-600/30" : "bg-zinc-800 border border-zinc-700"
             }`}>
-              <div className="flex items-center gap-1.5 mb-1 text-xs text-zinc-500">
+              <div className="flex items-center gap-1.5 mb-1 text-xs text-zinc-400">
                 {m.role === "user" ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3" />}
                 {m.role}
               </div>
@@ -132,7 +132,7 @@ export function Chat() {
             </div>
           </div>
         ))}
-        {sending && <div className="text-zinc-600 text-sm animate-pulse">Thinking...</div>}
+        {sending && <div className="text-zinc-400 text-sm animate-pulse">Thinking...</div>}
         <div ref={bottomRef} />
       </div>
 

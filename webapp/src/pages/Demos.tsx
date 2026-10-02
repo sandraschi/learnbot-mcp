@@ -130,14 +130,14 @@ export function Demos() {
               <demo.icon className={`w-4 h-4 ${running === demo.id ? "text-amber-500 animate-pulse" : "text-zinc-400"}`} />
               <span className="text-sm font-medium">{demo.label}</span>
             </div>
-            <p className="text-xs text-zinc-600">{demo.description}</p>
+            <p className="text-xs text-zinc-400">{demo.description}</p>
           </button>
         ))}
       </div>
 
       <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 font-mono text-xs leading-relaxed h-64 overflow-y-auto">
         {logs.length === 0 ? (
-          <span className="text-zinc-600">Run a demo to see output here...</span>
+          <span className="text-zinc-400">Run a demo to see output here...</span>
         ) : (
           logs.map((line, i) => (
             <div key={i} className={line.startsWith(">>>") ? "text-amber-500 font-bold" : line.startsWith("ERROR") ? "text-red-400" : "text-zinc-300"}>

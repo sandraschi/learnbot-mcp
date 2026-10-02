@@ -1,4 +1,4 @@
-"""Lesson depot — structured lesson plans with CRUD and runner."""
+"""Lesson depot - structured lesson plans with CRUD and runner."""
 
 from __future__ import annotations
 

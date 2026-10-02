@@ -1,4 +1,4 @@
-"""Learnbot tools — vocabulary quiz, grammar check, reading passage generation."""
+"""Learnbot tools - vocabulary quiz, grammar check, reading passage generation."""
 
 from __future__ import annotations
 
@@ -223,7 +223,7 @@ async def graded_reader(
     target_lang: str = "ar",
     topic: str = "",
 ) -> dict:
-    """Generate a graded reader — a leveled reading text with vocabulary and questions.
+    """Generate a graded reader - a leveled reading text with vocabulary and questions.
 
     Unlike reading_passage which generates one-off texts, graded_reader produces
     a structured reader suitable for extensive reading practice:

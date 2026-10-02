@@ -1,14 +1,14 @@
-"""Japanese reference data — kanji, JMdict, JLPT vocab, Tatoeba examples, JLPT questions.
+"""Japanese reference data - kanji, JMdict, JLPT vocab, Tatoeba examples, JLPT questions.
 
 Was ai-games-collection integration over HTTP (kanji-api :11003, jlpt-api :11001).
-Now queries local bundled snapshots directly — no running ai-games-collection
+Now queries local bundled snapshots directly - no running ai-games-collection
 required, no port dependency (11001/11003 also collide with unrelated
 fleet hardware-control servers per WEBAPP_PORTS.md; local queries sidestep
 that entirely). See data/ATTRIBUTION.md for data sources and licensing.
 
 Data files: data/kanji.db (kanji, jmdict, jlpt_vocabulary, examples tables),
 data/jlpt_questions.db (questions, question_options tables). Both are
-read-only snapshots of ai-games-collection's data — re-copy from ai-games-collection/data/ to
+read-only snapshots of ai-games-collection's data - re-copy from ai-games-collection/data/ to
 refresh; do not write to these files from learnbot-mcp.
 """
 
@@ -40,7 +40,7 @@ def _missing_db(path: Path) -> dict:
     return {
         "success": False,
         "error": f"{path.name} not found at {path}. Copy it from ai-games-collection/data/ "
-        f"— see data/ATTRIBUTION.md.",
+        f"- see data/ATTRIBUTION.md.",
     }
 
 
@@ -48,7 +48,7 @@ def _connect_ro(path: Path) -> aiosqlite.Connection:
     """Return an unstarted aiosqlite Connection for a read-only local file.
 
     Caller must enter this exactly once via `async with _connect_ro(path) as conn:`.
-    Do NOT `await` this function and then also `async with` the result —
+    Do NOT `await` this function and then also `async with` the result -
     aiosqlite.Connection.__aenter__ awaits itself to start its background
     thread, and starting that thread twice raises
     RuntimeError("threads can only be started once").
@@ -199,7 +199,7 @@ async def example_sentences(word: str, limit: int = 5) -> dict:
     """Get example sentences for a Japanese word or expression.
 
     Sources from bundled kanji.db's Tatoeba sentence table (278K+ pairs,
-    CC BY 2.0 FR — see data/ATTRIBUTION.md).
+    CC BY 2.0 FR - see data/ATTRIBUTION.md).
 
     Returns: {"success": bool, "examples": list, "count": int}
     """
@@ -283,7 +283,7 @@ async def jlpt_vocab_by_level(jlpt: str = "N5", limit: int = 20) -> dict:
     """Get JLPT-graded vocabulary list for a specific level (N5-N1).
 
     Sources from bundled kanji.db's jlpt_vocabulary table (8K+ entries).
-    Same underlying query as vocab_lookup(jlpt=...) — kept as a separate
+    Same underlying query as vocab_lookup(jlpt=...) - kept as a separate
     tool for callers that only ever want level-graded lists, not free-text
     search.
 

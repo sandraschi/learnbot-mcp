@@ -58,20 +58,20 @@ export function Personas() {
               <div className="flex items-center gap-2">
                 <Bot className="w-4 h-4 text-amber-500" />
                 <span className="font-medium">{p.display_name || p.name}</span>
-                <span className="text-xs text-zinc-600">{p.name}</span>
+                <span className="text-xs text-zinc-400">{p.name}</span>
               </div>
-              <div className="text-sm text-zinc-500 mt-1 line-clamp-2">{p.backstory?.slice(0, 200)}</div>
-              <div className="text-xs text-zinc-600 mt-1">
+              <div className="text-sm text-zinc-400 mt-1 line-clamp-2">{p.backstory?.slice(0, 200)}</div>
+              <div className="text-xs text-zinc-400 mt-1">
                 Voice: {p.voice || "none"} &middot; Platforms: {(p.platforms || []).join(", ") || "none"}
                 {(p.proactive_triggers || []).length > 0 && <> &middot; Triggers: {p.proactive_triggers.length}</>}
               </div>
             </div>
-            <button onClick={() => remove(p.name)} className="text-zinc-600 hover:text-red-400 p-1">
+            <button onClick={() => remove(p.name)} className="text-zinc-400 hover:text-red-400 p-1">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
         ))}
-        {personas.length === 0 && <div className="text-center text-zinc-600 py-8 text-sm">No personas yet.</div>}
+        {personas.length === 0 && <div className="text-center text-zinc-400 py-8 text-sm">No personas yet.</div>}
       </div>
     </div>
   );

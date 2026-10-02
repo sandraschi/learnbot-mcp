@@ -34,7 +34,7 @@ export function Audit() {
     <div data-testid="audit-page">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold">Audit Log</h1>
-        <button onClick={load} className="text-sm text-zinc-500 hover:text-zinc-300 px-3 py-1.5 rounded-lg border border-zinc-700">
+        <button onClick={load} className="text-sm text-zinc-400 hover:text-zinc-300 px-3 py-1.5 rounded-lg border border-zinc-700">
           Refresh
         </button>
       </div>
@@ -49,7 +49,7 @@ export function Audit() {
       <div className="space-y-1">
         {turns.map((t: any, i: number) => (
           <div key={t.id || i} className={`border-l-2 ${color(t.role)} pl-3 py-2`}>
-            <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+            <div className="flex items-center gap-1.5 text-xs text-zinc-400">
               {icon(t.role)}
               <span>{t.role}</span>
               <span>&middot;</span>
@@ -63,7 +63,7 @@ export function Audit() {
             <div className="text-sm mt-0.5 line-clamp-2">{t.content?.slice(0, 300)}</div>
           </div>
         ))}
-        {turns.length === 0 && <div className="text-center text-zinc-600 py-8 text-sm">No audit entries found.</div>}
+        {turns.length === 0 && <div className="text-center text-zinc-400 py-8 text-sm">No audit entries found.</div>}
       </div>
     </div>
   );

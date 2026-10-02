@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Volume2, Play, User, Users } from "lucide-react";
+import { Volume2, Play, User, Users, AlertCircle } from "lucide-react";
 import { api } from "../api";
 
 export function Voices() {
   const [voices, setVoices] = useState<any[]>([]);
   const [testing, setTesting] = useState<string | null>(null);
+  const [failed, setFailed] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/voices")
@@ -15,14 +16,19 @@ export function Voices() {
 
   const testVoice = async (id: string) => {
     setTesting(id);
+    setFailed(null);
     try {
-      await fetch("/api/voice/test", {
+      const r = await fetch("/api/voice/test", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ voice_id: id, text: "Hello! This is a voice test." }),
       });
-    } catch {}
-    setTimeout(() => setTesting(null), 2000);
+      const data = await r.json();
+      if (!r.ok || !data.success) setFailed(id);
+    } catch {
+      setFailed(id);
+    }
+    setTesting(null);
   };
 
   const groups = [
@@ -34,7 +40,7 @@ export function Voices() {
   return (
     <div data-testid="voices-page">
       <h1 className="text-xl font-bold mb-2">Voices</h1>
-      <p className="text-sm text-zinc-500 mb-6">
+      <p className="text-sm text-zinc-400 mb-6">
         Gemini TTS voices. Click the play button to hear a sample.
       </p>
 
@@ -56,17 +62,24 @@ export function Voices() {
                   <button
                     onClick={() => testVoice(v.id)}
                     disabled={testing === v.id}
-                    className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-amber-500 disabled:opacity-50 transition-colors"
+                    title={failed === v.id ? "Voice test failed" : undefined}
+                    className={`p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 transition-colors ${
+                      failed === v.id ? "text-red-400 hover:text-red-300" : "text-zinc-400 hover:text-amber-500"
+                    }`}
                   >
                     {testing === v.id ? (
                       <Volume2 className="w-4 h-4 animate-pulse" />
+                    ) : failed === v.id ? (
+                      <AlertCircle className="w-4 h-4" />
                     ) : (
                       <Play className="w-4 h-4" />
                     )}
                   </button>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium">{v.id}</div>
-                    <div className="text-xs text-zinc-500 truncate">{v.desc}</div>
+                    <div className="text-xs text-zinc-400 truncate">
+                      {failed === v.id ? <span className="text-red-400">Test failed &mdash; check TTS provider config</span> : v.desc}
+                    </div>
                   </div>
                 </div>
               ))}

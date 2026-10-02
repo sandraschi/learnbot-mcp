@@ -680,7 +680,7 @@ async def lesson_generate(
     framework: str = "",
     duration_min: int = 15,
 ) -> dict:
-    """Generate a complete lesson via AI — sections, vocab, quiz — and save it.
+    """Generate a complete lesson via AI - sections, vocab, quiz - and save it.
 
     Framework-aware: pass 'CEFR', 'JLPT', 'HSK', 'DELF', etc. to target that standard.
     The LLM uses the framework to calibrate content difficulty and focus areas."""
@@ -730,7 +730,7 @@ async def graded_reader(
     target_lang: str = "ar",
     topic: str = "",
 ) -> dict:
-    """Generate a graded reader — leveled text + vocabulary + comprehension + discussion.
+    """Generate a graded reader - leveled text + vocabulary + comprehension + discussion.
 
     Unlike reading_passage (single text + questions), graded_reader produces
     a structured reader for extensive reading practice with pre-reading vocab,
@@ -815,7 +815,7 @@ async def example_sentences(word: str, limit: int = 5) -> dict:
     """Get example sentences for a Japanese word.
 
     Sources from bundled data/kanji.db's Tatoeba sentence table (278K+ pairs,
-    CC BY 2.0 FR — see data/ATTRIBUTION.md). Local SQLite query, no
+    CC BY 2.0 FR - see data/ATTRIBUTION.md). Local SQLite query, no
     external service required.
 
     ## Return Format

@@ -4,6 +4,7 @@ import { Bot, Eye, EyeOff, MessageCircle, RotateCw, Square } from "lucide-react"
 
 export function Avatar() {
   const [persona, setPersona] = useState("miko");
+  const [personaInput, setPersonaInput] = useState("miko");
   const [expression, setExpression] = useState<VrmExpression>("neutral");
   const [talking, setTalking] = useState(false);
   const [lookAtMouse, setLookAtMouse] = useState(true);
@@ -19,22 +20,24 @@ export function Avatar() {
   return (
     <div data-testid="avatar-page" className="max-w-lg mx-auto">
       <h1 className="text-xl font-bold mb-2">Avatar</h1>
-      <p className="text-sm text-zinc-500 mb-6">
+      <p className="text-sm text-zinc-400 mb-6">
         Interactive VRM avatar. Drag to orbit, scroll to zoom, and drive her
         expressions below.
       </p>
 
       <div className="flex items-center gap-2 mb-4">
-        <Bot className="w-4 h-4 text-zinc-500" />
+        <Bot className="w-4 h-4 text-zinc-400" />
         <input
           className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm"
-          value={persona}
-          onChange={(e) => setPersona(e.target.value)}
+          value={personaInput}
+          onChange={(e) => setPersonaInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") setPersona(personaInput); }}
           placeholder="Persona name"
         />
         <button
-          onClick={() => setPersona(persona)}
-          className="bg-amber-600 hover:bg-amber-500 text-sm px-3 py-1.5 rounded-lg"
+          onClick={() => setPersona(personaInput)}
+          disabled={personaInput === persona}
+          className="bg-amber-600 hover:bg-amber-500 disabled:opacity-40 disabled:hover:bg-amber-600 text-sm px-3 py-1.5 rounded-lg"
         >
           Load
         </button>
@@ -52,7 +55,7 @@ export function Avatar() {
       </div>
 
       <div className="mb-3">
-        <div className="text-xs text-zinc-500 mb-1.5">Expression</div>
+        <div className="text-xs text-zinc-400 mb-1.5">Expression</div>
         <div className="flex flex-wrap gap-1.5">
           {VRM_EXPRESSIONS.map((name) => (
             <button
@@ -67,7 +70,7 @@ export function Avatar() {
       </div>
 
       <div className="mb-6">
-        <div className="text-xs text-zinc-500 mb-1.5">Behaviour</div>
+        <div className="text-xs text-zinc-400 mb-1.5">Behaviour</div>
         <div className="flex flex-wrap gap-1.5">
           <button onClick={() => setTalking(!talking)} className={toggleClass(talking)}>
             {talking ? <Square className="w-3 h-3" /> : <MessageCircle className="w-3 h-3" />}
@@ -84,7 +87,7 @@ export function Avatar() {
         </div>
       </div>
 
-      <p className="text-xs text-zinc-600 text-center mt-4">
+      <p className="text-xs text-zinc-400 text-center mt-4">
         Drag = orbit, wheel = zoom. Auto-blink is always on. Expressions use VRM
         presets via three-vrm; the talk test cycles mouth visemes (real lip-sync
         from TTS phonemes is on the roadmap). Emotion tags from live chat will

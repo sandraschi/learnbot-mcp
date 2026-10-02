@@ -1,4 +1,4 @@
-"""Soundscape — background music, environmental audio, and SFX for the learnbot.
+"""Soundscape - background music, environmental audio, and SFX for the learnbot.
 
 Delegates to yahboom-mcp for physical sound effects (buzzer, beeps, built-in sounds)
 and to speech-mcp for ambient audio when no robot is available.

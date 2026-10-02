@@ -1,4 +1,4 @@
-"""Robot orchestration — maps emotion tags to Boomy/Bumi physical actions."""
+"""Robot orchestration - maps emotion tags to Boomy/Bumi physical actions."""
 
 from __future__ import annotations
 
@@ -156,7 +156,7 @@ async def execute_emotion(emotion_tag: str, yahboom_url: str = "http://127.0.0.1
 
 
 async def robot_stop_all(yahboom_url: str = "http://127.0.0.1:10892") -> dict:
-    """Emergency stop — halt all robot motion."""
+    """Emergency stop - halt all robot motion."""
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
             await client.post(f"{yahboom_url}/api/v1/stop_all")
@@ -172,7 +172,7 @@ async def robot_stop_all(yahboom_url: str = "http://127.0.0.1:10892") -> dict:
         return {"success": False, "error": str(e)}
 
 
-# Canonical tag list — all tags the LLM may emit (TTS-only tags have no robot mapping)
+# Canonical tag list - all tags the LLM may emit (TTS-only tags have no robot mapping)
 _EXTRA_TTS_TAGS = [
     "whispers",
     "sighs",
@@ -189,5 +189,5 @@ _EXTRA_TTS_TAGS = [
 ]
 EMOTION_TAGS = list(_EMOTION_MOTIONS.keys()) + _EXTRA_TTS_TAGS
 
-# Single regex for all tag extraction — import and reuse, don't duplicate
+# Single regex for all tag extraction - import and reuse, don't duplicate
 TAG_PATTERN = r"\[(" + "|".join(EMOTION_TAGS) + r")\]"

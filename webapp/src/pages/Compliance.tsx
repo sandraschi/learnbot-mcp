@@ -15,7 +15,7 @@ export function Compliance() {
 
   if (err) return <div className="text-red-400 text-sm">{err}</div>;
   if (!data)
-    return <div className="text-zinc-500 text-sm">Loading...</div>;
+    return <div className="text-zinc-400 text-sm">Loading...</div>;
 
   const items = [
     {
@@ -53,7 +53,7 @@ export function Compliance() {
               <Icon className="w-5 h-5 text-amber-500 shrink-0" />
               <div>
                 <div className="text-sm font-medium">{label}</div>
-                <div className="text-sm text-zinc-500">{value}</div>
+                <div className="text-sm text-zinc-400">{value}</div>
               </div>
             </div>
           </div>
@@ -69,7 +69,7 @@ export function Compliance() {
               className="bg-zinc-900 border border-zinc-800 rounded-xl p-3"
             >
               <div className="text-sm font-medium">{topic}</div>
-              <div className="text-sm text-zinc-500">{String(message)}</div>
+              <div className="text-sm text-zinc-400">{String(message)}</div>
             </div>
           )
         )}

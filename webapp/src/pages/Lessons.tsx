@@ -104,15 +104,15 @@ export function Lessons() {
               </div>
               <button
                 onClick={() => remove(lesson.id)}
-                className="text-zinc-600 hover:text-red-400 p-0.5"
+                className="text-zinc-400 hover:text-red-400 p-0.5"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
             {lesson.description && (
-              <p className="text-xs text-zinc-500 mb-2 line-clamp-2">{lesson.description}</p>
+              <p className="text-xs text-zinc-400 mb-2 line-clamp-2">{lesson.description}</p>
             )}
-            <div className="flex flex-wrap gap-1.5 text-xs text-zinc-600">
+            <div className="flex flex-wrap gap-1.5 text-xs text-zinc-400">
               <span className="bg-zinc-800 px-2 py-0.5 rounded">{lesson.level}</span>
               <span className="bg-zinc-800 px-2 py-0.5 rounded">{lesson.language}</span>
               <span className="bg-zinc-800 px-2 py-0.5 rounded">{lesson.duration_min}min</span>
@@ -122,7 +122,7 @@ export function Lessons() {
             {(lesson.tags?.length || 0) > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {lesson.tags.map((t: string, i: number) => (
-                  <span key={i} className="text-xs text-zinc-600 bg-zinc-800/50 px-1.5 py-0.5 rounded">
+                  <span key={i} className="text-xs text-zinc-400 bg-zinc-800/50 px-1.5 py-0.5 rounded">
                     #{t}
                   </span>
                 ))}
@@ -151,12 +151,12 @@ export function Lessons() {
                 ))}
                 {lesson.vocab?.length > 0 && (
                   <div className="p-2 bg-zinc-800/50 rounded">
-                    <span className="text-zinc-500 font-medium text-[10px] uppercase">Vocabulary</span>
+                    <span className="text-zinc-400 font-medium text-[10px] uppercase">Vocabulary</span>
                     {lesson.vocab.slice(0, 5).map((v: any, i: number) => (
                       <div key={i} className="flex gap-2 mt-1">
                         <span className="text-zinc-200">{v.word}</span>
-                        <span className="text-zinc-600">{v.reading}</span>
-                        <span className="text-zinc-500">{v.definition}</span>
+                        <span className="text-zinc-400">{v.reading}</span>
+                        <span className="text-zinc-400">{v.definition}</span>
                       </div>
                     ))}
                   </div>
@@ -168,7 +168,7 @@ export function Lessons() {
       </div>
 
       {lessons.length === 0 && !generating && (
-        <div className="text-center text-zinc-600 py-12">
+        <div className="text-center text-zinc-400 py-12">
           <BookOpen className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">No lessons yet. Generate one above.</p>
         </div>

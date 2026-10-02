@@ -147,7 +147,7 @@ export function Japanese() {
               <div key={k.kanji} className="bg-zinc-800 rounded p-2 text-center">
                 <div className="text-2xl">{k.kanji}</div>
                 <div className="text-xs text-zinc-400 mt-1">{k.meanings.join(", ")}</div>
-                <div className="text-xs text-zinc-500">{k.jlpt} · {k.strokes} strokes</div>
+                <div className="text-xs text-zinc-400">{k.jlpt} · {k.strokes} strokes</div>
               </div>
             ))}
           </div>
@@ -159,7 +159,7 @@ export function Japanese() {
               <div key={i} className="bg-zinc-800 rounded p-2 flex justify-between items-center text-sm">
                 <div>
                   <span className="text-zinc-100">{v.expression || v.japanese}</span>
-                  <span className="text-zinc-500 ml-2">{v.reading}</span>
+                  <span className="text-zinc-400 ml-2">{v.reading}</span>
                 </div>
                 <div className="text-zinc-400 text-xs text-right max-w-[50%]">
                   {v.translation || v.meaning}
@@ -173,10 +173,10 @@ export function Japanese() {
 
       {/* Extra practice games — separate app, optional */}
       <h2 className="text-sm font-semibold text-zinc-200 mb-1">Extra Practice Games</h2>
-      <p className="text-zinc-500 text-xs mb-3">
+      <p className="text-zinc-400 text-xs mb-3">
         Optional — a separate app (ai-games-collection), not required for the dictionary/kanji lookup above.
       </p>
-      {gamesAppOk === null && <p className="text-zinc-500 text-sm mb-4">Checking ai-games-collection...</p>}
+      {gamesAppOk === null && <p className="text-zinc-400 text-sm mb-4">Checking ai-games-collection...</p>}
       {gamesAppOk === false && (
         <p className="text-amber-500 text-sm mb-4">
           ai-games-collection not reachable on :10987. Start it from its own repo if you want these extra games —
@@ -200,7 +200,7 @@ export function Japanese() {
                 {label}
                 <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <p className="text-xs text-zinc-500 mt-0.5">{desc}</p>
+              <p className="text-xs text-zinc-400 mt-0.5">{desc}</p>
             </div>
           </a>
         ))}

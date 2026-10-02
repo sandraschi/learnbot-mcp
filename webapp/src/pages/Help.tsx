@@ -171,7 +171,7 @@ export function Help() {
             className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
               active === t.id
                 ? "border-amber-500 text-amber-500"
-                : "border-transparent text-zinc-500 hover:text-zinc-300"
+                : "border-transparent text-zinc-400 hover:text-zinc-300"
             }`}
           >
             <t.icon className="w-4 h-4" />
@@ -185,7 +185,7 @@ export function Help() {
             {tab.content}
           </div>
         ) : (
-          <div className="text-zinc-500">Select a tab.</div>
+          <div className="text-zinc-400">Select a tab.</div>
         )}
       </div>
     </div>

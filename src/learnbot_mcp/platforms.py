@@ -38,7 +38,7 @@ async def _call_speech_mcp(payload: dict) -> dict:
 
 
 async def _sapi5_fallback(text: str) -> dict:
-    """Windows SAPI5 via PowerShell — last resort when speech-mcp is down."""
+    """Windows SAPI5 via PowerShell - last resort when speech-mcp is down."""
     try:
         safe = text[:500].replace('"', '\\"').replace("`", "\\`")
         ps_cmd = f'Add-Type -AssemblyName System.Speech; $s=New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.Speak("{safe}")'  # noqa: E501

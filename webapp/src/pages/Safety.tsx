@@ -49,16 +49,16 @@ export function Safety() {
               <ShieldAlert className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
     <div data-testid="safety-page">
                 <div className="font-medium text-sm">{r.topic}</div>
-                <div className="text-xs text-zinc-500">Action: {r.action}</div>
-                {r.message && <div className="text-xs text-zinc-600 mt-1">{r.message}</div>}
+                <div className="text-xs text-zinc-400">Action: {r.action}</div>
+                {r.message && <div className="text-xs text-zinc-400 mt-1">{r.message}</div>}
               </div>
             </div>
-            <button onClick={() => remove(r.id)} className="text-zinc-600 hover:text-red-400 p-1">
+            <button onClick={() => remove(r.id)} className="text-zinc-400 hover:text-red-400 p-1">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
         ))}
-        {rules.length === 0 && <div className="text-center text-zinc-600 py-8 text-sm">No safety rules configured.</div>}
+        {rules.length === 0 && <div className="text-center text-zinc-400 py-8 text-sm">No safety rules configured.</div>}
       </div>
     </div>
   );

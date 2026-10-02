@@ -12,7 +12,7 @@ from learnbot_mcp.config import get_settings
 log = logging.getLogger(__name__)
 
 _DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
-_DEFAULT_MODEL = "llama3.2:3b"
+_DEFAULT_MODEL = "gemma4:12b"
 
 
 async def chat_completion(
@@ -29,7 +29,7 @@ async def chat_completion(
     caller passes one. "ollama" keeps the legacy path (local-llm-mcp first,
     direct Ollama second). Any other registry provider goes through the
     backend proxy (llm_providers.chat_complete, keystore keys).
-    Default model is qwen3.5-9b-deepseek-v4-flash.
+    Default model is gemma4:12b (fleet 10-15B bar; multilingual incl. Japanese).
 
     Returns {"response": str, "model": str, "provider": str}.
     """

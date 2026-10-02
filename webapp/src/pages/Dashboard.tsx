@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bot, MessageSquare, Shield, Activity, ShieldCheck, Clock, ArrowRight, Users2, Headset } from "lucide-react";
 import { api } from "../api";
+import { LlmOnboarding } from "../components/LlmOnboarding";
 
 function KpiCard({ icon: Icon, label, value, testid }: { icon: React.ElementType; label: string; value: string | number; testid: string }) {
   return (
@@ -157,6 +158,10 @@ export function Dashboard() {
             <Headset className="w-4 h-4" /> Learn in VR
           </button>
         </div>
+      </div>
+
+      <div className="mb-6">
+        <LlmOnboarding mode="banner" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

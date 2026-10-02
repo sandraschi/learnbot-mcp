@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Send, Eraser, Download, Bot, User } from "lucide-react";
 import { api } from "../api";
+import { LlmOnboarding } from "../components/LlmOnboarding";
+import { CHAT_PRESETS } from "../lib/chat-presets";
 
 interface Msg {
   role: string;
@@ -84,6 +86,9 @@ export function Chat() {
 
   return (
     <div className="flex flex-col h-full max-w-3xl mx-auto" data-testid="chat-page">
+      <div className="mb-3">
+        <LlmOnboarding mode="banner" />
+      </div>
       <div className="flex items-center gap-2 mb-4 flex-wrap" data-testid="chat-controls">
         <select
           className="bg-zinc-800 text-sm px-3 py-1.5 rounded-lg border border-zinc-700"
@@ -136,6 +141,18 @@ export function Chat() {
         <div ref={bottomRef} />
       </div>
 
+      <div className="flex flex-wrap gap-1.5 mb-2" data-testid="chat-presets">
+        {CHAT_PRESETS.map((p) => (
+          <button
+            key={p.id}
+            title={p.label}
+            onClick={() => setInput((cur) => (cur.trim() ? `${cur.trim()}\n${p.prompt}` : p.prompt))}
+            className="text-xs bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-full px-2.5 py-1 text-zinc-300"
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
       <div className="flex gap-2">
         <input
           className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500"

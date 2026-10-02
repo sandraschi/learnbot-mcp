@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Info, Shield, BookOpen, FileText, MessageCircle, JapaneseYen, Headset } from "lucide-react";
+import { Info, Shield, BookOpen, FileText, MessageCircle, JapaneseYen, Headset, Bot } from "lucide-react";
 
 const tabs = [
   {
@@ -105,6 +105,22 @@ JMdict: 214K entries | JLPT vocab: 8K words | Kanji: 13K characters | Tatoeba: 2
 ### Learn more
 
 See docs/JAPANESE_LEARNING.md for the full guide with phased workflow from beginner to conversational.`,
+  },
+  {
+    id: "llm",
+    label: "AI Setup",
+    icon: Bot,
+    content: `## AI providers
+
+Chat needs a working LLM. Pick one in Settings: local engines are free (Ollama, LM Studio, vLLM), cloud needs an API key (OpenAI, Anthropic, DeepSeek, OpenRouter, Meta, Google, Groq, Mistral, Together, Fireworks, Cohere, xAI, Perplexity).
+
+### How it works
+- The browser never calls vendors. Everything goes through the backend proxy; keys live in data/llm_keys.json (0600) or env vars, never shown back.
+- Selection (provider + model) lives in this browser (localStorage). Test buttons validate without saving.
+- No local engine + no cloud key = Chat shows setup guidance instead of answers.
+
+### Fleet background
+See arxiv-mcp llm-guide skill for local-vs-cloud tradeoffs, what fits a 24GB GPU, and pricing.`,
   },
   {
     id: "vr",

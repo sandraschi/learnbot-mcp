@@ -16,6 +16,7 @@ Verified against `src/learnbot_mcp/config.py` (pydantic-settings, `.env`-backed)
 | `CHATBOT_LLM_PROVIDER` | `local-llm-mcp` | LLM backend provider |
 | `LEARNBOT_LLM_BASE_URL` | `http://127.0.0.1:10832` | LLM server base URL |
 | `LEARNBOT_LLM_MODEL` | *(empty)* | Model name override (e.g. `llama3.2:3b`) |
+| `LEARNBOT_LLM_PROVIDER` | `ollama` | LLM provider ID for chat (`ollama`, `lmstudio`, `vllm`, or any cloud ID); Settings page offers all 16 |
 | `LEARNBOT_SPEECH_MCP_URL` | `http://127.0.0.1:10909` | speech-mcp TTS/STT bridge URL |
 | `LEARNBOT_AVATAR_MCP_URL` | `http://127.0.0.1:10792` | avatar-mcp bridge URL |
 | `LEARNBOT_RESONITE_MCP_URL` | `http://127.0.0.1:10979` | resonite-mcp bridge URL (backend — `:10978` is the Vite frontend, no `/health`) |
@@ -46,6 +47,18 @@ Create a `.env` file in the repo root (see `.env.example`), or set them in
   }
 }
 ```
+
+## LLM providers
+
+Chat supports 16 providers through the backend proxy (`POST /api/llm/chat`,
+SSE at `/api/llm/chat/stream`) — the browser never calls vendors directly.
+Locals (`ollama`, `lmstudio`, `vllm`) need no key; cloud providers
+(OpenAI, Anthropic, DeepSeek, OpenRouter, Meta, Google, Groq, Mistral,
+Together, Fireworks, Cohere, xAI, Perplexity) need a key from env
+(`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, … — see `llm_providers.py`) or the
+Settings page, which stores into `data/llm_keys.json` (0600, gitignored —
+env wins). `GET /api/llm/providers` reports configured flags, never keys.
+Fleet background: `arxiv-mcp/docs/SPEC-llm-providers.md`.
 
 ## Notes
 

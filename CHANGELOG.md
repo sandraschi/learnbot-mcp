@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased] - LLM vendors + onboarding (2026-10-02)
+
+### Added
+- **16-provider registry + backend proxy** (`llm_providers.py`,
+  `/api/llm/providers|models|chat|chat/stream|keys|test`, `llm_status` tool,
+  0600 keystore, canonical IDs per `SPEC-llm-providers.md`). `llm_client`
+  routes non-ollama providers through it; `LEARNBOT_LLM_PROVIDER` selects.
+- **Settings page + vendored kit** (`lib/llm.ts`, `ActiveLlmCard`,
+  `LlmProviderCards`, `LlmOnboarding`, own `chat-presets.ts`), onboarding
+  banners on Dashboard + Chat, preset chips in Chat. 40 MCP tools.
+
 ## [Unreleased] - Learn in VR (2026-10-02)
 
 ### Added

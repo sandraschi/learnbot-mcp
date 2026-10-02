@@ -1,6 +1,6 @@
 # Tool Reference
 
-Full MCP tool reference for learnbot-mcp — 39 tools, verified against
+Full MCP tool reference for learnbot-mcp — 40 tools, verified against
 `src/learnbot_mcp/server.py` (2026-10-02). If a tool isn't listed here, it
 isn't registered.
 
@@ -84,6 +84,7 @@ All accept `source_lang`/`target_lang` — not Japanese-only.
 | `vr_summon` | `platform, variant, user_id` | Summon Miko: greeting + delivery receipts + audit turn (resonite/overte live, vrchat handoff) |
 | `vr_lesson_step` | `user_id, level, answer, question_id` | Classroom loop: bundled JLPT item + local grading + spoken praise |
 | `vr_classroom_ensure` | — | Spin up the persistent classroom (Overte permanent entities first) |
+| `llm_status` | — | LLM provider registry with configured flags + active default (never keys) |
 
 ---
 

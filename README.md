@@ -33,7 +33,7 @@ human side of what the MCP tools drive for agents.
 - **Deep Japanese/JLPT toolset** (`/japanese`) — bundled kanji, JMdict, JLPT vocab (N5–N1), and example-sentence lookups run on local SQLite, no external service required — plus 11 linked practice games (kanji drills, flashcards, karuta, listening) from a separate optional `ai-games-collection`
 - **Multi-platform output** — speak via TTS (Gemini prosody via speech-mcp, falls back to Windows SAPI5), or send to Discord/Resonite/Overte/VRChat bridges
 - **Learn in VR** (`/vr`) — Dashboard quick-action + launchpad page: Resonite summon (live), Overte greeting-sign spawn (live), classroom quiz loop with spoken JLPT items, VRChat chatbox handoff (last) — see [docs/ONBOARDING_VR.md](docs/ONBOARDING_VR.md)
-- **39 MCP tools** across personas, conversations, lessons, language tools, safety, VR, and audit — see [docs/TOOLS.md](docs/TOOLS.md)
+- **40 MCP tools** across personas, conversations, lessons, language tools, safety, VR, LLM vendors, and audit — see [docs/TOOLS.md](docs/TOOLS.md)
 
 ## Quick Install
 

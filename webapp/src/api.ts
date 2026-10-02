@@ -61,5 +61,7 @@ export const api = {
   },
   vr: {
     status: () => get("/vr/status"),
+    summon: (body: { platform: string; variant: string }) =>
+      post("/vr/summon", body),
   },
 };

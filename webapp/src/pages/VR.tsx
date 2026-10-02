@@ -67,6 +67,8 @@ export function VR() {
   const [openTrack, setOpenTrack] = useState("resonite");
   const [miko, setMiko] = useState<"classic" | "genki">("genki");
   const [headsetOpen, setHeadsetOpen] = useState(false);
+  const [summoning, setSummoning] = useState(false);
+  const [summon, setSummon] = useState<any | null>(null);
 
   useEffect(() => {
     api.vr.status().then(setStatus).catch(() => {});
@@ -74,6 +76,19 @@ export function VR() {
 
   const companions = status?.companions ?? {};
   const anyReachable = Object.values(companions).some((c) => c.reachable);
+
+  const doSummon = async () => {
+    setSummoning(true);
+    setSummon(null);
+    try {
+      const r = await api.vr.summon({ platform: openTrack, variant: miko });
+      setSummon(r);
+      api.vr.status().then(setStatus).catch(() => {});
+    } catch {
+      setSummon({ success: false, error: "Summon request failed - is the learnbot backend running?" });
+    }
+    setSummoning(false);
+  };
 
   return (
     <div data-testid="vr-page" className="max-w-3xl mx-auto">
@@ -169,12 +184,42 @@ export function VR() {
         </div>
         <button
           data-testid="vr-summon-miko"
-          disabled
-          title="Summon lands in Phase 2"
-          className="mt-3 w-full px-4 py-2 text-sm bg-zinc-800 text-zinc-500 rounded-lg cursor-not-allowed"
+          onClick={doSummon}
+          disabled={summoning || openTrack !== "resonite"}
+          title={openTrack !== "resonite" ? "Resonite summon only in Phase 2 - VRChat/Overte land in Phase 4" : undefined}
+          className="mt-3 w-full px-4 py-2 text-sm bg-amber-600 hover:bg-amber-500 disabled:bg-zinc-800 disabled:text-zinc-500 rounded-lg disabled:cursor-not-allowed"
         >
-          Summon Miko — coming in Phase 2{status ? ` (${status.summon_note})` : ""}
+          {summoning ? "Summoning Miko..." : "Summon Miko"}
         </button>
+        {openTrack !== "resonite" && (
+          <p className="text-xs text-zinc-500 mt-2">Summon targets Resonite in Phase 2 — switch to the Resonite track to summon.</p>
+        )}
+        {summon && (
+          <div className="mt-3 text-sm bg-zinc-800 border border-zinc-700 rounded-lg p-3 space-y-2">
+            {summon.success ? (
+              <>
+                <div className="font-medium">{summon.greeting_ja}</div>
+                <div className="text-xs text-zinc-400">{summon.greeting_romaji}</div>
+                <div className="text-xs text-zinc-500">{summon.greeting_en}</div>
+                <div className="text-xs space-y-1 pt-1">
+                  {summon.receipts?.map((r: any, i: number) => (
+                    <div key={i} className={r.ok ? "text-green-400" : "text-zinc-400"}>
+                      {r.ok ? "✓" : "·"} {r.step}: {r.detail}
+                    </div>
+                  ))}
+                </div>
+                <div className="text-xs text-zinc-500">
+                  Audit: {summon.audit} ·{" "}
+                  <a href={`/chat?conv=${summon.conversation_id}`} className="text-amber-500 hover:text-amber-400">
+                    Continue in Chat
+                  </a>
+                </div>
+              </>
+            ) : (
+              <div className="text-red-400 text-xs">Summon failed: {summon.error}</div>
+            )}
+          </div>
+        )}
       </div>
 
       <div data-testid="vr-in-viewer" className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-6">

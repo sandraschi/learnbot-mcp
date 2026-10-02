@@ -64,4 +64,13 @@ export const api = {
     summon: (body: { platform: string; variant: string }) =>
       post("/vr/summon", body),
   },
+  llm: {
+    providers: () => get("/llm/providers"),
+    models: (provider: string) => get(`/llm/models?provider=${encodeURIComponent(provider)}`),
+    test: (body: { provider: string; api_key?: string }) => post("/llm/test", body),
+    saveKey: (body: { provider: string; api_key: string }) => post("/llm/keys", body),
+    clearKey: (provider: string) => del(`/llm/keys/${encodeURIComponent(provider)}`),
+    chat: (body: { provider: string; model: string; messages: unknown[] }) =>
+      post("/llm/chat", body),
+  },
 };

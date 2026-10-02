@@ -74,13 +74,29 @@ mode or monitor selection** — there is no `-screen-fullscreen`-style flag;
 - Keep learnbot's VR page (browser) on the main monitor, Resonite on the
   second. No config file to edit, no relaunch needed.
 
-### Track B — VRChat (advanced, Phase 4)
+### Track B — VRChat (advanced, LAST)
 
-Create + verify a VRChat account, log vrchat-mcp in (Settings: username,
-password, then 2FA code), join a **private/friends instance**, summon from the
-VR page (chatbox delivery, ≤144 chars per message). Fleet ports for vrchat-mcp
-are currently unclaimed (config 0/0, README claims 10795/10796) — resolved in
-Phase 4 before this track goes live.
+Heaviest track: account + 2FA + anti-cheat + trust ranks. Do Resonite first.
+
+1. Create a VRChat account, verify your email, and merge it to a full
+   VRChat account (not Steam-only) so API login works.
+2. **Anti-cheat gate (the BIOS one)**: VRChat's EAC build requires **Secure
+   Boot enabled in BIOS/UEFI** and **Memory Integrity (HVCI) on** in Windows
+   Security > Device security > Core isolation. Check first: `msinfo32` >
+   BIOS Mode must read UEFI (Legacy = convert with MBR2GPT first), and
+   registry `HKLM:\...\SecureBoot\State\UEFISecureBootEnabled` should be 1.
+   Caveats: Secure Boot complicates Linux dual-boot; HVCI broke some Vive
+   Bluetooth drivers. If either is a problem, stay on Resonite/Overte.
+3. Install VRChat (Steam or Quest) — desktop mode works, no headset needed.
+4. In **vrchat-mcp** Settings: store username + password, complete the 2FA
+   code handshake (`auth_2fa`, Email or TOTP). learnbot never holds these.
+5. Join a **private or friends instance** — never a public world for lessons.
+6. On learnbot's VR page (VRChat track), press **Summon Miko**: you get the
+   greeting + numbered chatbox chunks (≤144 chars each). Send them in order
+   via vrchat-mcp `manage_input chatbox` (MCP, not REST — learnbot cannot
+   POST chat itself). Voice + audit turn work regardless.
+7. Avatars: switching needs a valid avatar ID your account can access —
+   arbitrary anime avatars are NOT promised. Presence + voice + text is v1.
 
 ### Track C — Overte self-hosted (Phase 4 live, classroom future)
 

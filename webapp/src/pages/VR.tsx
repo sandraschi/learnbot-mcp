@@ -220,14 +220,14 @@ export function VR() {
         <button
           data-testid="vr-summon-miko"
           onClick={doSummon}
-          disabled={summoning || openTrack === "vrchat"}
-          title={openTrack === "vrchat" ? "VRChat summon lands in Phase 6 (last)" : undefined}
+          disabled={summoning}
+          title="Summon Miko on this track"
           className="mt-3 w-full px-4 py-2 text-sm bg-amber-600 hover:bg-amber-500 disabled:bg-zinc-800 disabled:text-zinc-500 rounded-lg disabled:cursor-not-allowed"
         >
           {summoning ? "Summoning Miko..." : "Summon Miko"}
         </button>
         {openTrack === "vrchat" && (
-          <p className="text-xs text-zinc-500 mt-2">VRChat summon lands in Phase 6 (last) — Resonite and Overte summon are live.</p>
+          <p className="text-xs text-zinc-500 mt-2">VRChat delivery runs through vrchat-mcp chatbox (MCP/OSC) — summon prepares numbered chunks you paste in order. Needs 2FA login + Secure Boot (Track B).</p>
         )}
         {summon && (
           <div className="mt-3 text-sm bg-zinc-800 border border-zinc-700 rounded-lg p-3 space-y-2">
@@ -243,6 +243,16 @@ export function VR() {
                     </div>
                   ))}
                 </div>
+                {summon.chunks?.length > 0 && (
+                  <div className="text-xs space-y-1 pt-1">
+                    <div className="text-zinc-300 font-medium">Chatbox chunks (send in order):</div>
+                    {summon.chunks.map((c: string, i: number) => (
+                      <div key={i} className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 font-mono">
+                        {i + 1}. {c}
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div className="text-xs text-zinc-500">
                   Audit: {summon.audit} ·{" "}
                   <a href={`/chat?conv=${summon.conversation_id}`} className="text-amber-500 hover:text-amber-400">

@@ -96,6 +96,16 @@ async def platform_send(
             "platform": "opencode",
             "message": "Delivered via opencode context",
         }
+    if platform == "vrchat":
+        # Phase 6: chatbox runs through vrchat-mcp manage_input (MCP/OSC),
+        # not REST. Spoken line always works; chunks via vr_summon.
+        spoken = await speech_say(text=content, voice=voice or "Leda")
+        return {
+            "success": bool(spoken.get("success")),
+            "platform": "vrchat",
+            "voice": spoken,
+            "note": "Spoken via speech-mcp. Chatbox delivery runs in vrchat-mcp (2FA login first); chunks via vr_summon.",
+        }
     if platform in ("discord", "avatar"):
         return {
             "success": False,

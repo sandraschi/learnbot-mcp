@@ -147,6 +147,21 @@ async def _resonite_post(path: str, payload: dict) -> tuple[bool, str]:
     return await _companion_post(get_settings().resonite_mcp_url, path, payload)
 
 
+def _chatbox_chunks(text: str, limit: int = 144) -> list[str]:
+    """Split text into OSC chatbox-sized chunks on word boundaries."""
+    words, chunks, cur = text.split(), [], ""
+    for w in words:
+        nxt = f"{cur} {w}".strip()
+        if len(nxt) > limit and cur:
+            chunks.append(cur)
+            cur = w
+        else:
+            cur = nxt
+    if cur:
+        chunks.append(cur)
+    return chunks
+
+
 async def overte_domain_live() -> tuple[bool, str]:
     """True when the Overte domain-server answers :40100 via overte-mcp."""
     cfg = get_settings()
@@ -248,8 +263,9 @@ async def vr_summon(
                 "skills": [],
             }
         )
-        persona = await get_persona(persona_name)
+    persona = await get_persona(persona_name)
     receipts: list[dict] = []
+    chunks: list[str] = []
 
     if platform == "overte":
         live, live_detail = await overte_domain_live()
@@ -266,11 +282,29 @@ async def vr_summon(
                 }
             )
     elif platform == "vrchat":
+        # Phase 6 (last): vrchat-mcp exposes chatbox via MCP manage_input
+        # (OSC /chatbox/input), NOT via plain REST - learnbot cannot POST a
+        # message itself. So summon = service probe + auth checklist +
+        # 144-char chunks the user (or a future MCP client) delivers.
+        up, up_detail = await _probe(get_settings().vrchat_mcp_url)
+        receipts.append({"step": "service", "ok": up, "detail": up_detail})
+        full = f"{script['ja']} [{script['romaji']}] {script['en']}"
+        chunks = _chatbox_chunks(full)
         receipts.append(
             {
-                "step": "vrchat",
+                "step": "auth-checklist",
                 "ok": False,
-                "detail": "VRChat summon lands in Phase 6 (last) - Resonite/Overte only for now.",
+                "detail": "In vrchat-mcp: log in (username + password + 2FA code), join a "
+                "private/friends instance, then send the chunks below in order via "
+                "manage_input chatbox. EAC needs Secure Boot + Memory Integrity "
+                "(see ONBOARDING_VR Track B).",
+            }
+        )
+        receipts.append(
+            {
+                "step": "chatbox-chunks",
+                "ok": True,
+                "detail": f"{len(chunks)} chunk(s), each <=144 chars.",
             }
         )
     else:
@@ -355,6 +389,7 @@ async def vr_summon(
         "greeting_romaji": script["romaji"],
         "greeting_en": script["en"],
         "receipts": receipts,
+        "chunks": chunks,
         "conversation_id": conv_id,
         "audit": turns_note,
         "disclosure": disclosure,

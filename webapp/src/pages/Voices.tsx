@@ -40,9 +40,18 @@ export function Voices() {
   return (
     <div data-testid="voices-page">
       <h1 className="text-xl font-bold mb-2">Voices</h1>
-      <p className="text-sm text-zinc-400 mb-6">
+      <p className="text-sm text-zinc-400 mb-4">
         Gemini TTS voices. Click the play button to hear a sample.
       </p>
+      <div className="text-xs text-zinc-400 bg-zinc-900 border border-zinc-800 rounded-xl p-3 mb-6">
+        <span className="font-medium text-zinc-300">Miko VR voice (locked Phase 3):</span>{" "}
+        Gemini <span className="font-mono">Leda</span> speaks Miko&apos;s Japanese greeting
+        (A/B sample: <span className="font-mono">docs/audio/miko-genki-gemini-leda.wav</span>).
+        Kokoro <span className="font-mono">af_heart</span> is English-only — used for the
+        English gloss, never the JP line. Qwen3-TTS needs a 3&nbsp;s clone reference
+        before it can speak; VoiceStudio sidecar stays the local-first candidate
+        once <span className="font-mono">:3900</span> is running.
+      </div>
 
       {groups.map((group) => {
         const filtered = voices.filter((v) => v.gender === group.key);

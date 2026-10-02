@@ -53,6 +53,10 @@ Core path costs €0 and needs no credit card. Cloud TTS is an optional fallback
    listening-first for first-timers), press **Summon Miko**.
 7. You hear the greeting on your speakers; the script + delivery receipts show
    on the page. Press **Continue in Chat** to keep practicing as text.
+8. (Optional, in-world avatar): import `D:/Dev/repos/avatar-mcp/models/Nekomimi-chan.vrm`
+   into your Resonite inventory once via drag-drop, note its inventory path, and set
+   `LEARNBOT_MIKO_AVATAR_PATH` to it before restarting learnbot. Until then the
+   `avatar` receipt honestly reports skipped — voice + expression still work.
 8. Classroom shortcut (later, Phase 5): a Resonite shortcut/Steam launch option
    like `-Join <session-URI>` boots straight into the Miko classroom session —
    no navigation needed. `-SkipIntroTutorial` and `-ForceLANOnly` are useful
@@ -97,8 +101,10 @@ Overte cannot load VRM directly).
 - **First VoiceStudio synthesis slow**: ~2.3 GB model download inside the
   first request timeout — pre-install the OmniVoice model via its catalogue.
 - **Resonite inventory flaky**: upstream inventory requests currently time out
-  even for list — avatar VRM loading waits for Phase 3, voice + expression
-  work without it.
+  even for list — so Miko's avatar step is optional (`LEARNBOT_MIKO_AVATAR_PATH`,
+  empty by default). Voice + expression work without it. Never set the path to
+  a VRM file and expect ResoniteLink to import it — ResoniteLink has no VRM/GLB
+  import; the VRM goes into inventory via manual drag-drop.
 - **Old learnbot DB**: summon self-heals the personas languages/skills
   migration and seeds the Miko persona automatically. Nothing to do.
 - **VRChat 2FA**: codes expire fast; approve in vrchat-mcp Settings, not here.

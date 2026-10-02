@@ -5,9 +5,13 @@ optional: every probe degrades to a dialogic hint, never an exception.
 Single implementation shared by REST (GET /api/vr/status, POST /api/vr/summon)
 and MCP (vr_status, vr_summon tools in server.py).
 
-Phase 2 summon (Resonite): session probe -> Happy expression best-effort ->
-spoken JP greeting via speech-mcp -> audit turn. Avatar VRM loading lands in
-Phase 3 (needs Miko's Resonite inventory path); VRChat/Overte in Phase 4.
+Summon (Resonite, live since Phase 2): session probe -> optional avatar load
+(LEARNBOT_MIKO_AVATAR_PATH, empty = skipped with hint) -> Happy expression
+best-effort -> spoken JP greeting via speech-mcp -> audit turn.
+Voice ranking, locked Phase 3 A/B (2026-10-02): gemini/Leda JP proven
+(4.3 s sample in docs/audio), kokoro EN-only (gloss fallback), qwen needs
+clone ref audio, VoiceStudio pending sidecar. Ear confirmation is Sandra's.
+VRChat/Overte summon lands in Phase 4/6.
 """
 
 from __future__ import annotations
@@ -219,6 +223,24 @@ async def vr_summon(
         linked, link_detail = await resonite_session_linked()
         receipts.append({"step": "session", "ok": linked, "detail": link_detail})
         if linked:
+            from learnbot_mcp.config import get_settings as _get_cfg
+
+            avatar_path = _get_cfg().miko_avatar_path.strip()
+            if avatar_path:
+                ok, detail = await _resonite_post(
+                    "/api/resonite/avatar/load", {"avatar_path": avatar_path}
+                )
+                receipts.append({"step": "avatar", "ok": ok, "detail": detail})
+            else:
+                receipts.append(
+                    {
+                        "step": "avatar",
+                        "ok": False,
+                        "detail": "Skipped: set LEARNBOT_MIKO_AVATAR_PATH to Miko's Resonite inventory path "
+                        "(import D:/Dev/repos/avatar-mcp/models/Nekomimi-chan.vrm to inventory once, "
+                        "then use its inventory path). Web preview stays on the /vr page.",
+                    }
+                )
             ok, detail = await _resonite_post(
                 "/api/resonite/avatar/set_parameter",
                 {"parameter": "Happy", "value": 0.8},

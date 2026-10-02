@@ -577,6 +577,26 @@ async def vr_status() -> dict:
     return await vr_status_payload()
 
 
+@mcp.tool(annotations=_READ_ONLY)
+async def llm_status() -> dict:
+    """LLM provider status: registry with configured flags + active default.
+
+    Never returns key material. Set keys via POST /api/llm/keys or env vars.
+
+    ## Return Format
+    {"providers": [...], "default_provider": str, "default_model": str}
+    """
+    from learnbot_mcp.config import get_settings
+    from learnbot_mcp.llm_providers import public_provider_info
+
+    cfg = get_settings()
+    return {
+        "providers": public_provider_info(),
+        "default_provider": cfg.llm_provider,
+        "default_model": cfg.llm_model,
+    }
+
+
 @mcp.tool(annotations=_MUTATING)
 async def vr_summon(
     platform: str = "resonite",

@@ -21,20 +21,31 @@ async def chat_completion(
     model: str = "",
     stream: bool = False,
     timeout: float = 30.0,
+    provider: str = "",
 ) -> dict[str, Any]:
     """Call an LLM with message history.
 
-    Tries local-llm-mcp first. Falls back to direct Ollama call.
+    Provider routing: configured `llm_provider` (default "ollama") unless the
+    caller passes one. "ollama" keeps the legacy path (local-llm-mcp first,
+    direct Ollama second). Any other registry provider goes through the
+    backend proxy (llm_providers.chat_complete, keystore keys).
     Default model is qwen3.5-9b-deepseek-v4-flash.
 
     Returns {"response": str, "model": str, "provider": str}.
     """
     cfg = get_settings()
     model_name = model or cfg.llm_model or _DEFAULT_MODEL
+    provider_id = (provider or cfg.llm_provider or "ollama").strip().lower()
     full_messages = []
     if system_prompt:
         full_messages.append({"role": "system", "content": system_prompt[:4000]})
     full_messages.extend(messages)
+
+    if provider_id != "ollama":
+        from learnbot_mcp.llm_providers import chat_complete
+
+        text = await chat_complete(provider_id, model_name, full_messages)
+        return {"response": text, "model": model_name, "provider": provider_id}
 
     # Try 1: local-llm-mcp
     try:

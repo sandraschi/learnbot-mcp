@@ -11,7 +11,7 @@ from typing import Any
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
-from starlette.responses import FileResponse, HTMLResponse, JSONResponse
+from starlette.responses import FileResponse, HTMLResponse, JSONResponse, StreamingResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
@@ -486,6 +486,100 @@ async def api_proactive_tick(request: Request) -> JSONResponse:
     return JSONResponse(result)
 
 
+async def api_llm_providers(request: Request) -> JSONResponse:
+    """GET /api/llm/providers - registry rows with configured flags, never keys."""
+    from learnbot_mcp.llm_providers import public_provider_info
+
+    return JSONResponse({"providers": public_provider_info()})
+
+
+async def api_llm_models(request: Request) -> JSONResponse:
+    """GET /api/llm/models?provider= - live list when keyed, else curated."""
+    from learnbot_mcp.llm_providers import list_models
+
+    provider = request.query_params.get("provider", "ollama")
+    try:
+        return JSONResponse(await list_models(provider))
+    except ValueError as e:
+        return JSONResponse({"success": False, "error": str(e)}, status_code=400)
+
+
+async def api_llm_chat(request: Request) -> JSONResponse:
+    """POST /api/llm/chat {provider, model, messages} - proxied chat, no stream."""
+    from learnbot_mcp.llm_providers import chat_complete
+
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    try:
+        text = await chat_complete(
+            str(body.get("provider", "ollama")),
+            str(body.get("model", "")),
+            list(body.get("messages", [])),
+        )
+        return JSONResponse({"content": text})
+    except (ValueError, RuntimeError) as e:
+        return JSONResponse({"success": False, "error": str(e)}, status_code=200)
+
+
+async def api_llm_chat_stream(request: Request) -> StreamingResponse:
+    """POST /api/llm/chat/stream - OpenAI-style SSE passthrough."""
+    from learnbot_mcp.llm_providers import chat_stream
+
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    provider = str(body.get("provider", "ollama"))
+    model = str(body.get("model", ""))
+    messages = list(body.get("messages", []))
+    return StreamingResponse(chat_stream(provider, model, messages), media_type="text/event-stream")
+
+
+async def api_llm_keys(request: Request) -> JSONResponse:
+    """POST /api/llm/keys {provider, api_key} - write-only key save."""
+    from learnbot_mcp.llm_providers import save_key
+
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    try:
+        save_key(str(body.get("provider", "")), str(body.get("api_key", "")))
+        return JSONResponse({"success": True, "provider": str(body.get("provider", ""))})
+    except ValueError as e:
+        return JSONResponse({"success": False, "error": str(e)}, status_code=400)
+
+
+async def api_llm_keys_delete(request: Request) -> JSONResponse:
+    """DELETE /api/llm/keys/{provider} - remove a stored key."""
+    from learnbot_mcp.llm_providers import delete_key
+
+    provider = request.path_params.get("provider", "")
+    try:
+        removed = delete_key(provider)
+        return JSONResponse({"success": True, "removed": removed})
+    except ValueError as e:
+        return JSONResponse({"success": False, "error": str(e)}, status_code=400)
+
+
+async def api_llm_test(request: Request) -> JSONResponse:
+    """POST /api/llm/test {provider, api_key?} - validate a typed-but-unsaved key."""
+    from learnbot_mcp.llm_providers import list_models
+
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    try:
+        result = await list_models(str(body.get("provider", "")), str(body.get("api_key", "")))
+        ok = result.get("source") == "live" and not result.get("key_missing")
+        return JSONResponse({"success": True, "ok": ok, **result})
+    except ValueError as e:
+        return JSONResponse({"success": False, "error": str(e)}, status_code=400)
+
+
 async def api_audit_query(request: Request) -> JSONResponse:
     from learnbot_mcp.database import get_db
 
@@ -591,6 +685,13 @@ def build_app() -> Starlette:
         Route("/api/vr/summon", api_vr_summon, methods=["POST"]),
         Route("/api/vr/lesson-step", api_vr_lesson_step, methods=["POST"]),
         Route("/api/vr/classroom-ensure", api_vr_classroom_ensure, methods=["POST"]),
+        Route("/api/llm/providers", api_llm_providers),
+        Route("/api/llm/models", api_llm_models),
+        Route("/api/llm/chat", api_llm_chat, methods=["POST"]),
+        Route("/api/llm/chat/stream", api_llm_chat_stream, methods=["POST"]),
+        Route("/api/llm/keys", api_llm_keys, methods=["POST"]),
+        Route("/api/llm/keys/{provider}", api_llm_keys_delete, methods=["DELETE"]),
+        Route("/api/llm/test", api_llm_test, methods=["POST"]),
     ]
     if dist.is_dir() and (dist / "index.html").is_file():
         _routes.append(Mount("/assets", StaticFiles(directory=str(dist / "assets")), name="assets"))

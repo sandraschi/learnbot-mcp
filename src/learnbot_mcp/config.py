@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     llm_provider: str = Field(default="local-llm-mcp", alias="CHATBOT_LLM_PROVIDER")
     llm_base_url: str = Field(default="http://127.0.0.1:10832", alias="LEARNBOT_LLM_BASE_URL")
     llm_model: str = Field(default="", alias="LEARNBOT_LLM_MODEL")
+    llm_provider: str = Field(default="ollama", alias="LEARNBOT_LLM_PROVIDER")
 
     speech_mcp_url: str = Field(default="http://127.0.0.1:10909", alias="LEARNBOT_SPEECH_MCP_URL")
     avatar_mcp_url: str = Field(default="http://127.0.0.1:10792", alias="LEARNBOT_AVATAR_MCP_URL")

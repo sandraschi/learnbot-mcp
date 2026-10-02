@@ -20,41 +20,42 @@ from learnbot_mcp.compliance import disclosure_message, refusal_templates, requi
 from learnbot_mcp.config import get_settings
 from learnbot_mcp.platforms import speech_say
 from learnbot_mcp.proactive import proactive_tick
+from learnbot_mcp.vr import api_vr_status
 
 # Gemini TTS voices with character descriptions (from speech-mcp)
 GEMINI_VOICES = [
     {
         "id": "Leda",
         "gender": "female",
-        "desc": "Warm, friendly, youthful — good for cheerful assistants",
+        "desc": "Warm, friendly, youthful - good for cheerful assistants",
     },
-    {"id": "Aoede", "gender": "female", "desc": "Soft, melodic — good for storytelling"},
+    {"id": "Aoede", "gender": "female", "desc": "Soft, melodic - good for storytelling"},
     {
         "id": "Callirrhoe",
         "gender": "female",
-        "desc": "Bright, energetic — good for upbeat responses",
+        "desc": "Bright, energetic - good for upbeat responses",
     },
-    {"id": "Autonoe", "gender": "female", "desc": "Calm, measured — good for thoughtful answers"},
-    {"id": "Despina", "gender": "female", "desc": "Smooth, professional — good for business"},
-    {"id": "Erinome", "gender": "female", "desc": "Gentle, soothing — good for comfort"},
-    {"id": "Laomedeia", "gender": "female", "desc": "Rich, warm — good for narration"},
-    {"id": "Iocaste", "gender": "female", "desc": "Clear, authoritative — good for presenting"},
+    {"id": "Autonoe", "gender": "female", "desc": "Calm, measured - good for thoughtful answers"},
+    {"id": "Despina", "gender": "female", "desc": "Smooth, professional - good for business"},
+    {"id": "Erinome", "gender": "female", "desc": "Gentle, soothing - good for comfort"},
+    {"id": "Laomedeia", "gender": "female", "desc": "Rich, warm - good for narration"},
+    {"id": "Iocaste", "gender": "female", "desc": "Clear, authoritative - good for presenting"},
     {
         "id": "Umbriel",
         "gender": "female",
-        "desc": "Soft-spoken, intimate — good for close conversation",
+        "desc": "Soft-spoken, intimate - good for close conversation",
     },
-    {"id": "Kore", "gender": "neutral", "desc": "Balanced, all-purpose — good for general use"},
-    {"id": "Puck", "gender": "neutral", "desc": "Playful, mischievous — good for casual chat"},
-    {"id": "Algieba", "gender": "neutral", "desc": "Steady, reliable — safe default"},
-    {"id": "Algenib", "gender": "neutral", "desc": "Earnest, honest — good for serious topics"},
-    {"id": "Charon", "gender": "male", "desc": "Deep, resonant — good for authority figures"},
-    {"id": "Fenrir", "gender": "male", "desc": "Gruff, rough — good for pirates and warriors"},
-    {"id": "Orion", "gender": "male", "desc": "Bold, confident — good for heroes"},
-    {"id": "Orus", "gender": "male", "desc": "Warm baritone — good for mentors"},
-    {"id": "Zephyr", "gender": "male", "desc": "Light, airy — good for friendly banter"},
-    {"id": "Enceladus", "gender": "male", "desc": "Deep, booming — good for villains"},
-    {"id": "Rasalgethi", "gender": "male", "desc": "Grand, theatrical — good for dramatic effect"},
+    {"id": "Kore", "gender": "neutral", "desc": "Balanced, all-purpose - good for general use"},
+    {"id": "Puck", "gender": "neutral", "desc": "Playful, mischievous - good for casual chat"},
+    {"id": "Algieba", "gender": "neutral", "desc": "Steady, reliable - safe default"},
+    {"id": "Algenib", "gender": "neutral", "desc": "Earnest, honest - good for serious topics"},
+    {"id": "Charon", "gender": "male", "desc": "Deep, resonant - good for authority figures"},
+    {"id": "Fenrir", "gender": "male", "desc": "Gruff, rough - good for pirates and warriors"},
+    {"id": "Orion", "gender": "male", "desc": "Bold, confident - good for heroes"},
+    {"id": "Orus", "gender": "male", "desc": "Warm baritone - good for mentors"},
+    {"id": "Zephyr", "gender": "male", "desc": "Light, airy - good for friendly banter"},
+    {"id": "Enceladus", "gender": "male", "desc": "Deep, booming - good for villains"},
+    {"id": "Rasalgethi", "gender": "male", "desc": "Grand, theatrical - good for dramatic effect"},
 ]
 
 log = logging.getLogger(__name__)
@@ -518,7 +519,7 @@ async def api_audit_query(request: Request) -> JSONResponse:
 
 
 def _find_dist() -> Path:
-    """Find webapp dist directory — works in dev, PyInstaller, and Tauri."""
+    """Find webapp dist directory - works in dev, PyInstaller, and Tauri."""
     import sys
 
     # PyInstaller frozen: check _MEIPASS
@@ -581,6 +582,7 @@ def build_app() -> Starlette:
         Route("/api/lesson/{id}", api_lesson_delete, methods=["DELETE"]),
         Route("/api/chat/proactive-tick", api_proactive_tick, methods=["POST"]),
         Route("/api/audit", api_audit_query),
+        Route("/api/vr/status", api_vr_status),
     ]
     if dist.is_dir() and (dist / "index.html").is_file():
         _routes.append(Mount("/assets", StaticFiles(directory=str(dist / "assets")), name="assets"))
@@ -595,6 +597,9 @@ def build_app() -> Starlette:
         allow_headers=["*"],
     )
     return app
+
+
+app = build_app()
 
 
 def run_rest() -> None:

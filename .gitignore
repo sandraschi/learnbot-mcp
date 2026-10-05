@@ -16,8 +16,10 @@ web_sota/node_modules/
 web_sota/dist/
 *.mcpb
 *.bak
+*.bak-*
 reports/
 cua-reports/
 native/target/
 native/gen/
+native/binaries/
 native/resources/*.exe

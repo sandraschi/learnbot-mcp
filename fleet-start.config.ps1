@@ -10,6 +10,7 @@
         Kind          = 'uvicorn'
         UvicornTarget = 'learnbot_mcp.api:app'
         SyncExtras    = @('dev')
+        SyncOnStart  = $true
         Env           = @{ WEB_PORT = '11101' }
     }
     Frontend = @{

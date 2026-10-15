@@ -8,20 +8,20 @@ import {
 import { useZoom } from "./useZoom";
 
 const nav = [
-  { to: "/", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/chat", icon: MessageCircle, label: "Chat" },
-  { to: "/personas", icon: Users2, label: "Personas" },
-  { to: "/safety", icon: ShieldAlert, label: "Safety" },
-  { to: "/compliance", icon: ShieldCheck, label: "Compliance" },
-  { to: "/audit", icon: ScrollText, label: "Audit" },
-  { to: "/demos", icon: Play, label: "Demos" },
-  { to: "/japanese", icon: JapaneseYen, label: "Japanese" },
-  { to: "/lessons", icon: BookOpen, label: "Lessons" },
-  { to: "/avatar", icon: Accessibility, label: "Avatar" },
-  { to: "/vr", icon: Headset, label: "VR" },
-  { to: "/voices", icon: Mic2, label: "Voices" },
-  { to: "/settings", icon: SettingsIcon, label: "Settings" },
-  { to: "/help", icon: HelpCircle, label: "Help" },
+  { to: "/", icon: LayoutDashboard, label: "Dashboard", slug: "dashboard" },
+  { to: "/chat", icon: MessageCircle, label: "Chat", slug: "chat" },
+  { to: "/personas", icon: Users2, label: "Personas", slug: "personas" },
+  { to: "/safety", icon: ShieldAlert, label: "Safety", slug: "safety" },
+  { to: "/compliance", icon: ShieldCheck, label: "Compliance", slug: "compliance" },
+  { to: "/audit", icon: ScrollText, label: "Audit", slug: "audit" },
+  { to: "/demos", icon: Play, label: "Demos", slug: "demos" },
+  { to: "/japanese", icon: JapaneseYen, label: "Japanese", slug: "japanese" },
+  { to: "/lessons", icon: BookOpen, label: "Lessons", slug: "lessons" },
+  { to: "/avatar", icon: Accessibility, label: "Avatar", slug: "avatar" },
+  { to: "/vr", icon: Headset, label: "VR", slug: "vr" },
+  { to: "/voices", icon: Mic2, label: "Voices", slug: "voices" },
+  { to: "/settings", icon: SettingsIcon, label: "Settings", slug: "settings" },
+  { to: "/help", icon: HelpCircle, label: "Help", slug: "help" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -40,10 +40,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
           {!collapsed && <span className="font-semibold text-sm">LearnBot MCP</span>}
         </div>
         <nav className="flex-1 p-2 space-y-1">
-          {nav.map(({ to, icon: Icon, label }) => (
+          {nav.map(({ to, icon: Icon, label, slug }) => (
             <NavLink
               key={to}
               to={to}
+              data-testid={`nav-${slug}`}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-2 py-2 rounded-lg text-sm transition-colors ${
                   isActive

@@ -1,0 +1,198 @@
+{
+  "app": "learnbot-mcp",
+  "at": "2026-10-15T13:01:41+00:00",
+  "pages": [
+    {
+      "path": "/",
+      "label": "Dashboard",
+      "page_testid": "dashboard",
+      "assert": [
+        "backend-dot"
+      ],
+      "mutating": false,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/chat",
+      "label": "Chat",
+      "page_testid": "chat-page",
+      "assert": [
+        "chat-page",
+        "chat-controls",
+        "chat-messages",
+        "chat-input",
+        "chat-send"
+      ],
+      "mutating": true,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/personas",
+      "label": "Personas",
+      "page_testid": "personas-page",
+      "assert": [
+        "personas-page"
+      ],
+      "mutating": true,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/safety",
+      "label": "Safety",
+      "page_testid": "safety-page",
+      "assert": [
+        "safety-page"
+      ],
+      "mutating": false,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/compliance",
+      "label": "Compliance",
+      "page_testid": "compliance-page",
+      "assert": [
+        "compliance-page"
+      ],
+      "mutating": false,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/audit",
+      "label": "Audit",
+      "page_testid": "audit-page",
+      "assert": [
+        "audit-page"
+      ],
+      "mutating": false,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/demos",
+      "label": "Demos",
+      "page_testid": "demos-page",
+      "assert": [
+        "demos-page"
+      ],
+      "mutating": false,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/japanese",
+      "label": "Japanese",
+      "page_testid": "japanese-page",
+      "assert": [
+        "japanese-page"
+      ],
+      "mutating": false,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/lessons",
+      "label": "Lessons",
+      "page_testid": "lessons-page",
+      "assert": [
+        "lessons-page"
+      ],
+      "mutating": true,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/avatar",
+      "label": "Avatar",
+      "page_testid": "avatar-page",
+      "assert": [
+        "avatar-page"
+      ],
+      "mutating": true,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/vr",
+      "label": "VR",
+      "page_testid": "vr-page",
+      "assert": [
+        "vr-page"
+      ],
+      "mutating": true,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/voices",
+      "label": "Voices",
+      "page_testid": "voices-page",
+      "assert": [
+        "voices-page"
+      ],
+      "mutating": false,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/settings",
+      "label": "Settings",
+      "page_testid": "settings-page",
+      "assert": [
+        "settings-page"
+      ],
+      "mutating": true,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    },
+    {
+      "path": "/help",
+      "label": "Help",
+      "page_testid": "help-page",
+      "assert": [
+        "help-page"
+      ],
+      "mutating": false,
+      "frontend_dist": true,
+      "backend_reachable": false,
+      "backend_receipt": "unavailable (request-log lands with api.py patch)",
+      "status": "receipt-ok"
+    }
+  ],
+  "backend": {
+    "reachable": false,
+    "error": "ConnectError: All connection attempts failed"
+  },
+  "ok": 14,
+  "of": 14
+}

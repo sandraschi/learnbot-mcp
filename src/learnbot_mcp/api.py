@@ -68,6 +68,39 @@ cfg = get_settings()
 
 _START_TIME = datetime.now(UTC)
 
+# Backend-receipt proof for webapp_ops diagnose (cua-smoke v8 pattern).
+# In-memory ring buffer of recent requests; checked via direct HTTP so a
+# webview/Playwright network partition cannot fake a pass.
+_REQUEST_LOG: Any = None
+
+
+def _get_request_log():
+    global _REQUEST_LOG
+    if _REQUEST_LOG is None:
+        from collections import deque
+
+        _REQUEST_LOG = deque(maxlen=200)
+    return _REQUEST_LOG
+
+
+async def api_request_log(request: Request) -> JSONResponse:
+    del request
+    return JSONResponse({"requests": list(_get_request_log()), "count": len(_get_request_log())})
+
+
+async def api_ui_map(request: Request) -> JSONResponse:
+    del request
+    try:
+        from learnbot_mcp.webapp_ops import load_ui_map
+
+        ui_map = load_ui_map()
+        ui_map.pop("_source", None)
+        return JSONResponse(ui_map)
+    except Exception as exc:
+        return JSONResponse(
+            {"success": False, "error": f"{type(exc).__name__}: {exc}"}, status_code=500
+        )
+
 
 async def api_health(request: Request) -> JSONResponse:
     from learnbot_mcp.database import get_db
@@ -654,6 +687,8 @@ def build_app() -> Starlette:
         Route("/health", api_health),
         Route("/api/health", api_health),
         Route("/api/v1/diagnostics", api_diagnostics),
+        Route("/api/v1/request-log", api_request_log),
+        Route("/api/ui-map", api_ui_map),
         Route("/api/personas", api_personas_list),
         Route("/api/personas", api_personas_create, methods=["POST"]),
         Route("/api/personas/{name}", api_persona_get),
@@ -697,6 +732,22 @@ def build_app() -> Starlette:
         _routes.append(Mount("/assets", StaticFiles(directory=str(dist / "assets")), name="assets"))
         _routes.append(Route("/{path:path}", _spa_fallback))
     app = Starlette(routes=_routes)
+
+    @app.middleware("http")
+    async def _log_requests(request: Request, call_next):
+        try:
+            buf = _get_request_log()
+            buf.append(
+                {
+                    "method": request.method,
+                    "path": request.url.path,
+                    "at": datetime.now(UTC).isoformat(timespec="seconds"),
+                }
+            )
+        except Exception:
+            pass
+        return await call_next(request)
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["tauri://localhost", "http://tauri.localhost", "https://tauri.localhost"],

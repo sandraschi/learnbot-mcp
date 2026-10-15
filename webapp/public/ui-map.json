@@ -1,0 +1,31 @@
+{
+  "$schema": "https://sandraschi.github.io/fleet/schemas/ui-map-v1.json",
+  "app": "learnbot-mcp",
+  "version": "0.6.0",
+  "generated_from": "webapp/src/Layout.tsx + webapp/src/main.tsx",
+  "generated_at": "2026-10-15",
+  "backend": { "port": 11101, "health_path": "/health" },
+  "frontend": { "port": 11102 },
+  "routes": [
+    { "path": "/", "label": "Dashboard", "testid": "dashboard", "page_testid": "dashboard", "narrate": "Dashboard: backend health dot, KPI cards, entry CTAs into chat and personas.", "assert": ["backend-dot"], "mutating": false },
+    { "path": "/chat", "label": "Chat", "testid": "nav-chat", "page_testid": "chat-page", "narrate": "Chat: personality select, presets, message list, input and send.", "assert": ["chat-page", "chat-controls", "chat-messages", "chat-input", "chat-send"], "mutating": true },
+    { "path": "/personas", "label": "Personas", "testid": "nav-personas", "page_testid": "personas-page", "narrate": "Personas: CRUD for chatbot characters with voice and avatar.", "assert": ["personas-page"], "mutating": true },
+    { "path": "/safety", "label": "Safety", "testid": "nav-safety", "page_testid": "safety-page", "narrate": "Safety: topic blocks, rate limits, PII redaction rules.", "assert": ["safety-page"], "mutating": false },
+    { "path": "/compliance", "label": "Compliance", "testid": "nav-compliance", "page_testid": "compliance-page", "narrate": "Compliance: retention and audit policy surface.", "assert": ["compliance-page"], "mutating": false },
+    { "path": "/audit", "label": "Audit", "testid": "nav-audit", "page_testid": "audit-page", "narrate": "Audit: every turn with user, verdict, platform.", "assert": ["audit-page"], "mutating": false },
+    { "path": "/demos", "label": "Demos", "testid": "nav-demos", "page_testid": "demos-page", "narrate": "Demos: canned end-to-end runs including full_pipeline.", "assert": ["demos-page"], "mutating": false },
+    { "path": "/japanese", "label": "Japanese", "testid": "nav-japanese", "page_testid": "japanese-page", "narrate": "Japanese: kanji, vocab, JLPT quizzes, example sentences.", "assert": ["japanese-page"], "mutating": false },
+    { "path": "/lessons", "label": "Lessons", "testid": "nav-lessons", "page_testid": "lessons-page", "narrate": "Lessons: lesson CRUD plus AI generation and differentiation.", "assert": ["lessons-page"], "mutating": true },
+    { "path": "/avatar", "label": "Avatar", "testid": "nav-avatar", "page_testid": "avatar-page", "narrate": "Avatar: VRM lifecycle, delegates to avatar-mcp.", "assert": ["avatar-page"], "mutating": true },
+    { "path": "/vr", "label": "VR", "testid": "nav-vr", "page_testid": "vr-page", "narrate": "VR: summon Miko, practice view, headset path. MOCK banner until onboarded.", "assert": ["vr-page"], "mutating": true },
+    { "path": "/voices", "label": "Voices", "testid": "nav-voices", "page_testid": "voices-page", "narrate": "Voices: TTS voice pick, delegates to speech-mcp.", "assert": ["voices-page"], "mutating": false },
+    { "path": "/settings", "label": "Settings", "testid": "nav-settings", "page_testid": "settings-page", "narrate": "Settings: backend health plus LLM provider and model probe.", "assert": ["settings-page"], "mutating": true },
+    { "path": "/help", "label": "Help", "testid": "nav-help", "page_testid": "help-page", "narrate": "Help: wrappee, API ports, error-fix, FAQ tabs.", "assert": ["help-page"], "mutating": false }
+  ],
+  "tour_presets": {
+    "demo_60s": ["/", "/chat", "/personas", "/voices", "/settings"],
+    "onboarding": ["/", "/settings", "/chat"],
+    "full_walk": ["all"]
+  },
+  "notes": "testid = sidebar data-testid to click (to be added: nav-* on NavLinks; page_testid already exists on all pages). assert = page data-testids Playwright waits for. mutating = page can write/send - demo must use ?demo=1 or skip interact."
+}

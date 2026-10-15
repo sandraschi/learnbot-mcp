@@ -924,6 +924,47 @@ async def jlpt_quiz(level: str = "N5", limit: int = 5) -> dict:
     return await _jq(level=level, limit=limit)
 
 
+@mcp.tool(annotations=_READ_ONLY)
+async def webapp_ops(
+    operation: str = "get_ui_map",
+    route: str = "/",
+    preset: str = "demo_60s",
+    speak: bool = False,
+) -> dict:
+    """Drive the learnbot webapp from its authoritative UI map (pilot).
+
+    Portmanteau over the frontend tour surface. Phase 1 returns static
+    receipts (map + health + dist presence); live Playwright driving is
+    phase 2 and refuses honestly until wired. Speech is a soft
+    crossconnect to speech-mcp, never fatal when absent.
+
+    ## Return Format
+    {"success": bool, "operation": str, ...}
+
+    ## Examples
+    webapp_ops(operation="get_ui_map")
+    webapp_ops(operation="tour_page", route="/chat")
+    webapp_ops(operation="demo_webapp", preset="demo_60s")
+    webapp_ops(operation="diagnose_webapp")
+    """
+    from learnbot_mcp import webapp_ops as _ops
+
+    op = (operation or "").strip()
+    if op == "get_ui_map":
+        return await _ops.op_get_ui_map()
+    if op == "tour_page":
+        return await _ops.op_tour_page(route=route, speak=speak)
+    if op == "demo_webapp":
+        return await _ops.op_demo_webapp(preset=preset, speak=speak)
+    if op == "diagnose_webapp":
+        return await _ops.op_diagnose_webapp()
+    return {
+        "success": False,
+        "operation": op,
+        "error": f"unknown operation {op!r}; known: {list(_ops.OPERATIONS)}",
+    }
+
+
 def main():
     from learnbot_mcp.server import mcp
 

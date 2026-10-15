@@ -96,4 +96,4 @@ All accept `source_lang`/`target_lang` — not Japanese-only.
 
 Not MCP tools, but part of the same server:
 - **REST API** (`learnbot_mcp.api`, port 11101) — serves the webapp, plus `/api/kanji/search`, `/api/vocab/lookup`, `/api/lesson/generate`, `/api/avatar.vrm`, `/api/vr/status`, `/api/vr/summon`, `/api/vr/lesson-step`, `/api/vr/classroom-ensure`, `/api/ui-map`, `/api/v1/request-log`, and more. See `src/learnbot_mcp/api.py`.
-- **Webapp** (React, port 11102 dev / served from 11101 in prod) — 13 pages: Dashboard, Personas, Chat, Safety, Audit, Compliance, Help, Voices, Avatar, Demos, Lessons, Japanese, VR.
+- **Webapp** (React, port 11102 dev / served from 11101 in prod) — 14 pages: Dashboard, Personas, Chat, Safety, Compliance, Audit, Demos, Japanese, Lessons, Avatar, VR, Voices, Settings, Help.

@@ -13,9 +13,9 @@ language, with deep Japanese/JLPT support) — all logged and auditable.
 
 ## Preview
 
-The webapp is a 13-page control panel (Personas, Chat, Avatar, Lessons,
-Japanese, Safety, Audit, Compliance, Voices, Demos, VR, Help) - this is the
-human side of what the MCP tools drive for agents.
+The webapp is a 14-page control panel (Dashboard, Personas, Chat, Safety,
+Compliance, Audit, Demos, Japanese, Lessons, Avatar, VR, Voices, Settings,
+Help) - this is the human side of what the MCP tools drive for agents.
 
 | Dashboard | Chat | Japanese |
 |-----------|------|----------|

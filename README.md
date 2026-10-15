@@ -34,6 +34,7 @@ human side of what the MCP tools drive for agents.
 - **Multi-platform output** — speak via TTS (Gemini prosody via speech-mcp, falls back to Windows SAPI5), or send to Discord/Resonite/Overte/VRChat bridges
 - **Learn in VR** (`/vr`) — Dashboard quick-action + launchpad page: Resonite summon (live), Overte greeting-sign spawn (live), classroom quiz loop with spoken JLPT items, VRChat chatbox handoff (last) — see [docs/ONBOARDING_VR.md](docs/ONBOARDING_VR.md)
 - **40 MCP tools** across personas, conversations, lessons, language tools, safety, VR, LLM vendors, and audit — see [docs/TOOLS.md](docs/TOOLS.md)
+- **Self-driving webapp** (`webapp_ops`, pilot) — the server tours its own UI from an authoritative map: `diagnose_webapp` health-checks all 14 pages, `demo_webapp` walks a narrated preset, `speak=true` adds speech-mcp voiceover — see [demos/webapp-ops-pilot/README.md](demos/webapp-ops-pilot/README.md)
 
 ## Quick Install
 

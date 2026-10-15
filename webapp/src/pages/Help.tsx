@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Info, Shield, BookOpen, FileText, MessageCircle, JapaneseYen, Headset, Bot } from "lucide-react";
+import { Info, Shield, BookOpen, FileText, MessageCircle, JapaneseYen, Headset, Bot, Play } from "lucide-react";
 
 const tabs = [
   {
@@ -187,7 +187,33 @@ All endpoints on http://127.0.0.1:11101
 ### System
 - \`GET /api/health\` — server health
 - \`GET /api/compliance\` — compliance config
-- \`POST /api/chat/proactive-tick\` — fire due triggers`,
+- \`POST /api/chat/proactive-tick\` — fire due triggers
+
+### WebApp tour surface (pilot)
+- \`GET /api/ui-map\` — authoritative UI map (14 routes, testids, narration)
+- \`GET /api/v1/request-log\` — recent backend hits (proves data arrived, not just that the page rendered)`,
+  },
+  {
+    id: "tour",
+    label: "WebApp Tour",
+    icon: Play,
+    content: `## Self-driving webapp (pilot)
+
+The server can tour its own UI from an authoritative map instead of
+scraping the sidebar. All four ops are read-only — they never submit
+forms. Call them as the webapp_ops MCP tool:
+
+### Ops
+- \`get_ui_map\` — the map: routes, nav testids, narration, which pages mutate. Works with no backend running.
+- \`tour_page(route="/chat")\` — one-page receipt (testids, dist present, backend reachable). Unknown routes fail with the known-path list.
+- \`demo_webapp(preset="demo_60s")\` — walks a narrated preset (also: onboarding, full_walk). speak=true adds speech-mcp voiceover, degrading to text when speech-mcp is absent.
+- \`diagnose_webapp\` — health-checks all 14 pages, snapshots to demos/webapp-ops-pilot/last-diagnosis.json. Run it after editing the webapp.
+
+### One-click stack
+Run demos/webapp-ops-pilot/start-all.bat: boots speech-mcp (:10909/:10908) plus learnbot (:11101/:11102), then open this webapp and call diagnose_webapp.
+
+### Status
+Pilot, phase 1 (static receipts, no browser automation yet). Full write-up: demos/webapp-ops-pilot/README.md.`,
   },
 ];
 

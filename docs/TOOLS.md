@@ -1,7 +1,7 @@
 # Tool Reference
 
-Full MCP tool reference for learnbot-mcp — 40 tools, verified against
-`src/learnbot_mcp/server.py` (2026-10-02). If a tool isn't listed here, it
+Full MCP tool reference for learnbot-mcp — 41 tools, verified against
+`src/learnbot_mcp/server.py` (2026-10-15). If a tool isn't listed here, it
 isn't registered.
 
 ## Personas
@@ -86,8 +86,14 @@ All accept `source_lang`/`target_lang` — not Japanese-only.
 | `vr_classroom_ensure` | — | Spin up the persistent classroom (Overte permanent entities first) |
 | `llm_status` | — | LLM provider registry with configured flags + active default (never keys) |
 
+## WebApp tour (pilot, read-only)
+
+| Tool | Signature | What |
+|------|-----------|------|
+| `webapp_ops` | `operation, route, preset, speak` | Drive the webapp from `webapp/public/ui-map.json`: `get_ui_map` (the map, no backend needed), `tour_page` (one-page receipt), `demo_webapp` (narrated preset walk; `speak=true` adds speech-mcp voiceover), `diagnose_webapp` (health-checks all 14 pages, snapshots to `demos/webapp-ops-pilot/last-diagnosis.json`) |
+
 ---
 
 Not MCP tools, but part of the same server:
-- **REST API** (`learnbot_mcp.api`, port 11101) — serves the webapp, plus `/api/kanji/search`, `/api/vocab/lookup`, `/api/lesson/generate`, `/api/avatar.vrm`, `/api/vr/status`, `/api/vr/summon`, `/api/vr/lesson-step`, `/api/vr/classroom-ensure`, and more. See `src/learnbot_mcp/api.py`.
+- **REST API** (`learnbot_mcp.api`, port 11101) — serves the webapp, plus `/api/kanji/search`, `/api/vocab/lookup`, `/api/lesson/generate`, `/api/avatar.vrm`, `/api/vr/status`, `/api/vr/summon`, `/api/vr/lesson-step`, `/api/vr/classroom-ensure`, `/api/ui-map`, `/api/v1/request-log`, and more. See `src/learnbot_mcp/api.py`.
 - **Webapp** (React, port 11102 dev / served from 11101 in prod) — 13 pages: Dashboard, Personas, Chat, Safety, Audit, Compliance, Help, Voices, Avatar, Demos, Lessons, Japanese, VR.

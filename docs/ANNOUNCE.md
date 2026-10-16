@@ -27,7 +27,7 @@ Nothing sends automatically. The `post-commit` hook calls
 `scripts/check-announce.ps1`, which detects a *major* commit:
 
 - subject matches `^feat[(...)]?[!]?:` AND
-- touches `src/learnbot_mcp/` or `docs/TOOLS.md` or
+- touches `src/learnbot_mcp/`, `scripts/`, `docs/TOOLS.md`,
   `webapp/public/ui-map.json` or `pyproject.toml`
 
 On major it writes `reports/announce-draft-<sha>.md` and prints the exact

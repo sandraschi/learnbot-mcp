@@ -25,7 +25,7 @@ try {
   if ([string]::IsNullOrWhiteSpace($subject)) { Pop-Location; exit 0 }
 
   $isFeat = $subject -match '^feat(\(.+\))?!?:'
-  $watch = @('src/learnbot_mcp/', 'docs/TOOLS.md', 'webapp/public/ui-map.json', 'pyproject.toml')
+  $watch = @('src/learnbot_mcp/', 'scripts/', 'docs/TOOLS.md', 'webapp/public/ui-map.json', 'pyproject.toml')
   $touchesWatch = $false
   foreach ($f in $files) {
     foreach ($w in $watch) {

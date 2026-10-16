@@ -1,0 +1,10 @@
+#!/bin/sh
+# post-commit hook source for learnbot-mcp announce pilot.
+# Installed to .git/hooks/post-commit via `just install-announce-hook`.
+# Best-effort only: must NEVER fail the commit (exit 0 always).
+if command -v pwsh.exe >/dev/null 2>&1; then
+  pwsh.exe -NoProfile -File "$(git rev-parse --show-toplevel)/scripts/check-announce.ps1" || true
+elif command -v pwsh >/dev/null 2>&1; then
+  pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/scripts/check-announce.ps1" || true
+fi
+exit 0

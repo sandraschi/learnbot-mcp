@@ -54,12 +54,32 @@ cua-nsis-test:
 e2e:
     cd webapp; npx playwright test
 
-# Bootstrap: install dev deps + pre-commit hook
+# Bootstrap: install dev deps + pre-commit hook + announce post-commit hook
 bootstrap:
     uv sync --group dev
     uv run pre-commit install
-    Write-Host "Pre-commit hooks installed." -ForegroundColor Green
+    pwsh.exe -NoProfile -Command "Copy-Item '{{justfile_directory()}}\scripts\hooks\post-commit' '{{justfile_directory()}}\.git\hooks\post-commit' -Force; Write-Host 'Pre-commit + announce hooks installed.' -ForegroundColor Green"
 
 # Run CUA webapp test (pre-Tauri: start.ps1 stack + nav walk in browser)
 cua-webapp-test:
     powershell.exe -NoProfile -File "{{justfile_directory()}}\scripts\just\cua-webapp-test.ps1"
+
+# Announce pilot -> #fleet-learnbot via local discord-mcp backend (no token in repo).
+# Usage: just announce "hello fleet" / just announce-file "reports/announce-draft-abc.md"
+# Channel override: set ANNOUNCE_CHANNEL env var (default: fleet-learnbot).
+announce MSG:
+    pwsh.exe -NoProfile -File "{{justfile_directory()}}\scripts\announce-discord.ps1" -Message '{{MSG}}'
+
+announce-file FILE:
+    pwsh.exe -NoProfile -File "{{justfile_directory()}}\scripts\announce-discord.ps1" -MessageFile '{{FILE}}'
+
+# Preview without sending.
+announce-dry MSG:
+    pwsh.exe -NoProfile -File "{{justfile_directory()}}\scripts\announce-discord.ps1" -Message '{{MSG}}' -DryRun
+
+announce-file-dry FILE:
+    pwsh.exe -NoProfile -File "{{justfile_directory()}}\scripts\announce-discord.ps1" -MessageFile '{{FILE}}' -DryRun
+
+# Install post-commit announce hook (one time per clone, best-effort, never fails commits).
+install-announce-hook:
+    pwsh.exe -NoProfile -Command "Copy-Item '{{justfile_directory()}}\scripts\hooks\post-commit' '{{justfile_directory()}}\.git\hooks\post-commit' -Force; Write-Host 'post-commit hook installed.' -ForegroundColor Green"

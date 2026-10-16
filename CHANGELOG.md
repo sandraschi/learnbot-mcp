@@ -1,5 +1,28 @@
 # Changelog
 
+## [Unreleased] - webapp_ops + announce pilot (2026-10-16)
+
+### Added
+- **`webapp_ops` MCP tool** (`src/learnbot_mcp/webapp_ops.py`, wired in
+  `server.py`) - the server steers its own webapp from an authoritative map:
+  `get_ui_map` (14 routes, no browser), `tour_page` (per-route receipt +
+  narration), `demo_webapp` (preset walks), `diagnose_webapp` (all-route
+  check, writes `demos/webapp-ops-pilot/last-diagnosis.json`). Authoritative
+  `webapp/public/ui-map.json`, `data-testid="nav-*"` on all 14 sidebar links,
+  backend proof via `GET /api/v1/request-log` + `/api/ui-map`, soft
+  speech-mcp voiceover. Verified: ruff clean, tsc clean, pytest 43 passed,
+  diagnose 14/14. Phase-1 static receipts; live Playwright drive is Phase-2.
+  Pilot only, not a fleet standard yet
+  (`demos/webapp-ops-pilot/WEBAPP_OPS_DRAFT.md`).
+- **Announce pilot** - major changes draft their own #fleet-learnbot post:
+  `just announce "msg"` / `just announce-file "draft.md"` (+ `-dry`
+  previews) post via local discord-mcp backend (`:10756`, no token in repo,
+  chunked at 1900 chars, ASCII hygiene). `post-commit` hook
+  (`just install-announce-hook`, also in `just bootstrap`) detects `feat`
+  commits touching `src/learnbot_mcp/`, `scripts/`, `docs/TOOLS.md`,
+  `ui-map.json` or `pyproject.toml` and writes `reports/announce-draft-<sha>.md` - drafts
+  only, never auto-sends. See `docs/ANNOUNCE.md`.
+
 ## [Unreleased] - LLM vendors + onboarding (2026-10-02)
 
 ### Added

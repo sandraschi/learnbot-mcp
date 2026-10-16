@@ -44,6 +44,9 @@ just fmt           # ruff format src/
 just test          # pytest tests/ -q -v
 just deps          # uv sync
 just mcpb-pack      # build dist/learnbot-mcp.mcpb for Claude Desktop
+just announce "msg"     # post to #fleet-learnbot via discord-mcp (:10756)
+just announce-file "f"  # post a draft file; -dry variants preview; see docs/ANNOUNCE.md
+just install-announce-hook  # post-commit draft hook (also installed by bootstrap)
 ```
 
 Webapp dev server (hot reload, separate from the REST API):

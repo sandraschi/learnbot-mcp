@@ -14,6 +14,7 @@
 - `just cua-nsis-test` — NSIS smoke test (install → launch → nav walk → uninstall); nav phase uses `descendants(title=label)`
 - `just cua-webapp-test` — pre-Tauri browser walk (start.ps1 -Headless stack, Connected-badge wait, nav click-through) — fleet reference impl
 - `just ci` — ruff + format check + pytest + tsc
+- `just announce-dry "msg"` — preview #fleet-learnbot post (send: `just announce`); post-commit hook drafts on feat commits (docs/ANNOUNCE.md)
 
 ## Architecture
 
@@ -30,7 +31,8 @@ learnbot-mcp (orchestrator)
       ├── Ollama (default :11434) - LLM inference
       ├── speech-mcp (:10908) - TTS/STT
       ├── avatar-mcp (:10792) - avatar lifecycle
-      └── classroom-mcp (:11105) - admin layer (courses, students)
+      ├── classroom-mcp (:11105) - admin layer (courses, students)
+      └── discord-mcp (:10756) - #fleet-learnbot announcements (announce pilot)
 ```
 
 ## Tools

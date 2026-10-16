@@ -28,6 +28,11 @@ One MCP server that lets you define a chatbot persona once, then spawn it across
   JLPT quiz loop, persistent Overte classroom. Full plan:
   `mcp-central-docs/projects/learnbot-mcp/VR_LEARN_IN_VR_PLAN.md`.
 
+- **Fleet channel announcements (pilot 2026-10-16)**: major changes draft
+  their own `#fleet-learnbot` post - `just announce` sends via discord-mcp
+  (`:10756`, no token in repo); `post-commit` hook drafts on `feat` commits,
+  never auto-sends. Full spec: `docs/ANNOUNCE.md`.
+
 ### Out of scope (delegates to fleet infra)
 
 - **LLM inference**: delegates to `local-llm-mcp` or cloud providers
@@ -47,6 +52,9 @@ One MCP server that lets you define a chatbot persona once, then spawn it across
 5. As Sandra, the bot can proactively start a conversation ("Good morning, your TBR pile has 3 items due").
 6. As a fleet user, I deploy learnbot-mcp in China-compliant mode - real-name auth, 30-day retention, topic blocklist.
 7. As Joe Greybeardy (no headset, no VR background), I press Learn in VR, follow the Resonite track, and Miko greets me in Japanese with romaji + English — no BIOS changes, no headset, no credit card.
+8. As Sandra, every major repo change drafts its own #fleet-learnbot
+   announcement (what changed, why it matters, verification) - I review
+   one draft instead of chasing authors for updates.
 
 ## Success Metrics
 

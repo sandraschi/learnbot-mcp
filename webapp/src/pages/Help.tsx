@@ -1,5 +1,22 @@
 import { useState } from "react";
 import { Info, Shield, BookOpen, FileText, MessageCircle, JapaneseYen, Headset, Bot, Play } from "lucide-react";
+import { api } from "../api";
+
+interface DiagnosePage {
+  path: string;
+  label: string;
+  status: string;
+}
+
+interface DiagnoseResult {
+  success: boolean;
+  operation: string;
+  ok: number;
+  of: number;
+  at: string;
+  backend: { reachable: boolean };
+  pages: DiagnosePage[];
+}
 
 const tabs = [
   {
@@ -208,6 +225,7 @@ forms. Call them as the webapp_ops MCP tool:
 - \`tour_page(route="/chat")\` — one-page receipt (testids, dist present, backend reachable). Unknown routes fail with the known-path list.
 - \`demo_webapp(preset="demo_60s")\` — walks a narrated preset (also: onboarding, full_walk). speak=true adds speech-mcp voiceover, degrading to text when speech-mcp is absent.
 - \`diagnose_webapp\` — health-checks all 14 pages, snapshots to demos/webapp-ops-pilot/last-diagnosis.json. Run it after editing the webapp.
+Press **Run diagnosis** below for the same check in-browser (no MCP call needed).
 
 ### One-click stack
 Run demos/webapp-ops-pilot/start-all.bat: boots speech-mcp (:10909/:10908) plus learnbot (:11101/:11102), then open this webapp and call diagnose_webapp.
@@ -219,8 +237,24 @@ Pilot, phase 1 (static receipts, no browser automation yet). Full write-up: demo
 
 export function Help() {
   const [active, setActive] = useState(tabs[0].id);
+  const [diagRunning, setDiagRunning] = useState(false);
+  const [diag, setDiag] = useState<DiagnoseResult | null>(null);
+  const [diagError, setDiagError] = useState<string | null>(null);
 
   const tab = tabs.find((t) => t.id === active);
+
+  const runDiagnosis = async () => {
+    setDiagRunning(true);
+    setDiagError(null);
+    try {
+      const d = (await api.webapp.diagnose()) as DiagnoseResult;
+      setDiag(d);
+    } catch (e) {
+      setDiagError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setDiagRunning(false);
+    }
+  };
   return (
     <div data-testid="help-page">
       <h1 className="text-xl font-bold mb-4">Help</h1>
@@ -249,6 +283,35 @@ export function Help() {
           <div className="text-zinc-400">Select a tab.</div>
         )}
       </div>
+      {active === "tour" && (
+        <div data-testid="webapp-diagnose-panel" className="mt-4 rounded border border-zinc-800 p-4">
+          <button
+            type="button"
+            data-testid="webapp-diagnose-run"
+            onClick={runDiagnosis}
+            disabled={diagRunning}
+            className="px-4 py-2 text-sm font-medium rounded bg-amber-600 text-white hover:bg-amber-500 disabled:opacity-50"
+          >
+            {diagRunning ? "Running diagnosis..." : "Run diagnosis"}
+          </button>
+          {diagError && <div className="mt-2 text-sm text-red-400">{diagError}</div>}
+          {diag && (
+            <div data-testid="webapp-diagnose-result" className="mt-2 text-sm text-zinc-300">
+              <div>
+                {diag.ok}/{diag.of} pages ok at {diag.at} - backend{" "}
+                {diag.backend.reachable ? "reachable" : "unreachable"}.
+              </div>
+              {diag.pages
+                .filter((p) => p.status !== "receipt-ok")
+                .map((p) => (
+                  <div key={p.path} className="text-red-400">
+                    {p.path} ({p.label}): {p.status}
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

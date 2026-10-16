@@ -73,4 +73,8 @@ export const api = {
     chat: (body: { provider: string; model: string; messages: unknown[] }) =>
       post("/llm/chat", body),
   },
+  webapp: {
+    uiMap: () => get("/ui-map"),
+    diagnose: () => get("/webapp/diagnose"),
+  },
 };

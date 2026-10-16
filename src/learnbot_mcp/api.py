@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from starlette.applications import Starlette
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import FileResponse, HTMLResponse, JSONResponse, StreamingResponse
@@ -96,6 +97,19 @@ async def api_ui_map(request: Request) -> JSONResponse:
         ui_map = load_ui_map()
         ui_map.pop("_source", None)
         return JSONResponse(ui_map)
+    except Exception as exc:
+        return JSONResponse(
+            {"success": False, "error": f"{type(exc).__name__}: {exc}"}, status_code=500
+        )
+
+
+async def api_webapp_diagnose(request: Request) -> JSONResponse:
+    """Run webapp_ops diagnose over HTTP (Help > WebApp Tour button)."""
+    del request
+    try:
+        from learnbot_mcp.webapp_ops import op_diagnose_webapp
+
+        return JSONResponse(await op_diagnose_webapp())
     except Exception as exc:
         return JSONResponse(
             {"success": False, "error": f"{type(exc).__name__}: {exc}"}, status_code=500
@@ -681,6 +695,24 @@ def _spa_fallback(request: Request) -> HTMLResponse:
     return HTMLResponse("Frontend not available", status_code=503)
 
 
+class _RequestLogMiddleware(BaseHTTPMiddleware):
+    """Append every request to the in-memory ring buffer (backend-receipt proof)."""
+
+    async def dispatch(self, request: Request, call_next):
+        try:
+            buf = _get_request_log()
+            buf.append(
+                {
+                    "method": request.method,
+                    "path": request.url.path,
+                    "at": datetime.now(UTC).isoformat(timespec="seconds"),
+                }
+            )
+        except Exception:
+            pass
+        return await call_next(request)
+
+
 def build_app() -> Starlette:
     dist = _find_dist()
     _routes = [
@@ -689,6 +721,7 @@ def build_app() -> Starlette:
         Route("/api/v1/diagnostics", api_diagnostics),
         Route("/api/v1/request-log", api_request_log),
         Route("/api/ui-map", api_ui_map),
+        Route("/api/webapp/diagnose", api_webapp_diagnose),
         Route("/api/personas", api_personas_list),
         Route("/api/personas", api_personas_create, methods=["POST"]),
         Route("/api/personas/{name}", api_persona_get),
@@ -733,20 +766,7 @@ def build_app() -> Starlette:
         _routes.append(Route("/{path:path}", _spa_fallback))
     app = Starlette(routes=_routes)
 
-    @app.middleware("http")
-    async def _log_requests(request: Request, call_next):
-        try:
-            buf = _get_request_log()
-            buf.append(
-                {
-                    "method": request.method,
-                    "path": request.url.path,
-                    "at": datetime.now(UTC).isoformat(timespec="seconds"),
-                }
-            )
-        except Exception:
-            pass
-        return await call_next(request)
+    app.add_middleware(_RequestLogMiddleware)
 
     app.add_middleware(
         CORSMiddleware,

@@ -22,6 +22,9 @@
   commits touching `src/learnbot_mcp/`, `scripts/`, `docs/TOOLS.md`,
   `ui-map.json` or `pyproject.toml` and writes `reports/announce-draft-<sha>.md` - drafts
   only, never auto-sends. See `docs/ANNOUNCE.md`.
+- **"Run diagnosis" button** (Help > WebApp Tour tab) - the webapp can now
+  drive `diagnose_webapp` itself via new `GET /api/webapp/diagnose`
+  (same receipts as the MCP tool, rendered in-browser with ok/of counts).
 
 ## [Unreleased] - LLM vendors + onboarding (2026-10-02)
 

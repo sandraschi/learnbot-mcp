@@ -787,7 +787,7 @@ def run_rest() -> None:
 
     app = build_app()
     log.info("learnbot-mcp REST API on port %s", cfg.backend_port)
-    uvicorn.run(app, host="0.0.0.0", port=cfg.backend_port, log_level="info")
+    uvicorn.run(app, host="127.0.0.1", port=cfg.backend_port, log_level="info")
 
 
 if __name__ == "__main__":
